@@ -37,26 +37,37 @@ class ExploreActivity : AppCompatActivity() {
         val card = CardView(this).apply {
             radius = 16f
             cardElevation = 8f
-            setContentPadding(24, 24, 24, 24)
             useCompatPadding = true
+            setCardBackgroundColor(android.graphics.Color.parseColor("#F0BB78"))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, 24) // spacing between cards
+            }
         }
 
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
+            setPadding(24, 24, 24, 24) // move this from card to here
         }
 
         val nameView = TextView(this).apply {
             text = place.name
             textSize = 18f
+            setTextColor(android.graphics.Color.parseColor("#1f823a"))
             setPadding(0, 0, 0, 8)
+            setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
         val typeView = TextView(this).apply {
             text = "Type: ${place.type}"
+            setTextColor(android.graphics.Color.parseColor("#1f823a"))
         }
 
         val ratingView = TextView(this).apply {
             text = "Rating: ${place.rating} ★"
+            setTextColor(android.graphics.Color.parseColor("#1f823a"))
         }
 
         layout.addView(nameView)
@@ -66,4 +77,5 @@ class ExploreActivity : AppCompatActivity() {
         card.addView(layout)
         return card
     }
+
 }

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="164dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="@string/settings"
+        android:textColor="@color/black"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="18dp">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_h3"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editTextNumber2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:text="ex:15000"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="35dp">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_h4"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="236dp">
+
+        <CheckBox
+            android:id="@+id/checkBox11"
+            android:layout_width="83dp"
+            android:layout_height="30dp"
+            android:text="@string/interest_three"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox14"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox12"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox13"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox13"
+            android:layout_width="98dp"
+            android:layout_height="30dp"
+            android:text="@string/interest_one"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox10"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox11"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox12"
+            android:layout_width="136dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/interest_four"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <CheckBox
+            android:id="@+id/checkBox14"
+            android:layout_width="62dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="172dp"
+            android:text="@string/interest_five"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox11"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox10"
+            android:layout_width="107dp"
+            android:layout_height="30dp"
+            android:text="@string/interest_two"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox16"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox14"
+            app:layout_constraintHorizontal_bias="0.333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox13"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox16"
+            android:layout_width="87dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:text="@string/interest_six"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox17"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox10"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox18"
+            android:layout_width="113dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="40dp"
+            android:text="@string/interest_seven"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox21"
+            app:layout_constraintStart_toEndOf="@+id/checkBox16"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox14"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox21"
+            android:layout_width="102dp"
+            android:layout_height="30dp"
+            android:text="@string/interest_eight"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox22"
+            app:layout_constraintHorizontal_bias="0.597"
+            app:layout_constraintStart_toEndOf="@+id/checkBox17"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox18"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox20"
+            android:layout_width="81dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="23dp"
+            android:text="@string/interest_nine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkBox18"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox15" />
+
+        <CheckBox
+            android:id="@+id/checkBox22"
+            android:layout_width="84dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/interest_ten"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox20" />
+
+        <CheckBox
+            android:id="@+id/checkBox17"
+            android:layout_width="88dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:text="@string/interest_eleven"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox16"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <CheckBox
+            android:id="@+id/checkBox15"
+            android:layout_width="102dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="23dp"
+            android:text="@string/interest_twelve"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkBox14"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox12" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="67dp">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_save" />
+
+</LinearLayout>

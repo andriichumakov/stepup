@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StepUpApp</string>
+    <string name="intro_setup">Introduction</string>
+    <string name="prompt_name">What\'s your name?</string>
+    <string name="prompt_goal">What are you aiming for?</string>
+    <string name="goal_steps_one">5000 steps</string>
+    <string name="goal_steps_two">6500 steps</string>
+    <string name="goal_steps_three">8000 steps</string>
+    <string name="prompt_location">Which place would you like to visit?</string>
+    <string name="location_one">Emmen, WildLands</string>
+    <string name="location_two">Emmen, Museum of Contemporary Tibetan Art</string>
+    <string name="location_three">Emmen, Restaurant Galerie De Kamer</string>
+    <string name="location_four">Emmen, Cafe de Brasserie</string>
+    <string name="location_five">Emmen, Rensenpark</string>
+    <string name="user_name">Name</string>
+    <string name="custom_steps">Custom Number of Steps</string>
+    <string name="settings">Settings</string>
+    <string name="settings_h3">Customize daily step goal:</string>
+    <string name="setting_h4">Interests:</string>
+    <string name="interest_one">Tourism</string>
+    <string name="interest_two">Beverages</string>
+    <string name="interest_three">Dining</string>
+    <string name="interest_four">Entertainment</string>
+    <string name="setting_save">Save Changes</string>
+    <string name="interest_five">Art</string>
+    <string name="interest_six">Nature</string>
+    <string name="interest_seven">Technology</string>
+    <string name="interest_eight">Shopping</string>
+    <string name="interest_nine">Sailing</string>
+    <string name="interest_ten">Fishing</string>
+    <string name="interest_eleven">History</string>
+    <string name="interest_twelve">Sculpture</string>
+</resources>

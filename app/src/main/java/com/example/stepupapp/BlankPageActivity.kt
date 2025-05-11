@@ -2,10 +2,9 @@ package com.example.stepupapp
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.example.stepupapp.databinding.BlankPageWithButtonBinding
 
-class BlankPageActivity : AppCompatActivity() {
+class BlankPageActivity : BaseActivity() {
     private lateinit var binding: BlankPageWithButtonBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

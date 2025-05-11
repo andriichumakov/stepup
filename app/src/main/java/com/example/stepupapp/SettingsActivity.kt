@@ -2,10 +2,9 @@ package com.example.stepupapp
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.example.stepupapp.databinding.SettingsPageBinding
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
     private lateinit var binding: SettingsPageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

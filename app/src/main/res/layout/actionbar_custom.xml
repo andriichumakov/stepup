@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@color/orange_accent">
+
+    <ImageView
+        android:id="@+id/actionbar_logo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/step_up_logo"
+        android:contentDescription="Logo"/>
+
+    <TextView
+        android:id="@+id/actionbar_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Emmen, Netherlands"
+        android:textColor="@color/primary_green"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+</LinearLayout> 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme without ActionBar -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryDark">@color/dark_green</item>
+        <item name="colorAccent">@color/orange_accent</item>
+        <item name="android:windowBackground">@color/background_cream</item>
+    </style>
+    
+    <!-- Custom ActionBar theme -->
+    <style name="AppTheme.CustomActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/orange_accent</item>
+        <item name="colorPrimaryDark">@color/dark_orange</item>
+        <item name="colorAccent">@color/primary_green</item>
+        <item name="android:windowBackground">@color/background_cream</item>
+        <item name="actionBarStyle">@style/CustomActionBar</item>
+    </style>
+    
+    <!-- Custom ActionBar style -->
+    <style name="CustomActionBar" parent="Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="background">@color/orange_accent</item>
+        <item name="titleTextStyle">@style/ActionBarTitleText</item>
+    </style>
+    
+    <!-- ActionBar title text -->
+    <style name="ActionBarTitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/primary_green</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+</resources> 

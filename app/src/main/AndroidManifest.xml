@@ -26,6 +26,9 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+        <activity
+                android:name=".ExploreActivity"
+                android:exported="false" />
     </application>
 
 </manifest>

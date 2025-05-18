@@ -31,7 +31,7 @@
                     android:id="@+id/stepCountText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3,727 steps"
+                    android:text="0 steps"
                     android:textSize="28sp"
                     android:textColor="@android:color/white"
                     android:textStyle="bold"
@@ -43,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:layout_marginTop="16dp"
-                    android:progress="3727"
+                    android:progress="0"
                     android:max="6000"
                     android:progressTint="#00FF73"
                     android:backgroundTint="#333333"/>
@@ -60,7 +60,7 @@
                         android:id="@+id/distanceText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2.94 km"
+                        android:text="0.00 km"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:layout_marginEnd="32dp"/>
@@ -69,7 +69,7 @@
                         android:id="@+id/caloriesText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="119 Cal"
+                        android:text="0 Cal"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"/>
             </LinearLayout>
@@ -118,6 +118,27 @@
                     android:layout_marginTop="12dp"
                     android:layout_gravity="center_horizontal"
                     android:textAlignment="center"/>
+
+            <TextView
+                    android:id="@+id/quoteAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="— Anonymous"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center_horizontal"/>
+
+            <ImageButton
+                    android:id="@+id/refreshQuoteButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Refresh quote"
+                    app:srcCompat="@drawable/baseline_refresh_24"
+                    android:tint="@android:color/white"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

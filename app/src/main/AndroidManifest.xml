@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-sdk
+        android:minSdkVersion="28"
+        android:targetSdkVersion="35" />
+
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,6 +22,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.CustomActionBar"
         tools:targetApi="31">
+
+        <!-- Broadcast Receiver for Step Updates -->
+        <receiver
+            android:name=".StepUpdateReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="STEP_COUNT_UPDATE" />
+            </intent-filter>
+        </receiver>
 
         <!-- Launcher Activity -->
         <activity
@@ -41,6 +61,12 @@
         <activity
             android:name=".MemoryActivity"
             android:exported="false" />
+
+        <service
+            android:name=".StepCounterService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
     </application>
 

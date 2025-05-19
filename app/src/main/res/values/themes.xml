@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.StepUpApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.StepUpApp" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/orange_accent</item>
+        <item name="colorPrimaryVariant">@color/dark_orange</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/primary_green</item>
+        <item name="colorSecondaryVariant">@color/dark_green</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Background color -->
+        <item name="android:windowBackground">@color/background_cream</item>
+        <!-- ActionBar styling -->
+        <item name="actionBarStyle">@style/Widget.StepUpApp.ActionBar</item>
+    </style>
+
+    <style name="Widget.StepUpApp.ActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
+        <item name="background">@color/orange_accent</item>
+        <item name="titleTextStyle">@style/TextAppearance.StepUpApp.ActionBar.Title</item>
+    </style>
+
+    <style name="TextAppearance.StepUpApp.ActionBar.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/primary_green</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
 </resources>

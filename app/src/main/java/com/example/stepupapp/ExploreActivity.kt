@@ -1,25 +1,38 @@
 package com.example.stepupapp
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.api.OpenTripMapResponse
 import com.example.stepupapp.api.OpenTripMapService
 import com.example.stepupapp.api.PlaceDetails
 import com.example.stepupapp.databinding.ExplorePageBinding
 import com.example.stepupapp.databinding.PlaceCardBinding
+import com.google.android.gms.location.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.URLEncoder
+import java.util.*
 import kotlin.math.roundToInt
 
 class ExploreActivity : AppCompatActivity() {
@@ -30,14 +43,29 @@ class ExploreActivity : AppCompatActivity() {
     // Average steps per meter (rough estimate)
     private val STEPS_PER_METER = 1.3
     
-    // Location coordinates
-    private val EMMEN_LATITUDE = 52.788040
-    private val EMMEN_LONGITUDE = 6.893176
+    // Location request code
+    private val REQUEST_LOCATION_PERMISSION = 1001
+    
+    // Location client
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    
+    // Current location
+    private var currentLatitude = 52.788040
+    private var currentLongitude = 6.893176
+    private var currentLocationName = "Emmen, Netherlands"
+    private var isLocationUpdatesActive = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplorePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize location services
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        createLocationRequest()
+        createLocationCallback()
 
         // Initialize OpenTripMap service
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -55,8 +83,187 @@ class ExploreActivity : AppCompatActivity() {
 
         openTripMapService = retrofit.create(OpenTripMapService::class.java)
 
-        // Load places
+        // Show default loading state
+        binding.locationText.text = "Getting your location..."
+        
+        // Check for location permissions
+        if (checkLocationPermission()) {
+            startLocationUpdates()
+        } else {
+            requestLocationPermission()
+        }
+        
+        // Make location card clickable to refresh location
+        binding.locationCard.setOnClickListener {
+            refreshLocation()
+        }
+    }
+    
+    private fun createLocationRequest() {
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000 // 10 seconds
+            fastestInterval = 5000 // 5 seconds
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+    
+    private fun createLocationCallback() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                for (location in locationResult.locations) {
+                    updateLocationUI(location)
+                }
+            }
+        }
+    }
+    
+    private fun updateLocationUI(location: Location) {
+        currentLatitude = location.latitude
+        currentLongitude = location.longitude
+        
+        // Get location name using Geocoder
+        try {
+            val geocoder = Geocoder(this, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1)
+            
+            if (addresses != null && addresses.isNotEmpty()) {
+                val address = addresses[0]
+                val cityName = address.locality ?: address.subAdminArea ?: "Unknown"
+                val countryName = address.countryName ?: ""
+                currentLocationName = if (countryName.isNotEmpty()) "$cityName, $countryName" else cityName
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting location name: ${e.message}")
+            currentLocationName = "Unknown Location"
+        }
+        
+        // Update UI with location
+        binding.locationText.text = currentLocationName
+        
+        // Load places based on new location
         loadPlaces()
+        
+        // Stop location updates after getting an accurate location
+        stopLocationUpdates()
+    }
+    
+    private fun checkLocationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+    }
+    
+    private fun requestLocationPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            // Show an explanation to the user
+            AlertDialog.Builder(this)
+                .setTitle("Location Permission Needed")
+                .setMessage("This app needs location permissions to show places near you.")
+                .setPositiveButton("OK") { _, _ ->
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ),
+                        REQUEST_LOCATION_PERMISSION
+                    )
+                }
+                .create()
+                .show()
+        } else {
+            // No explanation needed, request the permission
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                REQUEST_LOCATION_PERMISSION
+            )
+        }
+    }
+    
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        if (checkLocationPermission()) {
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+            isLocationUpdatesActive = true
+            
+            // Show loading indicator
+            binding.locationText.text = "Getting your location..."
+            binding.locationProgressBar.visibility = View.VISIBLE
+        }
+    }
+    
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        isLocationUpdatesActive = false
+        binding.locationProgressBar.visibility = View.GONE
+    }
+    
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                startLocationUpdates()
+            } else {
+                // Permission denied
+                Snackbar.make(
+                    binding.root,
+                    "Location permission is required to show nearby places",
+                    Snackbar.LENGTH_LONG
+                ).setAction("Settings") {
+                    // Open settings
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                }.show()
+                
+                // Load places with default location
+                binding.locationText.text = currentLocationName
+                loadPlaces()
+            }
+        }
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        if (checkLocationPermission() && !isLocationUpdatesActive) {
+            startLocationUpdates()
+        }
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+    
+    private fun refreshLocation() {
+        if (checkLocationPermission()) {
+            startLocationUpdates()
+        } else {
+            requestLocationPermission()
+        }
     }
 
     private fun loadPlaces() {
@@ -70,8 +277,8 @@ class ExploreActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val places = openTripMapService.searchPlaces(
-                    longitude = EMMEN_LONGITUDE,
-                    latitude = EMMEN_LATITUDE,
+                    longitude = currentLongitude,
+                    latitude = currentLatitude,
                     apiKey = "OPENTRIPMAP_API_KEY"
                 )
 
@@ -202,7 +409,7 @@ class ExploreActivity : AppCompatActivity() {
         
         // Fallback: Open a web search for the place
         try {
-            val searchQuery = "${place.name} Emmen Netherlands reviews"
+            val searchQuery = "${place.name} ${currentLocationName} reviews"
             val searchUri = Uri.parse("https://www.google.com/search?q=" + 
                 URLEncoder.encode(searchQuery, "UTF-8"))
             val searchIntent = Intent(Intent.ACTION_VIEW, searchUri)

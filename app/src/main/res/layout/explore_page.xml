@@ -33,6 +33,7 @@
 
         <!-- Location Card -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/locationCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -53,17 +54,32 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:elevation="2dp"
-                    android:text="Current Location"
-                    android:textColor="#1A237E"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:drawableStartCompat="@android:drawable/ic_menu_mylocation"
-                    app:drawableTint="#1A237E" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:drawablePadding="8dp"
+                        android:elevation="2dp"
+                        android:text="Current Location"
+                        android:textColor="#1A237E"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@android:drawable/ic_menu_mylocation"
+                        app:drawableTint="#1A237E" />
+
+                    <ProgressBar
+                        android:id="@+id/locationProgressBar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:visibility="gone"
+                        android:indeterminateTint="#1A237E" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/locationText"
@@ -73,6 +89,15 @@
                     android:text="Emmen, Netherlands"
                     android:textColor="#1A237E"
                     android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Tap to refresh location"
+                    android:textColor="#616161"
+                    android:textSize="12sp"
+                    android:textStyle="italic" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

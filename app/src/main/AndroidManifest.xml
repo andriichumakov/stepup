@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.CustomActionBar"
+        android:theme="@style/Theme.StepUpApp"
         tools:targetApi="31">
 
         <!-- Launcher Activity -->

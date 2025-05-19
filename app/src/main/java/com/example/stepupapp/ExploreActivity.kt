@@ -72,7 +72,7 @@ class ExploreActivity : AppCompatActivity() {
                 val places = openTripMapService.searchPlaces(
                     longitude = EMMEN_LONGITUDE,
                     latitude = EMMEN_LATITUDE,
-                    apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
+                    apiKey = "OPENTRIPMAP_API_KEY"
                 )
 
                 if (places.isEmpty()) {

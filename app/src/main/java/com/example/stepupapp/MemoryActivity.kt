@@ -1,36 +1,64 @@
 package com.example.stepupapp
 
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.stepupapp.databinding.ActivityMemoryBinding
-import com.example.stepup.Memory
-import com.example.stepup.MemoryAdapter
-import com.example.stepupapp.R
 
 class MemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMemoryBinding
-    private lateinit var memoryAdapter: MemoryAdapter
-    private val memoryList = mutableListOf<Memory>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMemoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        memoryAdapter = MemoryAdapter(memoryList)
-        binding.recyclerViewMemories.layoutManager = LinearLayoutManager(this)
-        binding.recyclerViewMemories.adapter = memoryAdapter
-
-        // Example data
-        memoryList.add(
-            Memory(
-                imageRes = R.drawable.ic_launcher_background,
-                date = "2025-05-09",
-                location = "Hanoi, Vietnam"
-            )
+        // Add a memory item manually (you can add more this way)
+        addMemory(
+            imageRes = R.drawable.ic_launcher_background,
+            date = "2025-05-09",
+            location = "Hanoi, Vietnam"
         )
-        memoryAdapter.notifyDataSetChanged()
+    }
+
+    private fun addMemory(imageRes: Int, date: String, location: String) {
+        val context = this
+
+        val memoryLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setPadding(0, 0, 0, 48)
+        }
+
+        val imageView = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                400
+            )
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            setImageResource(imageRes)
+        }
+
+        val dateView = TextView(context).apply {
+            text = "Date: $date"
+            textSize = 16f
+        }
+
+        val locationView = TextView(context).apply {
+            text = "Location: $location"
+            textSize = 16f
+        }
+
+        memoryLayout.addView(imageView)
+        memoryLayout.addView(dateView)
+        memoryLayout.addView(locationView)
+
+        binding.memoryContainer.addView(memoryLayout)
     }
 }

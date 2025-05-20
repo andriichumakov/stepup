@@ -34,5 +34,11 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
 
+        binding.imageButtonMemory.setOnClickListener {
+            val intent = Intent(this, MemoryActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 }

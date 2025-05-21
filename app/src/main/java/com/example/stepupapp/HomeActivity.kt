@@ -17,7 +17,7 @@ import com.example.stepupapp.databinding.ActivityHomeBinding
 
 class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
-    private val target = 6000 // Keep this hardcoded for now
+    private var target: Int = 6000 // Will be updated in onCreate
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
@@ -45,10 +45,14 @@ class HomeActivity : BaseActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Initialize target from preferences
+        target = UserPreferences.getStepTarget(this)
+        updateTargetText()
+
         // Initialize LocalBroadcastManager
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
 
-        // Set up the progress bar
+        // Set up the progress bar with dynamic target
         binding.stepProgressBar.max = target
 
         // Set up navigation buttons
@@ -59,6 +63,12 @@ class HomeActivity : BaseActivity() {
 
         binding.imageButton4.setOnClickListener {
             val intent = Intent(this, ExploreActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Set up history button
+        binding.historyButton.setOnClickListener {
+            val intent = Intent(this, StepsOverviewActivity::class.java)
             startActivity(intent)
         }
 
@@ -79,6 +89,18 @@ class HomeActivity : BaseActivity() {
 
         // Check permissions and start service
         checkAndRequestPermissions()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Update target in case it was changed in settings
+        target = UserPreferences.getStepTarget(this)
+        binding.stepProgressBar.max = target
+        updateTargetText()
+    }
+
+    private fun updateTargetText() {
+        binding.targetText.text = "Target: $target"
     }
 
     private fun checkAndRequestPermissions() {

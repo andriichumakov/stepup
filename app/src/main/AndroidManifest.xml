@@ -59,6 +59,9 @@
         <activity
             android:name=".ExploreActivity"
             android:exported="false" />
+        <activity
+            android:name=".StepsOverviewActivity"
+            android:exported="false" />
 
         <!-- ✅ Memory Activity added for navigation -->
         <activity

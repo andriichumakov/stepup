@@ -31,4 +31,11 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
     </style>
+    
+    <!-- Custom progress bar style -->
+    <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:minHeight">24dp</item>
+        <item name="android:maxHeight">24dp</item>
+        <item name="android:progressDrawable">@drawable/custom_progress_drawable</item>
+    </style>
 </resources> 

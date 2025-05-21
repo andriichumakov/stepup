@@ -26,7 +26,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Step History"
+                android:text="Your steps overview"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"/>
@@ -35,86 +35,61 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Track your daily progress"
+                android:text="Average daily steps: 6850"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:alpha="0.8"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- History List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/historyRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/headerCard"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <!-- Sample History Items (for preview) -->
+    <!-- Weekly History Card -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/weeklyHistoryCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="2dp"
-        android:visibility="gone"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/headerCard">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="#1f823a">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Today"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A237E"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="March 15, 2024"
-                    android:textSize="14sp"
-                    android:textColor="#666666"/>
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
+                android:text="Weekly History"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5,432"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A237E"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="steps"
-                    android:textSize="14sp"
-                    android:textColor="#666666"/>
-            </LinearLayout>
+            <!-- Placeholder for weekly data -->
+            <TextView
+                android:id="@+id/weeklyDataPlaceholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Weekly data will be displayed here"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Back Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Back to Home"
+        android:textColor="@android:color/white"
+        app:backgroundTint="#1f823a"
+        app:cornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout> 

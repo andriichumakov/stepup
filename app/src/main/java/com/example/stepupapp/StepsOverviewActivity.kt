@@ -12,8 +12,13 @@ class StepsOverviewActivity : BaseActivity() {
         binding = ActivityStepsOverviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Set up back button
+        binding.backButton.setOnClickListener {
+            finish() // This will close the current activity and return to the previous one (Home)
+        }
+
         // Set up RecyclerView
-        binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
+//        binding.historyRecyclerView.layoutManager = LinearLayoutManager(this)
         // TODO: Set up adapter with sample data
     }
 } 

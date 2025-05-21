@@ -40,6 +40,9 @@
         <activity
             android:name=".ExploreActivity"
             android:exported="false" />
+        <activity
+            android:name=".LocationDetailsActivity"
+            android:exported="false" />
 
         <!-- ✅ Memory Activity added for navigation -->
         <activity

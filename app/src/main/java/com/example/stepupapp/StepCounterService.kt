@@ -41,73 +41,76 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onCreate() {
         super.onCreate()
         try {
-            android.util.Log.d("StepCounterService", "Service onCreate called - Starting service initialization")
+            android.util.Log.d("StepCounterService", "Service onCreate called")
             serviceScope = CoroutineScope(Dispatchers.Default)
             localBroadcastManager = LocalBroadcastManager.getInstance(this)
-            
-            android.util.Log.d("StepCounterService", "Checking for step sensor...")
+
+            // Send initial update immediately
+            sendStepUpdate(totalSteps)
+
             sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-            
-            android.util.Log.d("StepCounterService", "Step sensor check result: ${if (stepSensor == null) "null (no sensor found)" else "found"}")
-            
+
+            // Force emulator mode for testing
+            isEmulatorMode = true
+            android.util.Log.d("StepCounterService", "Forcing emulator mode for testing")
+
             createNotificationChannel()
             startForeground(NOTIFICATION_ID, createNotification())
-            
-            if (stepSensor == null) {
-                android.util.Log.d("StepCounterService", "No step sensor found, switching to emulator mode")
-                isEmulatorMode = true
-                android.util.Log.d("StepCounterService", "Starting emulator mode...")
-                startEmulatorMode()
-            } else {
-                android.util.Log.d("StepCounterService", "Step sensor found, using real sensor")
-                sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-            }
+
+            // Always start emulator mode for testing
+            android.util.Log.d("StepCounterService", "Starting emulator mode")
+            startEmulatorMode()
         } catch (e: Exception) {
-            android.util.Log.e("StepCounterService", "Error in onCreate: ${e.message}", e)
-            e.printStackTrace()
+            android.util.Log.e("StepCounterService", "Error in onCreate", e)
             stopSelf()
         }
     }
 
+    private fun isEmulator(): Boolean {
+        return (Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || "google_sdk" == Build.PRODUCT)
+    }
+
     private fun startEmulatorMode() {
         try {
-            android.util.Log.d("StepCounterService", "startEmulatorMode() called - Initial steps: $totalSteps")
-            
-            if (serviceScope == null) {
-                android.util.Log.e("StepCounterService", "ERROR: serviceScope is null in startEmulatorMode!")
-                return
-            }
-            
+            android.util.Log.d("StepCounterService", "Starting emulator mode with initial steps: $totalSteps")
+
             // Send initial update again to ensure it's received
             sendStepUpdate(totalSteps)
-            
-            android.util.Log.d("StepCounterService", "Starting emulator coroutine...")
+
             // Start a coroutine to simulate steps
-            serviceScope?.launch {
-                android.util.Log.d("StepCounterService", "Emulator coroutine started")
+            serviceScope?.launch(Dispatchers.Default) {
+                android.util.Log.d("StepCounterService", "Emulator mode coroutine started")
+                var lastUpdateTime = System.currentTimeMillis()
                 while (true) {
                     try {
-                        // Simulate a step every 5 seconds
-                        totalSteps++
-                        android.util.Log.d("StepCounterService", "Emulator mode - New step count: $totalSteps")
-                        sendStepUpdate(totalSteps)
-                        
-                        android.util.Log.d("StepCounterService", "Waiting for $EMULATOR_STEP_INTERVAL ms...")
-                        // Wait for the interval
-                        kotlinx.coroutines.delay(EMULATOR_STEP_INTERVAL)
-                        android.util.Log.d("StepCounterService", "Delay completed, continuing loop")
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - lastUpdateTime >= EMULATOR_STEP_INTERVAL) {
+                            // Simulate a step
+                            totalSteps++
+                            android.util.Log.d("StepCounterService", "Emulator mode - New step count: $totalSteps")
+                            withContext(Dispatchers.Main) {
+                                sendStepUpdate(totalSteps)
+                            }
+                            lastUpdateTime = currentTime
+                        }
+                        // Small delay to prevent CPU overuse
+                        kotlinx.coroutines.delay(100)
                     } catch (e: Exception) {
-                        android.util.Log.e("StepCounterService", "Error in emulator mode loop: ${e.message}", e)
-                        e.printStackTrace()
+                        android.util.Log.e("StepCounterService", "Error in emulator mode loop", e)
                         break
                     }
                 }
             }
-            android.util.Log.d("StepCounterService", "Emulator coroutine launched successfully")
         } catch (e: Exception) {
-            android.util.Log.e("StepCounterService", "Error starting emulator mode: ${e.message}", e)
-            e.printStackTrace()
+            android.util.Log.e("StepCounterService", "Error starting emulator mode", e)
             stopSelf()
         }
     }
@@ -157,25 +160,20 @@ class StepCounterService : Service(), SensorEventListener {
             val distance = steps / STEPS_PER_KM
             val calories = (steps * CALORIES_PER_STEP).toInt()
 
-            android.util.Log.d("StepCounterService", "Sending local broadcast update - Steps: $steps, Distance: $distance, Calories: $calories")
+            android.util.Log.d("StepCounterService", "Sending step update - Steps: $steps, Distance: $distance, Calories: $calories")
 
-            // Send both global and local broadcasts to ensure compatibility
+            // Send local broadcast
             val updateIntent = Intent("LOCAL_STEP_COUNT_UPDATE").apply {
                 putExtra("steps", steps)
                 putExtra("distance", distance)
                 putExtra("calories", calories)
             }
             localBroadcastManager.sendBroadcast(updateIntent)
+            android.util.Log.d("StepCounterService", "Local broadcast sent")
 
-            // Also send the global broadcast for the manifest-registered receiver
-            val globalIntent = Intent("STEP_COUNT_UPDATE").apply {
-                putExtra("steps", steps)
-                putExtra("distance", distance)
-                putExtra("calories", calories)
-            }
-            sendBroadcast(globalIntent)
-
+            // Update notification
             updateNotification(steps, distance, calories)
+            android.util.Log.d("StepCounterService", "Notification updated")
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error sending step update", e)
         }
@@ -185,9 +183,9 @@ class StepCounterService : Service(), SensorEventListener {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
-                        CHANNEL_ID,
-                        CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_LOW
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW
                 )
                 val notificationManager = getSystemService(NotificationManager::class.java)
                 notificationManager.createNotificationChannel(channel)
@@ -205,11 +203,11 @@ class StepCounterService : Service(), SensorEventListener {
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("StepUp App")
-                .setContentText(contentText)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
+            .setContentTitle("StepUp App")
+            .setContentText(contentText)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
     }
 
     private fun updateNotification(steps: Int, distance: Double, calories: Int) {
@@ -221,11 +219,11 @@ class StepCounterService : Service(), SensorEventListener {
             }
 
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("StepUp App")
-                    .setContentText(contentText)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    .build()
+                .setContentTitle("StepUp App")
+                .setContentText(contentText)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
 
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -246,4 +244,4 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.e("StepCounterService", "Error in onDestroy", e)
         }
     }
-} 
+}

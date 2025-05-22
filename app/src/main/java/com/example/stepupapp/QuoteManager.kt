@@ -22,6 +22,7 @@ class QuoteManager {
             Quote("The best time to walk is now.", "Anonymous"),
             Quote("Walking is the most ancient exercise and still the best modern exercise.", "Carrie Latet"),
             Quote("Go touch some grass.", "Anastasia"),
+            Quote("Taking a walk is nice, but you should also consider taking a shower", "Last words of Jesus"),
             Quote("Take a walk. It will clear your mind and lift your spirits.", "Anonymous")
         )
 

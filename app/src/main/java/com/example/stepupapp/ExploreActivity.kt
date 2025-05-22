@@ -557,6 +557,7 @@ class ExploreActivity : AppCompatActivity() {
                 ).show()
             }
         }
+        startActivity(intent)
     }
 
     private fun displayHardcodedPlaces() {

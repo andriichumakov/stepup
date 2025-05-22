@@ -8,6 +8,7 @@
         android:padding="16dp">
 
     <!-- Step Widget Card -->
+    <!-- The ducks are always watching -->
     <androidx.cardview.widget.CardView
             android:id="@+id/stepCard"
             android:layout_width="0dp"

@@ -18,17 +18,30 @@
     <string name="settings">Settings</string>
     <string name="settings_h3">Customize daily step goal:</string>
     <string name="setting_h4">Interests:</string>
-    <string name="interest_one">Tourism</string>
-    <string name="interest_two">Beverages</string>
-    <string name="interest_three">Dining</string>
-    <string name="interest_four">Entertainment</string>
+    <string name="interest_one">Adult</string>
+    <string name="interest_two">Amusements</string>
+    <string name="interest_three">Architecture</string>
+    <string name="interest_four">Cultural</string>
     <string name="setting_save">Save Changes</string>
-    <string name="interest_five">Art</string>
-    <string name="interest_six">Nature</string>
-    <string name="interest_seven">Technology</string>
-    <string name="interest_eight">Shopping</string>
-    <string name="interest_nine">Sailing</string>
-    <string name="interest_ten">Fishing</string>
-    <string name="interest_eleven">History</string>
-    <string name="interest_twelve">Sculpture</string>
+    <string name="interest_five">Shops</string>
+    <string name="interest_six">Foods</string>
+    <string name="interest_seven">Sport</string>
+    <string name="interest_eight">Historical</string>
+    <string name="interest_nine">Natural</string>
+    <string name="interest_ten">Other</string>
+    
+    <!-- Place Categories for Filter -->
+    <string-array name="place_categories">
+        <item>All</item>
+        <item>Adult</item>
+        <item>Amusements</item>
+        <item>Architecture</item>
+        <item>Cultural</item>
+        <item>Shops</item>
+        <item>Foods</item>
+        <item>Sport</item>
+        <item>Historical</item>
+        <item>Natural</item>
+        <item>Other</item>
+    </string-array>
 </resources>

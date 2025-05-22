@@ -17,26 +17,24 @@
             android:layout_width="162dp"
             android:layout_height="35dp"
 
-            android:layout_marginStart="21dp"
+            android:layout_marginEnd="96dp"
             android:text="@string/intro_setup"
             android:textColor="@color/black"
             android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.06"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.337"
+            app:layout_constraintVertical_bias="0.35"
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@android:mipmap/sym_def_app_icon"
-            tools:ignore="MissingConstraints" />
+            android:id="@+id/imageView3"
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            app:srcCompat="@drawable/stepup_logo_bunny_small"
+            tools:layout_editor_absoluteX="-1dp"
+            tools:layout_editor_absoluteY="1dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

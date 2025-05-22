@@ -8,18 +8,18 @@
     android:layout_marginVertical="8dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardBackgroundColor="#F8F9FA"
+    app:cardBackgroundColor="#C5F7D0"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     app:rippleColor="#1F000000"
-    app:strokeColor="#E0E0E0"
+    app:strokeColor="#C5F7D0"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:background="@drawable/card_gradient"
+        android:background="#C5F7D0"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -48,6 +48,7 @@
                 android:textAlignment="textEnd"
                 android:textColor="#1A237E"
                 android:textSize="12sp"
+                android:textStyle="bold"
                 tools:text="500k steps away" />
         </LinearLayout>
 
@@ -57,6 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/rounded_background"
+            android:backgroundTint="#E4FBE4"
             android:paddingHorizontal="12dp"
             android:paddingVertical="6dp"
             android:textColor="#1A237E"

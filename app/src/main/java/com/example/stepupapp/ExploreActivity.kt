@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -11,9 +12,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -40,8 +45,8 @@ class ExploreActivity : AppCompatActivity() {
     private lateinit var openTripMapService: OpenTripMapService
     private val TAG = "ExploreActivity"
 
-    // Average steps per meter (rough estimate)
-    private val STEPS_PER_METER = 1.3
+    // Step length in meters (average step length)
+    private val STEP_LENGTH = 0.50
     
     // Location request code
     private val REQUEST_LOCATION_PERMISSION = 1001
@@ -57,6 +62,10 @@ class ExploreActivity : AppCompatActivity() {
     private var currentLocationName = "Emmen, Netherlands"
     private var isLocationUpdatesActive = false
 
+    // Category filter
+    private var currentCategory = "All"
+    private var allPlacesList = listOf<OpenTripMapResponse>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplorePageBinding.inflate(layoutInflater)
@@ -66,6 +75,16 @@ class ExploreActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createLocationRequest()
         createLocationCallback()
+
+        // Initialize category spinner
+        setupCategorySpinner()
+
+        // Set up home button to navigate back to home screen
+        binding.homeButton.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish() // Close this activity
+        }
 
         // Initialize OpenTripMap service
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -93,9 +112,9 @@ class ExploreActivity : AppCompatActivity() {
             requestLocationPermission()
         }
         
-        // Make location card clickable to refresh location
+        // Make location card clickable to open current location on Google Maps
         binding.locationCard.setOnClickListener {
-            refreshLocation()
+            openCurrentLocationOnMaps()
         }
     }
     
@@ -265,10 +284,132 @@ class ExploreActivity : AppCompatActivity() {
             requestLocationPermission()
         }
     }
+    
+    private fun openCurrentLocationOnMaps() {
+        try {
+            // Create a geo URI for the current location
+            val gmmIntentUri = Uri.parse(
+                "geo:$currentLatitude,$currentLongitude?q=" + 
+                URLEncoder.encode(currentLocationName, "UTF-8")
+            )
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            
+            if (mapIntent.resolveActivity(packageManager) != null) {
+                startActivity(mapIntent)
+                return
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening Google Maps: ${e.message}")
+        }
+        
+        // Fallback: Open a web search for the location
+        try {
+            val searchUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + 
+                URLEncoder.encode(currentLocationName, "UTF-8"))
+            val searchIntent = Intent(Intent.ACTION_VIEW, searchUri)
+            startActivity(searchIntent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error opening maps search: ${e.message}")
+            Toast.makeText(
+                this,
+                "Could not open maps",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun setupCategorySpinner() {
+        val adapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.place_categories,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.categorySpinner.adapter = adapter
+        }
+
+        binding.categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedCategory = parent.getItemAtPosition(position).toString()
+                // Make sure text is visible and bold
+                (view as? TextView)?.apply {
+                    setTextColor(resources.getColor(android.R.color.black, theme))
+                    textSize = 14f
+                    typeface = Typeface.DEFAULT_BOLD
+                }
+                if (currentCategory != selectedCategory) {
+                    currentCategory = selectedCategory
+                    filterPlaces()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
+    private fun filterPlaces() {
+        if (allPlacesList.isEmpty()) {
+            return
+        }
+
+        // Clear existing places
+        binding.placesContainer.removeAllViews()
+
+        // Convert category to API kind format
+        val kindFilter = when (currentCategory) {
+            "All" -> ""
+            "Adult" -> "adult"
+            "Amusements" -> "amusements"
+            "Architecture" -> "architecture"
+            "Cultural" -> "cultural"
+            "Shops" -> "shops"
+            "Foods" -> "foods,cuisine"
+            "Sport" -> "sport"
+            "Historical" -> "historic"
+            "Natural" -> "natural"
+            "Other" -> "other"
+            else -> ""
+        }
+
+        // Display filtered places
+        lifecycleScope.launch {
+            val filteredPlaces = if (kindFilter.isEmpty()) {
+                allPlacesList
+            } else {
+                allPlacesList.filter { place ->
+                    place.kinds.contains(kindFilter)
+                }
+            }
+
+            if (filteredPlaces.isEmpty()) {
+                Toast.makeText(this@ExploreActivity, "No places found in category: $currentCategory", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            for (place in filteredPlaces) {
+                try {
+                    // Get detailed information for each place
+                    val details = openTripMapService.getPlaceDetails(
+                        xid = place.xid,
+                        apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
+                    )
+                    createPlaceCard(place, details)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error getting details for place ${place.name}: ${e.message}")
+                    // If detailed info fails, still show basic info
+                    createPlaceCard(place, null)
+                }
+            }
+        }
+    }
 
     private fun loadPlaces() {
         // Clear existing places
         binding.placesContainer.removeAllViews()
+        allPlacesList = emptyList()
 
         // Show loading state
         Toast.makeText(this, "Loading places...", Toast.LENGTH_SHORT).show()
@@ -279,7 +420,7 @@ class ExploreActivity : AppCompatActivity() {
                 val places = openTripMapService.searchPlaces(
                     longitude = currentLongitude,
                     latitude = currentLatitude,
-                    apiKey = "OPENTRIPMAP_API_KEY"
+                    apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
                 )
 
                 if (places.isEmpty()) {
@@ -289,26 +430,11 @@ class ExploreActivity : AppCompatActivity() {
 
                 Log.d(TAG, "Found ${places.size} places nearby")
                 
-                // Display places from API response
-                places.forEach { place ->
-                    try {
-                        Log.d(TAG, "Loading details for place: ${place.name} (${place.xid}), initial rating: ${place.rate}")
-                        
-                        // Get detailed information for each place
-                        val details = openTripMapService.getPlaceDetails(
-                            xid = place.xid,
-                            apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
-                        )
-                        
-                        Log.d(TAG, "Detailed rating for ${place.name}: ${details.rate}")
-                        createPlaceCard(place, details)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error getting details for place ${place.name}: ${e.message}")
-                        e.printStackTrace()
-                        // If detailed info fails, still show basic info
-                        createPlaceCard(place, null)
-                    }
-                }
+                // Save all places for filtering
+                allPlacesList = places
+                
+                // Apply current filter
+                filterPlaces()
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading places: ${e.message}")
                 e.printStackTrace()
@@ -364,11 +490,27 @@ class ExploreActivity : AppCompatActivity() {
         cardBinding.placeRating.text = ratingText
 
         // Convert distance to steps
-        val distanceInMeters = (place.dist * 1000).roundToInt()
-        val steps = (distanceInMeters * STEPS_PER_METER).roundToInt()
+        // Determine if place.dist is already in meters (larger values) or kilometers (smaller values)
+        val distanceInMeters = if (place.dist < 50) {
+            // Likely in kilometers, convert to meters
+            (place.dist * 1000).roundToInt()
+        } else {
+            // Already in meters
+            place.dist.roundToInt()
+        }
+        
+        val steps = (distanceInMeters / STEP_LENGTH).roundToInt()
+        
+        // Apply adjustments to account for real-world factors
+        val adjustedSteps = when {
+            steps >= 3000 -> steps + 2000 // Add 2k steps for distances 3k and above
+            steps >= 1000 -> steps + 1000 // Add 1k steps for distances between 1k-2k
+            else -> steps
+        }
+        
         val distanceText = when {
-            steps >= 1000 -> "${steps / 1000}k steps away"
-            else -> "$steps steps away"
+            adjustedSteps >= 1000 -> "${adjustedSteps / 1000}k steps away"
+            else -> "$adjustedSteps steps away"
         }
         cardBinding.placeAddress.text = distanceText
 
@@ -389,38 +531,31 @@ class ExploreActivity : AppCompatActivity() {
     }
 
     private fun openPlaceDetails(place: OpenTripMapResponse) {
-        // First try to open Google Maps with the place name at the specified location
         try {
-            // Create a geo URI with the place name as a query
-            val gmmIntentUri = Uri.parse(
-                "geo:${place.point.lat},${place.point.lon}?q=" + 
-                URLEncoder.encode(place.name, "UTF-8")
-            )
-            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-            mapIntent.setPackage("com.google.android.apps.maps")
-            
-            if (mapIntent.resolveActivity(packageManager) != null) {
-                startActivity(mapIntent)
-                return
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error opening Google Maps: ${e.message}")
-        }
-        
-        // Fallback: Open a web search for the place
-        try {
-            val searchQuery = "${place.name} ${currentLocationName} reviews"
-            val searchUri = Uri.parse("https://www.google.com/search?q=" + 
+            // Search directly on Google Maps for the place
+            val searchQuery = "${place.name} ${currentLocationName}"
+            val mapsSearchUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + 
                 URLEncoder.encode(searchQuery, "UTF-8"))
-            val searchIntent = Intent(Intent.ACTION_VIEW, searchUri)
-            startActivity(searchIntent)
+            val mapIntent = Intent(Intent.ACTION_VIEW, mapsSearchUri)
+            startActivity(mapIntent)
         } catch (e: Exception) {
-            Log.e(TAG, "Error opening web search: ${e.message}")
-            Toast.makeText(
-                this,
-                "Could not open place details",
-                Toast.LENGTH_SHORT
-            ).show()
+            Log.e(TAG, "Error opening Google Maps search: ${e.message}")
+            
+            // Fallback to normal web search if Maps search fails
+            try {
+                val searchQuery = "${place.name} ${currentLocationName}"
+                val searchUri = Uri.parse("https://www.google.com/search?q=" + 
+                    URLEncoder.encode(searchQuery, "UTF-8"))
+                val searchIntent = Intent(Intent.ACTION_VIEW, searchUri)
+                startActivity(searchIntent)
+            } catch (e2: Exception) {
+                Log.e(TAG, "Error opening web search: ${e2.message}")
+                Toast.makeText(
+                    this,
+                    "Could not open place details",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 

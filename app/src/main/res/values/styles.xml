@@ -31,4 +31,19 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
     </style>
+
+    <!-- Category Spinner Style -->
+    <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">#1A237E</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Category Spinner Dropdown Item Style -->
+    <style name="CustomSpinnerDropdownItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">#1A237E</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:background">#F0BB78</item>
+        <item name="android:padding">10dp</item>
+    </style>
 </resources> 

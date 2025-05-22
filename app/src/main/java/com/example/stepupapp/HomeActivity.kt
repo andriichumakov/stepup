@@ -221,5 +221,11 @@ class HomeActivity : BaseActivity() {
         } catch (e: Exception) {
             android.util.Log.e("HomeActivity", "Error unregistering receiver", e)
         }
+        binding.imageButtonMemory.setOnClickListener {
+            val intent = Intent(this, MemoryActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 }

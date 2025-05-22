@@ -261,35 +261,49 @@
 
         <!-- Settings Button -->
         <FrameLayout
-                android:id="@+id/settings_button_wrapper"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="24dp">
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="24dp">
 
             <ImageButton
-                    android:id="@+id/imageButton3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Settings"
-                    app:srcCompat="@drawable/baseline_settings_24"
-                    android:scaleType="fitCenter"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
+                android:id="@+id/imageButton3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Settings"
+                app:srcCompat="@drawable/baseline_settings_24"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
         </FrameLayout>
 
         <!-- Explore Button -->
         <FrameLayout
-                android:id="@+id/footprint_button_wrapper"
-                android:layout_width="48dp"
-                android:layout_height="48dp">
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="24dp">
 
             <ImageButton
-                    android:id="@+id/imageButton4"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Explore"
-                    app:srcCompat="@drawable/shoe"
-                    android:scaleType="fitCenter"
-                    android:background="?attr/selectableItemBackgroundBorderless"/>
+                android:id="@+id/imageButton4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Explore"
+                app:srcCompat="@drawable/shoe"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </FrameLayout>
+
+        <!-- Memory Button -->
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp">
+
+            <ImageButton
+                android:id="@+id/imageButtonMemory"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Memory"
+                app:srcCompat="@drawable/memory"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
         </FrameLayout>
     </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.example.stepupapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -22,6 +23,11 @@ class MemoryActivity : AppCompatActivity() {
             date = "2025-05-09",
             location = "Hanoi, Vietnam"
         )
+
+        binding.btnAddPlace.setOnClickListener {
+            val intent = Intent(this, AddMemoryActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun addMemory(imageRes: Int, date: String, location: String) {

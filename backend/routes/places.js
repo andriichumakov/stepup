@@ -37,13 +37,13 @@ router.get('/', async (req, res) => {
 
 // POST a new place
 router.post('/', upload.single('image'), async (req, res) => {
-  const { name, date, steps } = req.body;
+  const { name, date_saved, steps_taken} = req.body;
   const image = req.file ? req.file.filename : null;
 
   try {
     const result = await pool.query(
-      'INSERT INTO places (name, date, steps, image) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, date, steps, image]
+    'INSERT INTO places (name, date_saved, steps_taken) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, date_saved, steps_taken, image_url]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

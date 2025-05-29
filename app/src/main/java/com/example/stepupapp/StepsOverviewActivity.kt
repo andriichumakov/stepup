@@ -101,7 +101,9 @@ class StepsOverviewActivity : BaseActivity() {
     ) {
         try {
             Log.d("StepsOverviewActivity", "Updating display for ${dailyData.day}")
-            labelView.text = dailyData.day
+            // Check if this is today's data
+            val today = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+            labelView.text = if (dailyData.day == today) "Today" else dailyData.day
             progressBar.max = dailyData.target
             progressBar.progress = dailyData.steps
             stepsView.text = dailyData.steps.toString()

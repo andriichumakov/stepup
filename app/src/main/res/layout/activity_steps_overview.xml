@@ -84,11 +84,11 @@
 
                     <TextView
                             android:id="@+id/day1Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Monday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day1Progress"
@@ -96,8 +96,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="75"/>
 
                     <TextView
@@ -118,11 +118,11 @@
 
                     <TextView
                             android:id="@+id/day2Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Tuesday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day2Progress"
@@ -130,8 +130,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="90"/>
 
                     <TextView
@@ -152,11 +152,11 @@
 
                     <TextView
                             android:id="@+id/day3Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Wednesday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day3Progress"
@@ -164,8 +164,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="100"/>
 
                     <TextView
@@ -186,11 +186,11 @@
 
                     <TextView
                             android:id="@+id/day4Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Thursday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day4Progress"
@@ -198,8 +198,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="60"/>
 
                     <TextView
@@ -220,11 +220,11 @@
 
                     <TextView
                             android:id="@+id/day5Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Friday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day5Progress"
@@ -232,8 +232,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="85"/>
 
                     <TextView
@@ -254,11 +254,11 @@
 
                     <TextView
                             android:id="@+id/day6Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Saturday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day6Progress"
@@ -266,8 +266,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="95"/>
 
                     <TextView
@@ -287,11 +287,11 @@
 
                     <TextView
                             android:id="@+id/day7Label"
-                            android:layout_width="80dp"
+                            android:layout_width="90dp"
                             android:layout_height="wrap_content"
                             android:text="Sunday"
                             android:textColor="@android:color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="16sp"/>
 
                     <ProgressBar
                             android:id="@+id/day7Progress"
@@ -299,8 +299,8 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:layout_marginHorizontal="8dp"
-                            android:progressDrawable="@drawable/progress_bar"
+                            android:layout_marginHorizontal="4dp"
+                            android:progressDrawable="@drawable/progress_bar_weekly"
                             android:progress="70"/>
 
                     <TextView

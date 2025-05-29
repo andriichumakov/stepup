@@ -71,6 +71,11 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
 
+        binding.imageButtonMemory.setOnClickListener {
+            val intent = Intent(this, MemoryActivity::class.java)
+            startActivity(intent)
+        }
+
         // Set up history button
         binding.historyButton.setOnClickListener {
             val intent = Intent(this, StepsOverviewActivity::class.java)
@@ -221,11 +226,5 @@ class HomeActivity : BaseActivity() {
         } catch (e: Exception) {
             android.util.Log.e("HomeActivity", "Error unregistering receiver", e)
         }
-        binding.imageButtonMemory.setOnClickListener {
-            val intent = Intent(this, MemoryActivity::class.java)
-            startActivity(intent)
-        }
-
-
     }
 }

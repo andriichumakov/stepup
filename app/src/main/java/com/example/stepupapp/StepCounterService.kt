@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -56,13 +57,23 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.d("StepCounterService", "Forcing emulator mode for testing")
 
             createNotificationChannel()
-            startForeground(NOTIFICATION_ID, createNotification())
+            
+            // Start as foreground service with health type
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    createNotification(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, createNotification())
+            }
 
             // Always start emulator mode for testing
             android.util.Log.d("StepCounterService", "Starting emulator mode")
             startEmulatorMode()
         } catch (e: Exception) {
-            android.util.Log.e("StepCounterService", "Error in onCreate", e)
+            android.util.Log.e("StepCounterService", "Error in onCreate: ${e.message}", e)
             stopSelf()
         }
     }

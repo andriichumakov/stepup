@@ -5,12 +5,12 @@ plugins {
 }
 android {
     namespace = "com.example.stepupapp"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.stepupapp"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -66,15 +66,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.1")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
-    // Compose UI (replace `libs.` references with actual dependencies)
+    // Compose UI
     implementation("androidx.compose.ui:ui:1.5.1")
     implementation("androidx.compose.foundation:foundation:1.5.1")
     implementation("androidx.compose.material3:material3:1.1.2")
@@ -84,9 +80,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // Firebase app distribution plugin (normally declared in the root project)
-    // implementation(libs.firebase.appdistribution.gradle) ← You should configure this in settings.gradle.kts
 
     // Testing
     testImplementation("junit:junit:4.13.2")

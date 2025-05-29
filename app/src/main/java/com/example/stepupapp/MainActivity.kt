@@ -14,6 +14,8 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val serviceIntent = Intent(this, StepCounterService::class.java)
+        startService(serviceIntent)
         binding = SetupPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

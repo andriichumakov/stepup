@@ -18,8 +18,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+            <!-- Weather Widget Card -->
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/weatherCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:background="#1E1E1E"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="#1f823a"
+                        android:padding="16dp"
+                        android:gravity="center_vertical"
+                        android:stateListAnimator="@null">
+
+                    <ImageView
+                            android:id="@+id/weatherIcon"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/weather_cloud"
+                            android:contentDescription="Weather icon"/>
+
+                    <TextView
+                            android:id="@+id/weatherTemp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10°C"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:layout_marginStart="12dp"/>
+
+                    <TextView
+                            android:id="@+id/weatherMessage"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="You should take an umbrella"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:layout_marginStart="16dp"
+                            android:gravity="end|center_vertical"
+                            android:layout_marginEnd="8dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <!-- Step Widget Card -->
-            <!-- The ducks are always watching -->
             <androidx.cardview.widget.CardView
                     android:id="@+id/stepCard"
                     android:layout_width="0dp"
@@ -28,7 +83,7 @@
                     android:background="#1E1E1E"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/weatherCard"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
 

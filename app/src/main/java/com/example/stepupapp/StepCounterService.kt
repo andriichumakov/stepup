@@ -173,6 +173,9 @@ class StepCounterService : Service(), SensorEventListener {
 
             android.util.Log.d("StepCounterService", "Sending step update - Steps: $steps, Distance: $distance, Calories: $calories")
 
+            // Save daily steps
+            UserPreferences.saveDailySteps(this, steps)
+
             // Send local broadcast
             val updateIntent = Intent("LOCAL_STEP_COUNT_UPDATE").apply {
                 putExtra("steps", steps)

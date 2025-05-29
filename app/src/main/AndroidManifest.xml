@@ -58,6 +58,8 @@
         <activity
                 android:name=".StepsOverviewActivity"
                 android:exported="false" />
+        <activity android:name=".AuthOptionsActivity"
+                  android:exported="false" />
         <activity android:name=".MainActivity"
                   android:exported="false" />
 

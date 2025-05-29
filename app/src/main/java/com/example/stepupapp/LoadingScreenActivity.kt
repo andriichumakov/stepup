@@ -16,6 +16,10 @@ class LoadingScreenActivity : BaseActivity() {
         startProgressBar()
     }
 
+    private fun isLoggedIn(): Boolean {
+        return false;
+    }
+
     private fun startProgressBar() {
         val totalTime = 5000L  // 5 seconds
         val interval = 50L     // Update every 50ms for smoother animation
@@ -28,7 +32,11 @@ class LoadingScreenActivity : BaseActivity() {
 
             override fun onFinish() {
                 binding.progressBar.progress = 100
-                goToMainActivity()
+                if (isLoggedIn()) {
+                    goToMainActivity()
+                } else {
+                    goToAuthOptionsActivity()
+                }
             }
         }.start()
     }
@@ -37,5 +45,10 @@ class LoadingScreenActivity : BaseActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish() // Close loading screen so it doesn't stay in back stack
+    }
+    private fun goToAuthOptionsActivity() {
+        val intent = Intent(this, AuthOptionsActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

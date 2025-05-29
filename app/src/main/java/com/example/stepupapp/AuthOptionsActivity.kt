@@ -11,11 +11,11 @@ class AuthOptionsActivity : BaseActivity() {
         binding = LoginMethodBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.loginButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
         binding.registerButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
     }

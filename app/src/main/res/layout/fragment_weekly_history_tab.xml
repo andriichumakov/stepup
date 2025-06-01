@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- Weekly History Container -->
+    <LinearLayout
+        android:id="@+id/weeklyHistoryContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Day 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day1Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Monday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day1Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="75"/>
+
+            <TextView
+                android:id="@+id/day1Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4500"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day2Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Tuesday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day2Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="90"/>
+
+            <TextView
+                android:id="@+id/day2Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5400"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day3Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Wednesday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day3Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="100"/>
+
+            <TextView
+                android:id="@+id/day3Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6000"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day4Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Thursday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day4Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="60"/>
+
+            <TextView
+                android:id="@+id/day4Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3600"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 5 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day5Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Friday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day5Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="85"/>
+
+            <TextView
+                android:id="@+id/day5Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5100"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 6 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/day6Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Saturday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day6Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="95"/>
+
+            <TextView
+                android:id="@+id/day6Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5700"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <!-- Day 7 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/day7Label"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:text="Sunday"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                android:id="@+id/day7Progress"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="4dp"
+                android:progressDrawable="@drawable/progress_bar_weekly"
+                android:progress="70"/>
+
+            <TextView
+                android:id="@+id/day7Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4200"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout> 

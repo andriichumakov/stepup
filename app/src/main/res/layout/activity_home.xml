@@ -177,7 +177,8 @@
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:contentDescription="Refresh quote"
                             app:srcCompat="@drawable/baseline_refresh_24"
-                            android:tint="@android:color/white"/>
+                            app:tint="@android:color/white"/>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

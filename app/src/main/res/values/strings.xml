@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">StepUpApp</string>
-    <string name="intro_setup">Introduction</string>
+    <string name="intro_setup">Welcome To StepUp!</string>
     <string name="prompt_name">What\'s your name?</string>
     <string name="prompt_goal">What are you aiming for?</string>
     <string name="goal_steps_one">5000 steps</string>
     <string name="goal_steps_two">6500 steps</string>
     <string name="goal_steps_three">8000 steps</string>
-    <string name="prompt_location">Which place would you like to visit?</string>
+    <string name="prompt_location">What are you interested in?</string>
     <string name="location_one">Emmen, WildLands</string>
     <string name="location_two">Emmen, Museum of Contemporary Tibetan Art</string>
     <string name="location_three">Emmen, Restaurant Galerie De Kamer</string>

@@ -3,6 +3,7 @@ package com.example.stepupapp
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import com.example.stepupapp.connection.ProfileService
 import com.example.stepupapp.databinding.LoadingScreenBinding
 
 class LoadingScreenActivity : BaseActivity() {
@@ -12,6 +13,8 @@ class LoadingScreenActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = LoadingScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ProfileService.insertTestRow()
 
         startProgressBar()
     }

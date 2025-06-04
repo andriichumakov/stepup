@@ -145,19 +145,23 @@ class StepsOverviewActivity : BaseActivity() {
             val totalDays = weeklyData.size
             val targetMetPercentage = if (totalDays > 0) (daysMetTarget.toFloat() / totalDays.toFloat()) * 100 else 0f
 
+            // Calculate current streak
+            val currentStreak = calculateCurrentStreak(weeklyData)
+            val streakMessage = getStreakMessage(currentStreak)
+
             Log.d("StepsOverviewActivity", "Days met target: $daysMetTarget, Total days: $totalDays, Percentage: $targetMetPercentage")
 
             Canvas(
                 modifier = Modifier
-                    .size(140.dp)
+                    .size(180.dp)
                     .padding(4.dp)
             ) {
                 val center = Offset(size.width / 2, size.height / 2)
-                val radius = size.width.coerceAtMost(size.height) / 2 * 0.8f
+                val radius = size.width.coerceAtMost(size.height) / 2 * 0.85f
                 
                 // Draw background circle (unfilled portion)
                 drawArc(
-                    color = Color(0x80FFFFFF), // More visible semi-transparent white
+                    color = Color(0x80FFFFFF),
                     startAngle = -90f,
                     sweepAngle = 360f,
                     useCenter = true,
@@ -168,7 +172,7 @@ class StepsOverviewActivity : BaseActivity() {
                 // Draw filled portion (days target was met)
                 if (targetMetPercentage > 0) {
                     drawArc(
-                        color = Color(0xFF4CAF50), // Green
+                        color = Color(0xFF4CAF50),
                         startAngle = -90f,
                         sweepAngle = (targetMetPercentage / 100f) * 360f,
                         useCenter = true,
@@ -181,7 +185,7 @@ class StepsOverviewActivity : BaseActivity() {
                 drawIntoCanvas { canvas ->
                     val paint = Paint().apply {
                         color = android.graphics.Color.WHITE
-                        textSize = 48f
+                        textSize = 80f
                         textAlign = Paint.Align.CENTER
                         isFakeBoldText = true
                     }
@@ -195,7 +199,7 @@ class StepsOverviewActivity : BaseActivity() {
                     )
 
                     // Draw days met target below
-                    paint.textSize = 28f
+                    paint.textSize = 44f
                     canvas.nativeCanvas.drawText(
                         "$daysMetTarget / $totalDays days",
                         center.x,
@@ -204,6 +208,45 @@ class StepsOverviewActivity : BaseActivity() {
                     )
                 }
             }
+
+            // Add streak message below the chart
+            Text(
+                text = streakMessage,
+                color = Color.White,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 8.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
+
+    private fun calculateCurrentStreak(weeklyData: List<UserPreferences.DailyStepsData>): Int {
+        var streak = 0
+        // Sort data by date in descending order (most recent first)
+        val sortedData = weeklyData.sortedByDescending { it.day }
+        
+        // Check consecutive days from most recent
+        for (data in sortedData) {
+            if (data.steps >= data.target) {
+                streak++
+            } else {
+                break
+            }
+        }
+        return streak
+    }
+
+    private fun getStreakMessage(streak: Int): String {
+        return when (streak) {
+            0 -> "No streak yet"
+            1 -> "1 day streak, keep going!"
+            2 -> "2 day streak, keep it up!"
+            3 -> "3 day streak, you're on fire!"
+            4 -> "4 day streak, amazing!"
+            5 -> "5 day streak, incredible!"
+            6 -> "6 day streak, almost there!"
+            7 -> "You've been active all week!"
+            else -> "$streak day streak, outstanding!"
         }
     }
 }

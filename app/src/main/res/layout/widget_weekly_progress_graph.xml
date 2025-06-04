@@ -29,7 +29,7 @@
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/weeklyProgressChart"
             android:layout_width="match_parent"
-            android:layout_height="160dp"/>
+            android:layout_height="260dp"/>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView> 

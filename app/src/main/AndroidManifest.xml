@@ -49,7 +49,8 @@
             android:exported="false" />
         <activity
             android:name=".LocationDetailsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppTheme.CustomActionBar" />
 
         <!-- ✅ Memory Activity added for navigation -->
         <activity

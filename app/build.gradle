@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
 }
 
 def supabaseProperties = new Properties()
@@ -82,6 +83,9 @@ dependencies {
     // Location Services
     implementation 'com.google.android.gms:play-services-location:21.1.0'
 
+    // JSON
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
     // Supabase
     implementation "io.github.jan-tennert.supabase:supabase-kt:2.4.2"
     implementation "io.github.jan-tennert.supabase:postgrest-kt:2.4.2"

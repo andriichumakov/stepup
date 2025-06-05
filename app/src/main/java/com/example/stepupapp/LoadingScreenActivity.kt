@@ -3,7 +3,7 @@ package com.example.stepupapp
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
-import com.example.stepupapp.connection.ProfileService
+import com.example.stepupapp.services.ProfileService
 import com.example.stepupapp.databinding.LoadingScreenBinding
 
 class LoadingScreenActivity : BaseActivity() {
@@ -14,13 +14,7 @@ class LoadingScreenActivity : BaseActivity() {
         binding = LoadingScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ProfileService.insertTestRow()
-
         startProgressBar()
-    }
-
-    private fun isLoggedIn(): Boolean {
-        return false;
     }
 
     private fun startProgressBar() {
@@ -35,7 +29,7 @@ class LoadingScreenActivity : BaseActivity() {
 
             override fun onFinish() {
                 binding.progressBar.progress = 100
-                if (isLoggedIn()) {
+                if (ProfileService.isSignedIn()) {
                     goToMainActivity()
                 } else {
                     goToAuthOptionsActivity()

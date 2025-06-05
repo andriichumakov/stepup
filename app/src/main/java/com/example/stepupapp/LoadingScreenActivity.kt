@@ -18,8 +18,8 @@ class LoadingScreenActivity : BaseActivity() {
     }
 
     private fun startProgressBar() {
-        val totalTime = 5000L  // 5 seconds
-        val interval = 50L     // Update every 50ms for smoother animation
+        val totalTime = 3000L  // 5 seconds
+        val interval = 30L     // Update every 30ms for smoother animation
 
         object : CountDownTimer(totalTime, interval) {
             override fun onTick(millisUntilFinished: Long) {

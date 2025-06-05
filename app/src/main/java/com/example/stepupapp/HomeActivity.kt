@@ -78,6 +78,12 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
 
+        // Set up memory card click
+        binding.memoriesCard.setOnClickListener {
+            val intent = Intent(this, MemoryActivity::class.java)
+            startActivity(intent)
+        }
+
         // Set up weather widget click
         binding.weatherCard.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://weather.com/weather/today"))

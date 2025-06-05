@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/loadingScreenRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FAF6E9">
+
+        <!-- Centered container -->
+        <LinearLayout
+                android:id="@+id/centerContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                    android:id="@+id/welcomeMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome to StepUp!"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/signInPrompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="We noticed you are not signed in.\nPlease choose one of the following options:"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp"/>
+            <Button
+                    android:id="@+id/loginButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Login"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/dark_green"
+                    android:layout_marginBottom="8dp"/>
+
+            <!-- OR Text -->
+            <TextView
+                    android:id="@+id/orText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OR"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="8dp"/>
+
+            <Button
+                    android:id="@+id/registerButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Register"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@android:color/darker_gray"/>
+        </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

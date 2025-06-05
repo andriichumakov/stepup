@@ -27,7 +27,7 @@
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".LoadingScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,6 +60,14 @@
         <activity
                 android:name=".StepsOverviewActivity"
                 android:exported="false" />
+        <activity android:name=".AuthOptionsActivity"
+                  android:exported="false" />
+        <activity android:name=".LoginActivity"
+                  android:exported="false" />
+        <activity android:name=".RegisterActivity"
+                  android:exported="false" />
+        <activity android:name=".MainActivity"
+                  android:exported="false" />
 
         <!-- Step Counter Service -->
         <service

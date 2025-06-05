@@ -49,8 +49,8 @@
 
     <!-- Custom Progress Bar Style -->
     <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="android:progressTint">#FFFFFF</item>
-        <item name="android:progressBackgroundTint">#4DFFFFFF</item>
+        <item name="android:progressTint">#4CAF50</item>
+        <item name="android:progressBackgroundTint">#2A5A2A</item>
         <item name="android:minHeight">15dp</item>
     </style>
 </resources> 

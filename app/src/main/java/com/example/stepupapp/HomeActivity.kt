@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -76,10 +78,23 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
 
+        // Set up weather widget click
+        binding.weatherCard.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://weather.com/weather/today"))
+            startActivity(intent)
+        }
+
         // Set up history button
         binding.historyButton.setOnClickListener {
-            val intent = Intent(this, StepsOverviewActivity::class.java)
-            startActivity(intent)
+            try {
+                Log.d("HomeActivity", "History button clicked, starting StepsOverviewActivity")
+                val intent = Intent(this, StepsOverviewActivity::class.java)
+                startActivity(intent)
+                Log.d("HomeActivity", "StepsOverviewActivity started successfully")
+            } catch (e: Exception) {
+                Log.e("HomeActivity", "Error starting StepsOverviewActivity", e)
+                Toast.makeText(this, "Error opening steps overview", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Set up quote refresh button

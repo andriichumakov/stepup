@@ -22,7 +22,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 class StepCounterService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
-    private var totalSteps = 0  // Set initial steps to any number for testing
+    private var totalSteps = 0
     private var initialSteps = 0
     private var isFirstStep = true
     private var isEmulatorMode = false
@@ -36,7 +36,6 @@ class StepCounterService : Service(), SensorEventListener {
         private const val STEPS_PER_KM = 1312.33595801 // Average steps per kilometer
         private const val CALORIES_PER_STEP = 0.04 // Average calories burned per step
         private const val EMULATOR_STEP_INTERVAL = 5000L // 5 seconds between steps in emulator mode
-        private const val INITIAL_UPDATE_DELAY = 1000L // 1 second delay for initial update
     }
 
     override fun onCreate() {
@@ -52,9 +51,9 @@ class StepCounterService : Service(), SensorEventListener {
             sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
-            // Force emulator mode for testing
-            isEmulatorMode = true
-            android.util.Log.d("StepCounterService", "Forcing emulator mode for testing")
+            // Check if we're running on an emulator
+            isEmulatorMode = isEmulator()
+            android.util.Log.d("StepCounterService", "Running in ${if (isEmulatorMode) "emulator" else "device"} mode")
 
             createNotificationChannel()
             
@@ -69,9 +68,20 @@ class StepCounterService : Service(), SensorEventListener {
                 startForeground(NOTIFICATION_ID, createNotification())
             }
 
-            // Always start emulator mode for testing
-            android.util.Log.d("StepCounterService", "Starting emulator mode")
-            startEmulatorMode()
+            // Only start emulator mode if we're actually in an emulator
+            if (isEmulatorMode) {
+                android.util.Log.d("StepCounterService", "Starting emulator mode")
+                startEmulatorMode()
+            } else {
+                // Register the step sensor listener
+                stepSensor?.let {
+                    sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+                    android.util.Log.d("StepCounterService", "Step sensor registered")
+                } ?: run {
+                    android.util.Log.e("StepCounterService", "No step sensor found on device")
+                    Toast.makeText(this, "No step sensor found on your device", Toast.LENGTH_LONG).show()
+                }
+            }
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error in onCreate: ${e.message}", e)
             stopSelf()
@@ -132,6 +142,7 @@ class StepCounterService : Service(), SensorEventListener {
             if (!isEmulatorMode) {
                 stepSensor?.let {
                     sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+                    android.util.Log.d("StepCounterService", "Step sensor registered in onStartCommand")
                 }
             }
             return START_STICKY
@@ -155,6 +166,7 @@ class StepCounterService : Service(), SensorEventListener {
 
                 val currentSteps = event.values[0].toInt()
                 totalSteps = currentSteps - initialSteps
+                android.util.Log.d("StepCounterService", "Step sensor update - Current steps: $currentSteps, Initial steps: $initialSteps, Total steps: $totalSteps")
                 sendStepUpdate(totalSteps)
             }
         } catch (e: Exception) {
@@ -172,6 +184,9 @@ class StepCounterService : Service(), SensorEventListener {
             val calories = (steps * CALORIES_PER_STEP).toInt()
 
             android.util.Log.d("StepCounterService", "Sending step update - Steps: $steps, Distance: $distance, Calories: $calories")
+
+            // Save daily steps
+            UserPreferences.saveDailySteps(this, steps)
 
             // Send local broadcast
             val updateIntent = Intent("LOCAL_STEP_COUNT_UPDATE").apply {
@@ -248,6 +263,7 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.d("StepCounterService", "Service onDestroy called")
             if (!isEmulatorMode) {
                 sensorManager.unregisterListener(this)
+                android.util.Log.d("StepCounterService", "Step sensor unregistered")
             }
             serviceScope = null
             super.onDestroy()

@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.5.1")
     implementation("androidx.compose.foundation:foundation:1.5.1")
     implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
 
     // Retrofit & OkHttp
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

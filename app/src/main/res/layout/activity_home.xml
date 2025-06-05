@@ -251,7 +251,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
-                    android:background="#FDEEDC"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
                     app:layout_constraintTop_toBottomOf="@id/quoteCard"
@@ -287,20 +289,93 @@
                                 android:layout_width="120dp"
                                 android:layout_height="120dp"
                                 android:scaleType="centerCrop"
-                                android:background="@android:color/darker_gray"
+                                android:src="@drawable/memory_zoo"
+                                android:background="@drawable/rounded_image_background"
+                                android:padding="8dp"
                                 android:contentDescription="Memory image"/>
 
-                        <TextView
-                                android:id="@+id/memoryText"
+                        <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginStart="16dp"
-                                android:text="Your memories on March 15, 2024 at Central Park"
-                                android:textColor="@android:color/white"
-                                android:textSize="16sp"
-                                android:maxLines="3"
-                                android:ellipsize="end"/>
+                                android:orientation="vertical">
+
+                            <TextView
+                                    android:id="@+id/memoryDate"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:text="March 15, 2024"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginBottom="8dp"/>
+
+                            <TextView
+                                    android:id="@+id/memoryText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:text="A wonderful day at Wildlands Zoo"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="14sp"
+                                    android:maxLines="2"
+                                    android:ellipsize="end"/>
+
+                            <TextView
+                                    android:id="@+id/memorySteps"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="end"
+                                    android:text="8,500 steps"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="14sp"
+                                    android:alpha="0.8"
+                                    android:layout_marginTop="8dp"/>
+
+                            <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="end"
+                                    android:layout_marginTop="8dp">
+
+                                        <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:src="@drawable/ic_star"
+                                                android:tint="#FFD700"
+                                                android:layout_marginEnd="2dp"/>
+
+                                        <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:src="@drawable/ic_star"
+                                                android:tint="#FFD700"
+                                                android:layout_marginEnd="2dp"/>
+
+                                        <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:src="@drawable/ic_star"
+                                                android:tint="#FFD700"
+                                                android:layout_marginEnd="2dp"/>
+
+                                        <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:src="@drawable/ic_star"
+                                                android:tint="#FFD700"
+                                                android:layout_marginEnd="2dp"/>
+
+                                        <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:src="@drawable/ic_star"
+                                                android:tint="#FFD700"/>
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

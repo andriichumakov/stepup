@@ -29,6 +29,12 @@ class StepCounterService : Service(), SensorEventListener {
     private var serviceScope: CoroutineScope? = null
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
+    // Track notification states
+    private var hasNotified75 = false
+    private var hasNotified90 = false
+    private var hasNotified95 = false
+    private var hasNotified100 = false
+
     companion object {
         private const val NOTIFICATION_ID = 1
         private const val CHANNEL_ID = "StepCounterChannel"
@@ -44,6 +50,9 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.d("StepCounterService", "Service onCreate called")
             serviceScope = CoroutineScope(Dispatchers.Default)
             localBroadcastManager = LocalBroadcastManager.getInstance(this)
+
+            // Reset notification states at the start of a new day
+            resetNotificationStates()
 
             // Send initial update immediately
             sendStepUpdate(totalSteps)
@@ -200,9 +209,55 @@ class StepCounterService : Service(), SensorEventListener {
             // Update notification
             updateNotification(steps, distance, calories)
             android.util.Log.d("StepCounterService", "Notification updated")
+
+            // Check if we should send a goal reminder
+            checkAndSendGoalReminder(steps)
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error sending step update", e)
         }
+    }
+
+    private fun checkAndSendGoalReminder(currentSteps: Int) {
+        try {
+            val target = UserPreferences.getStepTarget(this)
+            val percentage = (currentSteps.toFloat() / target.toFloat()) * 100
+
+            // Send notification when user reaches 75%, 90%, 95%, and 100% of their goal
+            when {
+                currentSteps >= target && !hasNotified100 -> {
+                    sendGoalReminder(currentSteps, target, 100)
+                    hasNotified100 = true
+                }
+                percentage >= 95 && !hasNotified95 && !hasNotified100 -> {
+                    sendGoalReminder(currentSteps, target, 95)
+                    hasNotified95 = true
+                }
+                percentage >= 90 && !hasNotified90 && !hasNotified100 -> {
+                    sendGoalReminder(currentSteps, target, 90)
+                    hasNotified90 = true
+                }
+                percentage >= 75 && !hasNotified75 && !hasNotified100 -> {
+                    sendGoalReminder(currentSteps, target, 75)
+                    hasNotified75 = true
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("StepCounterService", "Error checking goal reminder", e)
+        }
+    }
+
+    private fun sendGoalReminder(currentSteps: Int, target: Int, percentage: Int) {
+        val remainingSteps = target - currentSteps
+        val title = when (percentage) {
+            100 -> "Step Goal Achieved! 🎉"
+            else -> "Step Goal Progress: $percentage%"
+        }
+        val message = when {
+            percentage == 100 -> "Congratulations! You've reached your daily step goal! 🎉"
+            remainingSteps <= 100 -> "You're so close! Only $remainingSteps steps left to reach your goal!"
+            else -> "You're at $percentage% of your goal! Only $remainingSteps steps to go!"
+        }
+        AddReminders.sendStepGoalNotification(this, title, message)
     }
 
     private fun createNotificationChannel() {
@@ -258,6 +313,13 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
+    private fun resetNotificationStates() {
+        hasNotified75 = false
+        hasNotified90 = false
+        hasNotified95 = false
+        hasNotified100 = false
+    }
+
     override fun onDestroy() {
         try {
             android.util.Log.d("StepCounterService", "Service onDestroy called")
@@ -266,6 +328,8 @@ class StepCounterService : Service(), SensorEventListener {
                 android.util.Log.d("StepCounterService", "Step sensor unregistered")
             }
             serviceScope = null
+            // Reset notification states when service is destroyed
+            resetNotificationStates()
             super.onDestroy()
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error in onDestroy", e)

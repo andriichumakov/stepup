@@ -21,12 +21,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.StepUpApp"
-        tools:targetApi="34">
+        tools:targetApi="34"
+        android:name=".AddReminders">
 
 
         <!-- Launcher Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".LoadingScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,7 +50,8 @@
             android:exported="false" />
         <activity
             android:name=".LocationDetailsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/AppTheme.CustomActionBar" />
 
         <!-- ✅ Memory Activity added for navigation -->
         <activity
@@ -58,6 +60,14 @@
         <activity
                 android:name=".StepsOverviewActivity"
                 android:exported="false" />
+        <activity android:name=".AuthOptionsActivity"
+                  android:exported="false" />
+        <activity android:name=".LoginActivity"
+                  android:exported="false" />
+        <activity android:name=".RegisterActivity"
+                  android:exported="false" />
+        <activity android:name=".MainActivity"
+                  android:exported="false" />
 
         <!-- Step Counter Service -->
         <service
@@ -71,7 +81,7 @@
             android:exported="false"
             />
 
-
+        <receiver android:name=".StepGoalNotificationReceiver" android:enabled="true" android:exported="false" />
     </application>
 
 </manifest>

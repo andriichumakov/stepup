@@ -2,6 +2,15 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
+}
+
+def supabaseProperties = new Properties()
+def supabasePropsFile = rootProject.file("supabase.properties")
+if (supabasePropsFile.exists()) {
+    supabaseProperties.load(new FileInputStream(supabasePropsFile))
+} else {
+    throw new GradleException("Missing supabase.properties file")
 }
 
 android {
@@ -16,6 +25,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        android.buildFeatures.buildConfig true
+        // Supabase connection
+        buildConfigField("String", "SUPABASE_URL", "\"${supabaseProperties["SUPABASE_URL"]}\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"${supabaseProperties["SUPABASE_KEY"]}\"")
     }
 
     buildTypes {
@@ -69,4 +82,13 @@ dependencies {
 
     // Location Services
     implementation 'com.google.android.gms:play-services-location:21.1.0'
+
+    // JSON
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
+    // Supabase
+    implementation "io.github.jan-tennert.supabase:supabase-kt:2.4.2"
+    implementation "io.github.jan-tennert.supabase:postgrest-kt:2.4.2"
+    // Include a Ktor client engine, e.g., CIO
+    implementation "io.ktor:ktor-client-android:2.3.12"
 } 

@@ -43,7 +43,8 @@ data class WikipediaExtracts(
 
 data class Sources(
     val geometry: String,
-    val attributes: List<String>
+    val attributes: List<String>,
+    val opening_hours: String?
 )
 
 interface OpenTripMapService {

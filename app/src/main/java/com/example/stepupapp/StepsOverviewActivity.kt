@@ -223,7 +223,7 @@ class StepsOverviewActivity : BaseActivity() {
     private fun calculateCurrentStreak(weeklyData: List<UserPreferences.DailyStepsData>): Int {
         var streak = 0
         // Sort data by date in descending order (most recent first)
-        val sortedData = weeklyData.sortedByDescending { it.day }
+        val sortedData = weeklyData.sortedByDescending { it.date }
         
         // Check consecutive days from most recent
         for (data in sortedData) {

@@ -60,7 +60,7 @@ object UserPreferences {
                 val dayName = dayFormat.format(date)
                 val steps = getPrefs(context).getInt("$KEY_DAILY_STEPS_PREFIX$dateStr", 0)
                 Log.d("UserPreferences", "Getting steps for $dateStr ($dayName): $steps")
-                result.add(DailyStepsData(dayName, steps, getStepTarget(context)))
+                result.add(DailyStepsData(dayName, steps, getStepTarget(context), date))
             }
 
             Log.d("UserPreferences", "Generated weekly data with ${result.size} days")
@@ -112,7 +112,7 @@ object UserPreferences {
                 // Get the stored calories value
                 val calories = getPrefs(context).getInt("$KEY_DAILY_CALORIES_PREFIX$dateStr", 0)
                 Log.d("UserPreferences", "Getting stored calories for $dateStr ($dayName): $calories")
-                result.add(DailyStepsData(dayName, calories, DEFAULT_CALORIE_TARGET))
+                result.add(DailyStepsData(dayName, calories, DEFAULT_CALORIE_TARGET, date))
             }
 
             Log.d("UserPreferences", "Generated weekly calories data with ${result.size} days")
@@ -140,7 +140,7 @@ object UserPreferences {
                 // Get the stored distance value
                 val distance = getPrefs(context).getInt("$KEY_DAILY_DISTANCE_PREFIX$dateStr", 0)
                 Log.d("UserPreferences", "Getting stored distance for $dateStr ($dayName): $distance")
-                result.add(DailyStepsData(dayName, distance, DEFAULT_DISTANCE_TARGET))
+                result.add(DailyStepsData(dayName, distance, DEFAULT_DISTANCE_TARGET, date))
             }
 
             Log.d("UserPreferences", "Generated weekly distance data with ${result.size} days")
@@ -164,6 +164,7 @@ object UserPreferences {
     data class DailyStepsData(
         val day: String,
         val steps: Int,
-        val target: Int
+        val target: Int,
+        val date: Date
     )
 }

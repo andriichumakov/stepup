@@ -12,19 +12,25 @@
         layout="@layout/header_standard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,7 +64,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#C5F7D0"
+                    android:background="#FFD75C"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -85,8 +91,8 @@
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp"
-                        app:boxStrokeColor="#1A237E"
-                        app:hintTextColor="#1A237E">
+                        app:boxStrokeColor="@color/dark_blue"
+                        app:hintTextColor="@color/dark_blue">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextNumber2"
@@ -94,7 +100,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:text="15000"
-                            android:textColor="#1A237E"
+                            android:textColor="@color/dark_blue"
                             android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -105,151 +111,159 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#55BF73"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="#F8F9FA"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:rippleColor="#1F000000"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp"
+                android:layout_marginHorizontal="2dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:elevation="2dp"
-                    android:text="@string/setting_h4"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:drawableStartCompat="@android:drawable/ic_menu_sort_by_size"
-                    app:drawableTint="#EAEBF6" />
-
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#C5F7D0"
+                    android:background="#55BF73"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_one"
+                        android:drawablePadding="8dp"
+                        android:elevation="2dp"
+                        android:text="@string/setting_h4"
                         android:textColor="#FFFFFF"
-                        android:textSize="14sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@android:drawable/ic_menu_sort_by_size"
+                        app:drawableTint="#FFFFFF" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <GridLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_two"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="12dp"
+                        android:columnCount="2"
+                        android:rowCount="5">
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox11"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_three"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox10"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_two"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox12"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_four"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox11"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_three"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox14"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_five"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox12"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_four"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox16"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_six"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox14"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_five"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox18"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_seven"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox16"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_six"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox21"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_eight"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox18"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_seven"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox20"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_nine"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox21"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_eight"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/checkBox22"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_margin="4dp"
-                        android:text="@string/interest_ten"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        app:buttonTint="#FFFFFF" />
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox20"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_nine"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                </GridLayout>
+                        <com.google.android.material.checkbox.MaterialCheckBox
+                            android:id="@+id/checkBox22"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="4dp"
+                            android:text="@string/interest_ten"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            app:buttonTint="#FFFFFF" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:padding="12dp"
-                    android:text="@string/setting_save"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    app:backgroundTint="#55BF73"
-                    app:cornerRadius="12dp"
-                    app:elevation="4dp" />
-
+                    </GridLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:text="@string/setting_save"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                app:backgroundTint="#55BF73"
+                app:cornerRadius="12dp"
+                app:elevation="4dp" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

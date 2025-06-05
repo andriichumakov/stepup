@@ -14,6 +14,16 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Check if setup is already completed
+        if (UserPreferences.isSetupCompleted(this)) {
+            // Skip setup and go directly to HomeActivity
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        
         val serviceIntent = Intent(this, StepCounterService::class.java)
         startService(serviceIntent)
         binding = SetupPageBinding.inflate(layoutInflater)
@@ -22,14 +32,17 @@ class MainActivity : BaseActivity() {
         // Set up preset step target buttons
         binding.button.setOnClickListener {
             setStepTarget(5000)
+            binding.editTextNumber.setText("5000")
             hasUserSetTarget = true
         }
         binding.button3.setOnClickListener {
             setStepTarget(6500)
+            binding.editTextNumber.setText("6500")
             hasUserSetTarget = true
         }
         binding.button4.setOnClickListener {
             setStepTarget(8000)
+            binding.editTextNumber.setText("8000")
             hasUserSetTarget = true
         }
 
@@ -53,6 +66,9 @@ class MainActivity : BaseActivity() {
                 if (!hasUserSetTarget) {
                     setStepTarget(6000) // Default target
                 }
+
+                // Mark setup as completed
+                UserPreferences.setSetupCompleted(this)
 
                 // Proceed to home activity
                 val intent = Intent(this, HomeActivity::class.java)

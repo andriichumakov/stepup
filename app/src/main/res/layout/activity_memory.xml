@@ -32,10 +32,11 @@
                 android:id="@+id/txtPlaceName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:text="Name of the place"
-                android:textStyle="bold"
+                android:textColor="#1A237D"
                 android:textSize="20sp"
-                android:layout_marginBottom="16dp" />
+                android:textStyle="bold" />
 
             <!-- Icon + Info Rows -->
             <LinearLayout
@@ -127,8 +128,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="List of places"
-                android:layout_marginBottom="8dp" />
+                android:textColor="#1A237D" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -146,14 +148,16 @@
                     <Button
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:text="1"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="@color/primary_green"
+                        android:text="1" />
 
                     <Button
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:text="2"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="@color/primary_green"
+                        android:text="2" />
 
                     <!-- More buttons can be added here -->
                 </LinearLayout>
@@ -170,8 +174,8 @@
                 android:id="@+id/btnAddPlace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/primary_green"
                 android:text="ADD NEW PLACE"
-                android:backgroundTint="#000000"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
     </ScrollView>

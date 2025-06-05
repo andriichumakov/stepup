@@ -147,7 +147,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    app:cardBackgroundColor="#FDCA00"
+                    app:cardBackgroundColor="@color/light_yellow"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="2dp">
 
@@ -155,11 +155,11 @@
                         android:id="@+id/categorySpinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#FDCA00"
-                        android:backgroundTint="#FDCA00"
+                        android:background="@color/light_yellow"
+                        android:backgroundTint="@color/light_yellow"
                         android:minWidth="120dp"
                         android:padding="8dp"
-                        android:popupBackground="#FDCA00" />
+                        android:popupBackground="@color/light_yellow" />
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
 
@@ -182,10 +182,10 @@
         android:layout_margin="16dp"
         android:alpha="0.8"
         android:contentDescription="Go back to home"
-        app:backgroundTint="#FDCA00"
+        app:backgroundTint="@color/light_yellow"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_menu_revert"
-        app:tint="#1A237E"
+        app:tint="@color/dark_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

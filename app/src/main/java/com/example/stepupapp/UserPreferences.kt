@@ -9,6 +9,7 @@ import java.util.*
 object UserPreferences {
     private const val PREFS_NAME = "StepUpPrefs"
     private const val KEY_STEP_TARGET = "step_target"
+    private const val KEY_SETUP_COMPLETED = "setup_completed"
     private const val DEFAULT_STEP_TARGET = 6000
     private const val KEY_DAILY_STEPS_PREFIX = "daily_steps_"
     private const val KEY_DAILY_CALORIES_PREFIX = "daily_calories_"
@@ -26,6 +27,14 @@ object UserPreferences {
 
     fun setStepTarget(context: Context, target: Int) {
         getPrefs(context).edit().putInt(KEY_STEP_TARGET, target).apply()
+    }
+
+    fun isSetupCompleted(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_SETUP_COMPLETED, false)
+    }
+
+    fun setSetupCompleted(context: Context, completed: Boolean = true) {
+        getPrefs(context).edit().putBoolean(KEY_SETUP_COMPLETED, completed).apply()
     }
 
     fun saveDailySteps(context: Context, steps: Int) {

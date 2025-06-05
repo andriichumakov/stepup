@@ -11,7 +11,9 @@
         layout="@layout/header_standard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -37,29 +39,29 @@
                     app:layout_constraintEnd_toEndOf="parent">
 
                 <LinearLayout
-                        android:layout_width="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary_green"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:background="#1f823a">
+                        android:text="Your steps overview"
+                        android:textColor="@android:color/white"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Your steps overview"
-                            android:textColor="@android:color/white"
-                            android:textSize="24sp"
-                            android:textStyle="bold"/>
-
-                    <TextView
-                            android:id="@+id/averageStepsText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Average daily steps: 6850"
-                            android:textColor="@android:color/white"
-                            android:textSize="16sp"
-                            android:alpha="0.8"/>
+                        android:id="@+id/averageStepsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.8"
+                        android:text="Average daily steps: 6850"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -76,41 +78,41 @@
                     app:layout_constraintEnd_toEndOf="parent">
 
                 <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:background="#1f823a">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary_green"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Weekly History"
-                            android:layout_gravity="center_horizontal"
-                            android:textColor="@android:color/white"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="10dp"
+                        android:text="Weekly History"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <!-- Tab Layout -->
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tabLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:background="@android:color/transparent"
-                        app:tabTextColor="@android:color/white"
-                        app:tabSelectedTextColor="@android:color/white"
+                        app:tabGravity="fill"
                         app:tabIndicatorColor="@android:color/white"
                         app:tabMode="fixed"
-                        app:tabGravity="fill"
-                        android:layout_marginBottom="8dp"/>
+                        app:tabSelectedTextColor="@android:color/white"
+                        app:tabTextColor="@android:color/white" />
 
                     <!-- ViewPager for tab content -->
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/viewPager"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"/>
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

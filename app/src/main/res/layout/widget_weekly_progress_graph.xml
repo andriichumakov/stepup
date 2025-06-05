@@ -12,24 +12,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary_green"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="#1f823a">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
             android:text="Weekly Progress"
             android:textColor="@android:color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"/>
+            android:textStyle="bold" />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/weeklyProgressChart"
             android:layout_width="match_parent"
-            android:layout_height="260dp"/>
+            android:layout_height="260dp" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView> 

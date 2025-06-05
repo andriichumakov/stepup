@@ -8,11 +8,11 @@
     android:layout_marginVertical="8dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardBackgroundColor="#55BF73"
+    app:cardBackgroundColor="@color/primary_green"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     app:rippleColor="#1F000000"
-    app:strokeColor="#55BF73"
+    app:strokeColor="@color/primary_green"
     app:strokeWidth="1dp">
 
     <LinearLayout

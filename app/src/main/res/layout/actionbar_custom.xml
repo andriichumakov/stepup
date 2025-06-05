@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:background="#FFD75C"
     android:gravity="center_vertical"
-    android:background="@color/orange_accent">
+    android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/actionbar_logo"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:src="@drawable/stepup_logo_bunny_small"
-        android:contentDescription="Logo"/>
+        android:contentDescription="Logo"
+        android:src="@drawable/stepup_logo_bunny_small" />
 
     <TextView
         android:id="@+id/actionbar_location"
@@ -22,7 +21,7 @@
         android:layout_marginStart="16dp"
         android:text="Emmen, Netherlands"
         android:textColor="@color/primary_green"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
 </LinearLayout> 

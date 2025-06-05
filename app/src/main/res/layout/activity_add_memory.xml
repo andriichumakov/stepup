@@ -25,8 +25,9 @@
             android:id="@+id/btnChooseImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choose Image"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#1A237D"
+            android:text="Choose Image" />
 
         <!-- Date Input -->
         <EditText
@@ -59,8 +60,9 @@
             android:id="@+id/btnSubmitMemory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add Memory"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#1A237D"
+            android:text="Add Memory" />
 
     </LinearLayout>
 </ScrollView>

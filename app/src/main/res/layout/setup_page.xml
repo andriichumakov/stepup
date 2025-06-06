@@ -137,15 +137,6 @@
             android:rowCount="5">
 
             <CheckBox
-                android:id="@+id/checkAdult"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="4dp"
-                android:text="@string/interest_one"
-                android:textColor="@color/black" />
-
-            <CheckBox
                 android:id="@+id/checkAmusements"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

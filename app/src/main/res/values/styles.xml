@@ -4,15 +4,15 @@
     <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/primary_green</item>
         <item name="colorPrimaryVariant">@color/dark_green</item>
-        <item name="colorSecondary">@color/orange_accent</item>
-        <item name="colorSecondaryVariant">@color/dark_orange</item>
+        <item name="colorSecondary">@color/light_yellow</item>
+        <item name="colorSecondaryVariant">@color/gold_accent</item>
         <item name="android:windowBackground">@color/background_cream</item>
     </style>
     
     <!-- Custom ActionBar theme -->
     <style name="AppTheme.CustomActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="colorPrimary">@color/orange_accent</item>
-        <item name="colorPrimaryVariant">@color/dark_orange</item>
+        <item name="colorPrimary">@color/light_yellow</item>
+        <item name="colorPrimaryVariant">@color/gold_accent</item>
         <item name="colorSecondary">@color/primary_green</item>
         <item name="colorSecondaryVariant">@color/dark_green</item>
         <item name="android:windowBackground">@color/background_cream</item>
@@ -21,7 +21,7 @@
     
     <!-- Custom ActionBar style -->
     <style name="CustomActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
-        <item name="background">@color/orange_accent</item>
+        <item name="background">@color/light_yellow</item>
         <item name="titleTextStyle">@style/ActionBarTitleText</item>
     </style>
     
@@ -34,22 +34,22 @@
 
     <!-- Category Spinner Style -->
     <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
-        <item name="android:textColor">#1A237E</item>
+        <item name="android:textColor">@color/dark_blue</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <!-- Category Spinner Dropdown Item Style -->
     <style name="CustomSpinnerDropdownItemStyle" parent="Widget.AppCompat.DropDownItem.Spinner">
-        <item name="android:textColor">#1A237E</item>
+        <item name="android:textColor">@color/dark_blue</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:background">#F0BB78</item>
+        <item name="android:background">@color/light_yellow</item>
         <item name="android:padding">10dp</item>
     </style>
 
     <!-- Custom Progress Bar Style -->
     <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="android:progressTint">#4CAF50</item>
+        <item name="android:progressTint">@color/light_yellow</item>
         <item name="android:progressBackgroundTint">#2A5A2A</item>
         <item name="android:minHeight">15dp</item>
     </style>

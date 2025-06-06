@@ -9,9 +9,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Custom colors for StepUp app -->
-    <color name="primary_green">#1F823A</color>
-    <color name="dark_green">#166D2E</color>
-    <color name="orange_accent">#F0BB78</color>
-    <color name="dark_orange">#E5A963</color>
-    <color name="background_cream">#FAF6E9</color>
+    <color name="dark_blue">#FF1A237D</color>
+    <color name="primary_green">#FF55BF73</color>
+    <color name="dark_green">#FF166D2E</color>
+    <color name="gold_accent">#FFD01D</color>
+    <color name="light_yellow">#FFFFD75C</color>
+    <color name="background_cream">#FFFAF6E9</color>
 </resources>

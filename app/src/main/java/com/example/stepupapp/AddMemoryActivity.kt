@@ -39,6 +39,7 @@ class AddMemoryActivity : AppCompatActivity() {
     private lateinit var dateInput: EditText
     private lateinit var locationInput: EditText
     private lateinit var stepsInput: EditText  // Added steps input
+    private lateinit var backBtn: Button  // Added back button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +51,7 @@ class AddMemoryActivity : AppCompatActivity() {
         dateInput = findViewById(R.id.editTextDate)
         locationInput = findViewById(R.id.editTextLocation)
         stepsInput = findViewById(R.id.editTextSteps)  // You must add this EditText in your layout!
+        backBtn = findViewById(R.id.btnBack)  // Initialize back button
 
         chooseImageBtn.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
@@ -68,6 +70,13 @@ class AddMemoryActivity : AppCompatActivity() {
                 val imageFile = uriToFile(selectedImageUri!!)
                 uploadPlace(imageFile, location, date, steps)
             }
+        }
+
+        // Set up the back button click listener
+        backBtn.setOnClickListener {
+            val intent = Intent(this, MemoryActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 

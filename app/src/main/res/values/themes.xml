@@ -3,8 +3,8 @@
 
     <style name="Theme.StepUpApp" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/orange_accent</item>
-        <item name="colorPrimaryVariant">@color/dark_orange</item>
+        <item name="colorPrimary">@color/light_yellow</item>
+        <item name="colorPrimaryVariant">@color/gold_accent</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/primary_green</item>
@@ -17,7 +17,7 @@
     </style>
 
     <style name="Widget.StepUpApp.ActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
-        <item name="background">@color/orange_accent</item>
+        <item name="background">@color/light_yellow</item>
         <item name="titleTextStyle">@style/TextAppearance.StepUpApp.ActionBar.Title</item>
     </style>
 

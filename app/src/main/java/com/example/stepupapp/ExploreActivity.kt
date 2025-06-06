@@ -11,10 +11,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -30,6 +33,7 @@ import com.example.stepupapp.databinding.PlaceCardBinding
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -55,21 +59,36 @@ class ExploreActivity : AppCompatActivity() {
     private var currentLocationName = "Emmen, Netherlands"
     private var isLocationUpdatesActive = false
 
-    private var currentCategory = "All"
     private var allPlacesList = listOf<OpenTripMapResponse>()
+    private var currentSubcategory = ""
+    private var userInterests = setOf<String>()
+    private var isManualFilterMode = false
+    private var filterJob: kotlinx.coroutines.Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExplorePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Load user interests
+        userInterests = UserPreferences.getUserInterests(this)
+
         // Initialize location services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createLocationRequest()
         createLocationCallback()
 
-        // Initialize category spinner
+        // Initialize category spinner (hidden by default)
         setupCategorySpinner()
+        
+        // Initialize subcategory search
+        setupSubcategorySearch()
+
+        // Setup toggle button for manual filtering
+        setupToggleButton()
+
+        // Display user interests
+        displayUserInterests()
 
         // Set up home button to navigate back to home screen
         binding.homeButton.setOnClickListener {
@@ -104,9 +123,16 @@ class ExploreActivity : AppCompatActivity() {
             requestLocationPermission()
         }
 
-        // Make location card clickable to open current location on Google Maps
+        // Make location card clickable to refresh location
         binding.locationCard.setOnClickListener {
-            openCurrentLocationOnMaps()
+            if (checkLocationPermission()) {
+                binding.locationProgressBar.visibility = View.VISIBLE
+                binding.locationText.text = "Refreshing location..."
+                startLocationUpdates()
+                Toast.makeText(this, "Refreshing nearby places...", Toast.LENGTH_SHORT).show()
+            } else {
+                requestLocationPermission()
+            }
         }
     }
 
@@ -224,6 +250,16 @@ class ExploreActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        
+        // Refresh user interests display and filter
+        userInterests = UserPreferences.getUserInterests(this)
+        displayUserInterests()
+        
+        // Refresh places with potentially updated interests
+        if (allPlacesList.isNotEmpty()) {
+            filterPlaces()
+        }
+        
         if (checkLocationPermission() && !isLocationUpdatesActive) {
             startLocationUpdates()
         }
@@ -252,8 +288,14 @@ class ExploreActivity : AppCompatActivity() {
                     textSize = 14f
                     typeface = Typeface.DEFAULT_BOLD
                 }
-                if (currentCategory != selectedCategory) {
-                    currentCategory = selectedCategory
+                
+                // Only use spinner selection in manual filter mode
+                if (isManualFilterMode) {
+                    // Override user interests with manual selection
+                    userInterests = setOf(selectedCategory)
+                    // Clear subcategory search when category changes
+                    binding.subcategorySearch.setText("")
+                    currentSubcategory = ""
                     filterPlaces()
                 }
             }
@@ -262,68 +304,214 @@ class ExploreActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupSubcategorySearch() {
+        // Set up autocomplete with all subcategories
+        val subcategories = resources.getStringArray(R.array.all_subcategories)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, subcategories)
+        binding.subcategorySearch.setAdapter(adapter)
+        
+        // Handle text changes for filtering
+        binding.subcategorySearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString().isNotEmpty()) {
+                    currentSubcategory = s.toString()
+                    filterPlaces()
+                } else {
+                    currentSubcategory = ""
+                    filterPlaces()
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+        
+        // Handle item selection from dropdown
+        binding.subcategorySearch.setOnItemClickListener { _, _, _, _ ->
+            // Filter will be triggered by text change
+            binding.subcategorySearch.clearFocus()
+        }
+        
+        // Set up clear button
+        binding.clearSearchButton.setOnClickListener {
+            binding.subcategorySearch.setText("")
+            binding.subcategorySearch.clearFocus()
+            currentSubcategory = ""
+            filterPlaces()
+        }
+    }
+
+    private fun setupToggleButton() {
+        binding.toggleFilterButton.setOnClickListener {
+            isManualFilterMode = !isManualFilterMode
+            if (isManualFilterMode) {
+                binding.categorySpinnerCard.visibility = View.VISIBLE
+                binding.toggleFilterButton.text = "Use My Interests"
+                Toast.makeText(this, "Manual filter mode enabled", Toast.LENGTH_SHORT).show()
+            } else {
+                binding.categorySpinnerCard.visibility = View.GONE
+                binding.toggleFilterButton.text = "Manual Filter"
+                Toast.makeText(this, "Showing places from your interests", Toast.LENGTH_SHORT).show()
+            }
+            filterPlaces()
+        }
+    }
+
     private fun loadPlaces() {
+        // Cancel any ongoing filter operation
+        filterJob?.cancel()
+        
         binding.placesContainer.removeAllViews()
         allPlacesList = emptyList()
         Toast.makeText(this, "Loading places...", Toast.LENGTH_SHORT).show()
 
         lifecycleScope.launch {
             try {
+                Log.d(TAG, "Making API call with coordinates: lat=$currentLatitude, lon=$currentLongitude")
                 val places = openTripMapService.searchPlaces(
                     longitude = currentLongitude,
                     latitude = currentLatitude,
-                    apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
+                    apiKey = "5ae2e3f221c38a28845f05b66b2ebd0c0a4a7428f0803525b45f11d8"
                 )
 
-                if (places.isEmpty()) {
+                Log.d(TAG, "API response received: ${places.size} places")
+                
+                // Filter out dummy/test data
+                val filteredPlaces = places.filter { place ->
+                    val name = place.name.lowercase()
+                    // Exclude Android codenames and other obvious dummy data
+                    !name.contains("eclair") && 
+                    !name.contains("marshmallow") &&
+                    !name.contains("lollipop") &&
+                    !name.contains("play music") &&
+                    !name.contains("google sign") &&
+                    !name.contains("android") &&
+                    !name.contains("test") &&
+                    name.isNotBlank() &&
+                    place.dist <= 15000 // Ensure within 15km
+                }
+                
+                // Remove duplicates based on xid (unique identifier)
+                val uniquePlaces = filteredPlaces.distinctBy { it.xid }
+                
+                // Also remove duplicates by name (in case same place has different xids)
+                val finalPlaces = uniquePlaces.groupBy { it.name.lowercase().trim() }
+                    .mapValues { entry -> entry.value.minByOrNull { it.dist } } // Keep closest if duplicates by name
+                    .values
+                    .filterNotNull()
+                    .sortedBy { it.dist } // Sort by distance (closest first)
+                
+                finalPlaces.forEachIndexed { index, place ->
+                    Log.d(TAG, "Unique Place $index: name='${place.name}', xid='${place.xid}', kinds='${place.kinds}', dist=${place.dist}")
+                }
+
+                if (finalPlaces.isEmpty()) {
                     Toast.makeText(this@ExploreActivity, "No places found nearby", Toast.LENGTH_SHORT).show()
                     return@launch
                 }
 
-                allPlacesList = places
-                filterPlaces()
+                allPlacesList = finalPlaces
+                filterPlaces() // Apply interest-based filtering immediately
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading places: ${e.message}")
+                Log.e(TAG, "Error loading places: ${e.message}", e)
+                Toast.makeText(this@ExploreActivity, "Error loading places: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun filterPlaces() {
         if (allPlacesList.isEmpty()) return
+        
+        // Cancel any ongoing filter operation
+        filterJob?.cancel()
+        
+        // Clear the container immediately
         binding.placesContainer.removeAllViews()
 
-        val kindFilter = when (currentCategory) {
-            "All" -> ""
-            "Adult" -> "adult"
-            "Amusements" -> "amusements"
-            "Architecture" -> "architecture"
-            "Cultural" -> "cultural"
-            "Shops" -> "shops"
-            "Foods" -> "foods,cuisine"
-            "Sport" -> "sport"
-            "Historical" -> "historic"
-            "Natural" -> "natural"
-            "Other" -> "other"
-            else -> ""
+        // Create filters based on user interests instead of single category
+        val interestFilters = if (userInterests.isEmpty() || userInterests.contains("All")) {
+            emptyList() // Show all if no specific interests
+        } else {
+            userInterests.mapNotNull { interest ->
+                when (interest) {
+                    "Amusements" -> "amusements"
+                    "Architecture" -> "architecture"
+                    "Cultural" -> "cultural"
+                    "Shops" -> "shops"
+                    "Foods" -> "foods,cuisine"
+                    "Sport" -> "sport"
+                    "Historical" -> "historic"
+                    "Natural" -> "natural"
+                    "Other" -> "other"
+                    else -> null
+                }
+            }
         }
 
-        lifecycleScope.launch {
-            val filteredPlaces = if (kindFilter.isEmpty()) {
-                allPlacesList
-            } else {
-                allPlacesList.filter { it.kinds.contains(kindFilter) }
+        // Get subcategory filter from search
+        val subcategoryFilter = getSubcategoryFilter(currentSubcategory)
+
+        filterJob = lifecycleScope.launch {
+            val filteredPlaces = allPlacesList.filter { place ->
+                val kinds = place.kinds.lowercase()
+                val name = place.name.lowercase()
+                
+                // First filter: Block all adult content (FAMILY SAFETY)
+                val isAdultContent = kinds.contains("adult") || 
+                                   kinds.contains("strip") ||
+                                   kinds.contains("nightclub") ||
+                                   kinds.contains("casino") ||
+                                   kinds.contains("gambling") ||
+                                   kinds.contains("brewery") ||
+                                   kinds.contains("bar") ||
+                                   kinds.contains("pub") ||
+                                   name.contains("casino") ||
+                                   name.contains("strip") ||
+                                   name.contains("adult")
+                
+                if (isAdultContent) return@filter false
+                
+                // Second filter: Interest-based categories (show places from ALL user interests)
+                val matchesInterests = if (interestFilters.isEmpty()) {
+                    true // Show all if no specific interests
+                } else {
+                    interestFilters.any { filter ->
+                        filter.split(",").any { kinds.contains(it.trim()) }
+                    }
+                }
+                
+                // Third filter: Subcategory filter from search
+                val matchesSubcategory = if (subcategoryFilter.isEmpty() || 
+                                           currentSubcategory.isEmpty()) {
+                    true
+                } else {
+                    subcategoryFilter.split(",").any { kinds.contains(it.trim()) }
+                }
+                
+                matchesInterests && matchesSubcategory
             }
 
             if (filteredPlaces.isEmpty()) {
-                Toast.makeText(this@ExploreActivity, "No places found in category: $currentCategory", Toast.LENGTH_SHORT).show()
+                val message = if (currentSubcategory.isNotEmpty()) {
+                    "No places found for: $currentSubcategory"
+                } else if (userInterests.isNotEmpty() && !userInterests.contains("All")) {
+                    "No places found for your interests: ${userInterests.joinToString(", ")}"
+                } else {
+                    "No places found nearby"
+                }
+                Toast.makeText(this@ExploreActivity, message, Toast.LENGTH_SHORT).show()
                 return@launch
             }
+
+            // Clear container again before adding new cards (double safety)
+            binding.placesContainer.removeAllViews()
 
             for (place in filteredPlaces) {
                 try {
                     val details = openTripMapService.getPlaceDetails(
                         xid = place.xid,
-                        apiKey = "5ae2e3f221c38a28845f05b6b1be8e1a545a03d2400444bde9904bde"
+                        apiKey = "5ae2e3f221c38a28845f05b66b2ebd0c0a4a7428f0803525b45f11d8"
                     )
                     createPlaceCard(place, details)
                 } catch (e: Exception) {
@@ -348,8 +536,25 @@ class ExploreActivity : AppCompatActivity() {
         cardBinding.placeRating.text = "⭐ $rating/10"
         cardBinding.placeAddress.text = stepsText
 
+        // Set click listener to navigate to LocationDetailsActivity
         cardBinding.root.setOnClickListener {
-            openPlaceDetails(place, details, rating.toString(), stepsText)
+            Log.d(TAG, "Place card clicked: $name")
+            try {
+                val intent = Intent(this, LocationDetailsActivity::class.java).apply {
+                    putExtra("name", name)
+                    putExtra("type", type)
+                    putExtra("description", details?.wikipedia_extracts?.text ?: "No description available for this location.")
+                    putExtra("rating", "$rating/10")
+                    putExtra("steps", stepsText)
+                    putExtra("openingHours", details?.sources?.opening_hours ?: "Opening hours not available")
+                    putExtra("latitude", place.point.lat)
+                    putExtra("longitude", place.point.lon)
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error opening location details: ${e.message}")
+                Toast.makeText(this, "Error opening location details", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val layoutParams = LinearLayout.LayoutParams(
@@ -364,9 +569,9 @@ class ExploreActivity : AppCompatActivity() {
 
     private fun openPlaceDetails(place: OpenTripMapResponse, details: PlaceDetails?, rating: String, steps: String) {
         val intent = Intent(this, LocationDetailsActivity::class.java).apply {
-            putExtra("name", place.name)
+            putExtra("name", place.name.ifEmpty { "Unnamed Place" })
             putExtra("type", place.kinds.split(",").firstOrNull()?.replace("_", " ") ?: "Unknown")
-            putExtra("description", details?.wikipedia_extracts?.text ?: "No description available")
+            putExtra("description", details?.wikipedia_extracts?.text ?: "No description available for this location.")
             putExtra("rating", rating)
             putExtra("steps", steps)
             putExtra("openingHours", details?.sources?.opening_hours ?: "Opening hours not available")
@@ -374,15 +579,61 @@ class ExploreActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun openCurrentLocationOnMaps() {
-        try {
-            val uri = Uri.parse("geo:$currentLatitude,$currentLongitude?q=" +
-                    URLEncoder.encode(currentLocationName, "UTF-8"))
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            intent.setPackage("com.google.android.apps.maps")
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "Could not open maps", Toast.LENGTH_SHORT).show()
+    private fun displayUserInterests() {
+        val interestsText = if (isManualFilterMode) {
+            "Manual filter mode • Showing selected category only"
+        } else if (userInterests.isEmpty() || userInterests.contains("All")) {
+            "All categories • Showing places from all interests • Tap to change in Settings"
+        } else {
+            "Showing places from: ${userInterests.joinToString(", ")} • Tap to change in Settings"
+        }
+        binding.interestsText.text = interestsText
+        
+        // Make the interests card clickable to open settings (only when not in manual mode)
+        binding.interestsCard.setOnClickListener {
+            if (!isManualFilterMode) {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Disable manual filter to change interests", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun getSubcategoryFilter(subcategory: String): String {
+        return when (subcategory.lowercase()) {
+            // Basic categories
+            "restaurant" -> "restaurant"
+            "cafe" -> "cafe"
+            "museum" -> "museum"
+            "park" -> "park"
+            "shopping mall" -> "mall"
+            "hotel" -> "hotel"
+            "church" -> "church"
+            "beach" -> "beach"
+            "monument" -> "monument"
+            "zoo" -> "zoo"
+            "aquarium" -> "aquarium"
+            "theatre" -> "theatre"
+            "castle" -> "castle"
+            "bridge" -> "bridge"
+            "tower" -> "tower"
+            "garden" -> "garden"
+            "lake" -> "lake"
+            "viewpoint" -> "viewpoint"
+            "stadium" -> "stadium"
+            "swimming pool" -> "swimming_pool"
+            "library" -> "library"
+            "art gallery" -> "gallery"
+            "cinema" -> "cinema"
+            "supermarket" -> "supermarket"
+            "hospital" -> "hospital"
+            "school" -> "school"
+            "bank" -> "bank"
+            "gas station" -> "fuel"
+            "theme park" -> "amusement_park"
+            "historic building" -> "historic"
+            else -> ""
         }
     }
 }

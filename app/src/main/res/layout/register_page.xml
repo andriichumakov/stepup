@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:text="Create Your StepUp Account"
                     android:textSize="20sp"
-                    android:textColor="#2E7D32"
+                    android:textColor="@color/primary_green"
                     android:textStyle="bold"
                     android:layout_marginBottom="24dp" />
 
@@ -45,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Username"
                     android:inputType="textPersonName"
-                    android:backgroundTint="#2E7D32" />
+                    android:backgroundTint="@color/primary_green" />
 
             <EditText
                     android:id="@+id/emailEditText"
@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
-                    android:backgroundTint="#2E7D32"
+                    android:backgroundTint="@color/primary_green"
                     android:layout_marginTop="12dp" />
 
             <EditText
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Password"
                     android:inputType="textPassword"
-                    android:backgroundTint="#2E7D32"
+                    android:backgroundTint="@color/primary_green"
                     android:layout_marginTop="12dp" />
 
             <EditText
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Confirm Password"
                     android:inputType="textPassword"
-                    android:backgroundTint="#2E7D32"
+                    android:backgroundTint="@color/primary_green"
                     android:layout_marginTop="12dp" />
 
             <Button
@@ -81,7 +81,7 @@
                     android:text="Register"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
-                    android:backgroundTint="#2E7D32"
+                    android:backgroundTint="@color/primary_green"
                     android:layout_marginTop="24dp" />
 
             <TextView
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Already have an account? Login here!"
-                    android:textColor="#2E7D32"
+                    android:textColor="@color/primary_green"
                     android:textSize="14sp"
                     android:layout_marginTop="20dp" />
         </LinearLayout>

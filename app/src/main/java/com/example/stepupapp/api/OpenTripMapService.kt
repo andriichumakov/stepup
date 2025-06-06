@@ -50,13 +50,13 @@ data class Sources(
 interface OpenTripMapService {
     @GET("0.1/en/places/radius")
     suspend fun searchPlaces(
-        @Query("radius") radius: Int = 2000,
+        @Query("radius") radius: Int = 15000,
         @Query("lon") longitude: Double,
         @Query("lat") latitude: Double,
         @Query("apikey") apiKey: String,
         @Query("format") format: String = "json",
-        @Query("limit") limit: Int = 20,
-        @Query("rate") rate: Int = 1,  // Only get places with rating >= 1
+        @Query("limit") limit: Int = 30,
+        @Query("rate") rate: Int = 1,
         @Query("kinds") kinds: String = "interesting_places,cultural,natural,museums,theatres_and_entertainments,urban_environment,historic,architecture,religion,amusements,tourist_facilities"
     ): List<OpenTripMapResponse>
 

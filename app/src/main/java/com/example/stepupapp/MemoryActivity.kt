@@ -28,6 +28,13 @@ class MemoryActivity : AppCompatActivity() {
             val intent = Intent(this, AddMemoryActivity::class.java)
             startActivity(intent)
         }
+
+        // Set up back button click listener
+        binding.backButton.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun addMemory(imageRes: Int, date: String, location: String) {

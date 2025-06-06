@@ -116,7 +116,45 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Places Section with Filter Dropdown -->
+            <!-- User Interests Indicator -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/interestsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#E3F2FD"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:layout_marginHorizontal="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E3F2FD"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🎯 Your Interests"
+                        android:textColor="#1976D2"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/interestsText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Loading interests..."
+                        android:textColor="#1976D2"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Places Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -132,7 +170,7 @@
                     android:shadowDx="1"
                     android:shadowDy="1"
                     android:shadowRadius="2"
-                    android:text="Nearby Places"
+                    android:text="Places for Your Interests"
                     android:textColor="#1A237E"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -142,11 +180,13 @@
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
-                <!-- Styled Spinner with Box -->
+                <!-- Category Spinner - Hidden by default, show all interests -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/categorySpinnerCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:visibility="gone"
                     app:cardBackgroundColor="@color/light_yellow"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="2dp">
@@ -161,6 +201,77 @@
                         android:padding="8dp"
                         android:popupBackground="@color/light_yellow" />
                 </androidx.cardview.widget.CardView>
+
+                <!-- Button to toggle manual category selection -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleFilterButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Manual Filter"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@color/dark_blue"
+                    app:cornerRadius="16dp"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
+            </LinearLayout>
+
+            <!-- Subcategory Search Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search specific type:"
+                    android:textColor="#1A237E"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Subcategory Search Field -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/primary_green"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="3dp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/subcategorySearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/primary_green"
+                        android:hint="Type to search (e.g., restaurant, museum...)"
+                        android:textColorHint="#80FFFFFF"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:padding="12dp"
+                        android:drawableStart="@android:drawable/ic_menu_search"
+                        android:drawablePadding="8dp"
+                        android:completionThreshold="1"
+                        android:maxLines="1"
+                        android:imeOptions="actionSearch" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Clear Search Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/clearSearchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="8dp"
+                    android:text="Clear"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@color/dark_green"
+                    app:cornerRadius="18dp"
+                    style="@style/Widget.Material3.Button.TextButton" />
+
             </LinearLayout>
 
             <!-- Places Container -->

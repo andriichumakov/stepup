@@ -138,10 +138,10 @@
         android:layout_margin="16dp"
         android:alpha="0.8"
         android:contentDescription="Go back to home"
-        app:backgroundTint="#F7DA9E"
+        app:backgroundTint="@color/light_yellow"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_menu_revert"
-        app:tint="#1A237E"
+        app:tint="@color/dark_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 

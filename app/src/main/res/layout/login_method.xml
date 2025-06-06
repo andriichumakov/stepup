@@ -63,6 +63,6 @@
                     android:layout_height="wrap_content"
                     android:text="Register"
                     android:textColor="@android:color/white"
-                    android:backgroundTint="@android:color/darker_gray"/>
+                    android:backgroundTint="@color/dark_blue"/>
         </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

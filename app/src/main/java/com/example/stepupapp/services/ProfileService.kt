@@ -46,6 +46,22 @@ object ProfileService {
         auth.signOut()
     }
 
+    // Get current user's profile from Supabase
+    suspend fun getCurrentProfile(context: Context): UserProfile? {
+        return try {
+            val userId = auth.currentSessionOrNull()?.user?.id ?: return null
+            
+            client.from("Profiles")
+                .select {
+                    filter { eq("id", userId) }
+                }
+                .decodeSingle<UserProfile>()
+        } catch (e: Exception) {
+            Log.e(TAG, "getCurrentProfile failed: ${e.localizedMessage}", e)
+            null
+        }
+    }
+
     // Register a new user (email + password + username), then insert into "Profiles" table
     //    On success, return UserProfile (with supabase-generated ID), or null on failure.
     suspend fun registerProfile(
@@ -70,7 +86,8 @@ object ProfileService {
                 "id" to userId,
                 "name" to username,
                 "email" to email,
-                "pfp_url" to null
+                "pfp_url" to null,
+                //"setup_completed" to false
             )
 
             val response = client.from("Profiles").insert(profileInsert)

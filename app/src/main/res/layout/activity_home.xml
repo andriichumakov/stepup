@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#FAF6E9">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <include
         android:id="@+id/header"
@@ -16,32 +15,32 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:fillViewport="true"
-            android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/header"
-            app:layout_constraintBottom_toTopOf="@id/bottomButtons">
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomButtons"
+        app:layout_constraintTop_toBottomOf="@id/header">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <!-- Weather Widget Card -->
             <androidx.cardview.widget.CardView
-                    android:id="@+id/weatherCard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:background="#1E1E1E"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                android:id="@+id/weatherCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="#1E1E1E"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -85,16 +84,16 @@
 
             <!-- Step Widget Card -->
             <androidx.cardview.widget.CardView
-                    android:id="@+id/stepCard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:background="#1E1E1E"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/weatherCard"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                android:id="@+id/stepCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="#1E1E1E"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weatherCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -181,17 +180,17 @@
 
             <!-- Quote Widget Card -->
             <androidx.cardview.widget.CardView
-                    android:id="@+id/quoteCard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="#FDEEDC"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/stepCard"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                android:id="@+id/quoteCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:background="#FDEEDC"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/stepCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -248,19 +247,20 @@
 
             <!-- Memories Widget Card -->
             <androidx.cardview.widget.CardView
-                    android:id="@+id/memoriesCard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="24dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:layout_constraintTop_toBottomOf="@id/quoteCard"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                android:id="@+id/memoriesCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/quoteCard">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -386,18 +386,18 @@
     </ScrollView>
 
     <!-- Bottom Button Row -->
+
     <LinearLayout
-            android:id="@+id/bottomButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:padding="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+        android:id="@+id/bottomButtons"
+        android:layout_width="0dp"
+        android:layout_height="77dp"
+        android:background="#FFD75C"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <!-- Settings Button -->
         <FrameLayout
@@ -409,10 +409,10 @@
                 android:id="@+id/imageButton3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Settings"
-                app:srcCompat="@drawable/baseline_settings_24"
                 android:scaleType="fitCenter"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                app:srcCompat="@drawable/baseline_settings_24" />
         </FrameLayout>
 
         <!-- Explore Button -->
@@ -425,10 +425,10 @@
                 android:id="@+id/imageButton4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Explore"
-                app:srcCompat="@drawable/shoe"
                 android:scaleType="fitCenter"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                app:srcCompat="@drawable/shoe" />
         </FrameLayout>
 
         <!-- Memory Button -->
@@ -440,10 +440,10 @@
                 android:id="@+id/imageButtonMemory"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Memory"
-                app:srcCompat="@drawable/memory"
                 android:scaleType="fitCenter"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
+                app:srcCompat="@drawable/memory" />
         </FrameLayout>
     </LinearLayout>
 

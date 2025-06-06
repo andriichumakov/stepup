@@ -10,6 +10,7 @@ object UserPreferences {
     private const val PREFS_NAME = "StepUpPrefs"
     private const val KEY_STEP_TARGET = "step_target"
     private const val KEY_SETUP_COMPLETED = "setup_completed"
+    private const val KEY_USER_INTERESTS = "user_interests"
     private const val DEFAULT_STEP_TARGET = 6000
     private const val KEY_DAILY_STEPS_PREFIX = "daily_steps_"
     private const val KEY_DAILY_CALORIES_PREFIX = "daily_calories_"
@@ -35,6 +36,39 @@ object UserPreferences {
 
     fun setSetupCompleted(context: Context, completed: Boolean = true) {
         getPrefs(context).edit().putBoolean(KEY_SETUP_COMPLETED, completed).apply()
+    }
+
+    // Interest management functions
+    fun saveUserInterests(context: Context, interests: Set<String>) {
+        val interestsString = interests.joinToString(",")
+        getPrefs(context).edit().putString(KEY_USER_INTERESTS, interestsString).apply()
+        Log.d("UserPreferences", "Saved interests: $interestsString")
+    }
+
+    fun getUserInterests(context: Context): Set<String> {
+        val interestsString = getPrefs(context).getString(KEY_USER_INTERESTS, "")
+        return if (interestsString.isNullOrEmpty()) {
+            emptySet()
+        } else {
+            interestsString.split(",").toSet()
+        }
+    }
+
+    fun getFirstUserInterest(context: Context): String {
+        val interests = getUserInterests(context)
+        return when {
+            interests.isEmpty() -> "All"
+            interests.contains("Amusements") -> "Amusements"
+            interests.contains("Architecture") -> "Architecture"
+            interests.contains("Cultural") -> "Cultural"
+            interests.contains("Shops") -> "Shops"
+            interests.contains("Foods") -> "Foods"
+            interests.contains("Sport") -> "Sport"
+            interests.contains("Historical") -> "Historical"
+            interests.contains("Natural") -> "Natural"
+            interests.contains("Other") -> "Other"
+            else -> interests.first()
+        }
     }
 
     fun saveDailySteps(context: Context, steps: Int) {

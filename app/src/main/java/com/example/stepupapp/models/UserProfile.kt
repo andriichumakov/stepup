@@ -12,5 +12,6 @@ data class UserProfile(
     val email: String,
     @SerialName("pfp_url") val pfpUrl: String? = null,
     @SerialName("created_at") val createdAt: String? = null,
-    @SerialName("last_updated") val lastUpdated: String? = null
+    @SerialName("last_updated") val lastUpdated: String? = null,
+    @SerialName("setup_completed") val setupCompleted: Boolean = false
 )

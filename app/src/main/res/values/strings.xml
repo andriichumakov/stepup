@@ -42,4 +42,150 @@
         <item>Natural</item>
         <item>Other</item>
     </string-array>
+
+    <!-- Subcategories based on OpenTripMap catalog (family-friendly only) -->
+    <string-array name="subcategories_all">
+        <item>All Types</item>
+    </string-array>
+
+    <string-array name="subcategories_foods">
+        <item>All Food Places</item>
+        <item>Restaurant</item>
+        <item>Fast Food</item>
+        <item>Cafe</item>
+        <item>Pizza</item>
+        <item>Ice Cream</item>
+        <item>Bakery</item>
+        <item>Food Court</item>
+        <item>Bistro</item>
+        <item>Sandwich Shop</item>
+    </string-array>
+
+    <string-array name="subcategories_shops">
+        <item>All Shops</item>
+        <item>Shopping Mall</item>
+        <item>Supermarket</item>
+        <item>Bookstore</item>
+        <item>Clothing Store</item>
+        <item>Electronics Store</item>
+        <item>Toy Store</item>
+        <item>Gift Shop</item>
+        <item>Pharmacy</item>
+        <item>Convenience Store</item>
+        <item>Department Store</item>
+    </string-array>
+
+    <string-array name="subcategories_amusements">
+        <item>All Entertainment</item>
+        <item>Theme Park</item>
+        <item>Zoo</item>
+        <item>Aquarium</item>
+        <item>Cinema</item>
+        <item>Playground</item>
+        <item>Bowling</item>
+        <item>Arcade</item>
+        <item>Mini Golf</item>
+        <item>Escape Room</item>
+    </string-array>
+
+    <string-array name="subcategories_cultural">
+        <item>All Cultural</item>
+        <item>Museum</item>
+        <item>Art Gallery</item>
+        <item>Theatre</item>
+        <item>Library</item>
+        <item>Cultural Center</item>
+        <item>Concert Hall</item>
+        <item>Exhibition Center</item>
+    </string-array>
+
+    <string-array name="subcategories_sport">
+        <item>All Sports</item>
+        <item>Swimming Pool</item>
+        <item>Gym</item>
+        <item>Tennis Court</item>
+        <item>Basketball Court</item>
+        <item>Soccer Field</item>
+        <item>Golf Course</item>
+        <item>Skating Rink</item>
+        <item>Sports Center</item>
+    </string-array>
+
+    <string-array name="subcategories_historical">
+        <item>All Historical</item>
+        <item>Monument</item>
+        <item>Memorial</item>
+        <item>Historic Building</item>
+        <item>Castle</item>
+        <item>Archaeological Site</item>
+        <item>Heritage Site</item>
+    </string-array>
+
+    <string-array name="subcategories_architecture">
+        <item>All Architecture</item>
+        <item>Church</item>
+        <item>Tower</item>
+        <item>Bridge</item>
+        <item>Historic House</item>
+        <item>Government Building</item>
+        <item>University</item>
+    </string-array>
+
+    <string-array name="subcategories_natural">
+        <item>All Natural</item>
+        <item>Park</item>
+        <item>Garden</item>
+        <item>Beach</item>
+        <item>Lake</item>
+        <item>Forest</item>
+        <item>Nature Reserve</item>
+        <item>Viewpoint</item>
+        <item>Hiking Trail</item>
+    </string-array>
+
+    <string-array name="subcategories_other">
+        <item>All Other</item>
+        <item>Hospital</item>
+        <item>School</item>
+        <item>Bank</item>
+        <item>Post Office</item>
+        <item>Gas Station</item>
+        <item>Hotel</item>
+        <item>Tourist Information</item>
+    </string-array>
+
+    <!-- Comprehensive searchable subcategories (family-friendly only) -->
+    <string-array name="all_subcategories">
+        <!-- Most Popular Subcategories -->
+        <item>Restaurant</item>
+        <item>Cafe</item>
+        <item>Museum</item>
+        <item>Park</item>
+        <item>Shopping Mall</item>
+        <item>Hotel</item>
+        <item>Church</item>
+        <item>Beach</item>
+        <item>Monument</item>
+        <item>Zoo</item>
+        <item>Aquarium</item>
+        <item>Theatre</item>
+        <item>Castle</item>
+        <item>Bridge</item>
+        <item>Tower</item>
+        <item>Garden</item>
+        <item>Lake</item>
+        <item>Viewpoint</item>
+        <item>Stadium</item>
+        <item>Swimming Pool</item>
+        <item>Library</item>
+        <item>Art Gallery</item>
+        <item>Cinema</item>
+        <item>Supermarket</item>
+        <item>Hospital</item>
+        <item>School</item>
+        <item>Bank</item>
+        <item>Gas Station</item>
+        <item>Theme Park</item>
+        <item>Historic Building</item>
+    </string-array>
 </resources>

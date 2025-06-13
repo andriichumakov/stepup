@@ -65,7 +65,7 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.d("StepCounterService", "Running in ${if (isEmulatorMode) "emulator" else "device"} mode")
 
             createNotificationChannel()
-            
+
             // Start as foreground service with health type
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startForeground(
@@ -241,6 +241,11 @@ class StepCounterService : Service(), SensorEventListener {
                     hasNotified75 = true
                 }
             }
+
+            //Send notification if the goal is not reached
+            if (currentSteps < target) {
+                sendGoalFailedNotification()
+            }
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error checking goal reminder", e)
         }
@@ -258,6 +263,22 @@ class StepCounterService : Service(), SensorEventListener {
             else -> "You're at $percentage% of your goal! Only $remainingSteps steps to go!"
         }
         AddReminders.sendStepGoalNotification(this, title, message)
+    }
+
+    // Notification for goal failed
+    private fun sendGoalFailedNotification() {
+        val title = "Step Goal Not Reached"
+        val message = "You didn’t reach your step goal today, but you can do it tomorrow!"
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.drawable.stepup_logo_bunny_small)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+        notificationManager.notify(2, notification)  // ID 2 for failed notification
     }
 
     private fun createNotificationChannel() {

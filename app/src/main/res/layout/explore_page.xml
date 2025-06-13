@@ -170,7 +170,7 @@
                     android:shadowDx="1"
                     android:shadowDy="1"
                     android:shadowRadius="2"
-                    android:text="Places for Your Interests"
+                    android:text="Nearby places"
                     android:textColor="#1A237E"
                     android:textSize="24sp"
                     android:textStyle="bold" />

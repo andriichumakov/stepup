@@ -28,6 +28,7 @@ class StepCounterService : Service(), SensorEventListener {
     private var isEmulatorMode = false
     private var serviceScope: CoroutineScope? = null
     private lateinit var localBroadcastManager: LocalBroadcastManager
+    private var lastResetDate: String = ""
 
     // Track notification states
     private var hasNotified75 = false
@@ -42,6 +43,40 @@ class StepCounterService : Service(), SensorEventListener {
         private const val STEPS_PER_KM = 1312.33595801 // Average steps per kilometer
         private const val CALORIES_PER_STEP = 0.04 // Average calories burned per step
         private const val EMULATOR_STEP_INTERVAL = 5000L // 5 seconds between steps in emulator mode
+        private const val MIDNIGHT_CHECK_INTERVAL = 60000L // Check for midnight every minute
+    }
+
+    private fun getCurrentDate(): String {
+        return java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+    }
+
+    private fun checkAndResetAtMidnight() {
+        val currentDate = getCurrentDate()
+        if (currentDate != lastResetDate) {
+            android.util.Log.d("StepCounterService", "Midnight detected, resetting step count")
+            // Reset step count
+            totalSteps = 0
+            initialSteps = 0
+            isFirstStep = true
+            lastResetDate = currentDate
+            // Reset notification states
+            resetNotificationStates()
+            // Send update with reset steps
+            sendStepUpdate(0)
+        }
+    }
+
+    private fun startMidnightCheck() {
+        serviceScope?.launch(Dispatchers.Default) {
+            while (true) {
+                try {
+                    checkAndResetAtMidnight()
+                    kotlinx.coroutines.delay(MIDNIGHT_CHECK_INTERVAL)
+                } catch (e: Exception) {
+                    android.util.Log.e("StepCounterService", "Error in midnight check", e)
+                }
+            }
+        }
     }
 
     override fun onCreate() {
@@ -50,6 +85,9 @@ class StepCounterService : Service(), SensorEventListener {
             android.util.Log.d("StepCounterService", "Service onCreate called")
             serviceScope = CoroutineScope(Dispatchers.Default)
             localBroadcastManager = LocalBroadcastManager.getInstance(this)
+
+            // Initialize last reset date
+            lastResetDate = getCurrentDate()
 
             // Reset notification states at the start of a new day
             resetNotificationStates()
@@ -76,6 +114,9 @@ class StepCounterService : Service(), SensorEventListener {
             } else {
                 startForeground(NOTIFICATION_ID, createNotification())
             }
+
+            // Start midnight check
+            startMidnightCheck()
 
             // Only start emulator mode if we're actually in an emulator
             if (isEmulatorMode) {

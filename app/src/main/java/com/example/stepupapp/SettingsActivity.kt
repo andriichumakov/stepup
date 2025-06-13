@@ -25,7 +25,13 @@ class SettingsActivity : BaseActivity() {
             try {
                 val newTarget = binding.editTextNumber2.text.toString().toInt()
                 if (newTarget > 0) {
-                    UserPreferences.setStepTarget(this, newTarget)
+                    // Only reset notifications if the target is actually changing
+                    if (newTarget != currentTarget) {
+                        UserPreferences.setStepTarget(this, newTarget)
+                        // Reset notification states in the service
+                        StepCounterService.getInstance()?.resetNotificationStates()
+                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states reset")
+                    }
                     
                     // Save interests
                     saveUserInterests()

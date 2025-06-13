@@ -44,6 +44,13 @@ class StepCounterService : Service(), SensorEventListener {
         private const val CALORIES_PER_STEP = 0.04 // Average calories burned per step
         private const val EMULATOR_STEP_INTERVAL = 5000L // 5 seconds between steps in emulator mode
         private const val MIDNIGHT_CHECK_INTERVAL = 60000L // Check for midnight every minute
+
+        // Add a static instance to access the service
+        private var instance: StepCounterService? = null
+
+        fun getInstance(): StepCounterService? {
+            return instance
+        }
     }
 
     private fun getCurrentDate(): String {
@@ -81,6 +88,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         try {
             android.util.Log.d("StepCounterService", "Service onCreate called")
             serviceScope = CoroutineScope(Dispatchers.Default)
@@ -354,14 +362,18 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-    private fun resetNotificationStates() {
+    // Make resetNotificationStates public and accessible
+    fun resetNotificationStates() {
         hasNotified75 = false
         hasNotified90 = false
         hasNotified95 = false
         hasNotified100 = false
+        android.util.Log.d("StepCounterService", "Notification states reset")
     }
 
     override fun onDestroy() {
+        super.onDestroy()
+        instance = null
         try {
             android.util.Log.d("StepCounterService", "Service onDestroy called")
             if (!isEmulatorMode) {
@@ -371,7 +383,6 @@ class StepCounterService : Service(), SensorEventListener {
             serviceScope = null
             // Reset notification states when service is destroyed
             resetNotificationStates()
-            super.onDestroy()
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error in onDestroy", e)
         }

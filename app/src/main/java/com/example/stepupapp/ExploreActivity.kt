@@ -62,6 +62,8 @@ class ExploreActivity : AppCompatActivity() {
     private var allPlacesList = listOf<OpenTripMapResponse>()
     private var currentSubcategory = ""
     private var userInterests = setOf<String>()
+    private var originalUserInterests = setOf<String>()
+    private var manualSelectedCategory = ""
     private var isManualFilterMode = false
     private var filterJob: kotlinx.coroutines.Job? = null
 
@@ -72,6 +74,7 @@ class ExploreActivity : AppCompatActivity() {
 
         // Load user interests
         userInterests = UserPreferences.getUserInterests(this)
+        originalUserInterests = userInterests
 
         // Initialize location services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -253,6 +256,7 @@ class ExploreActivity : AppCompatActivity() {
         
         // Refresh user interests display and filter
         userInterests = UserPreferences.getUserInterests(this)
+        originalUserInterests = userInterests
         displayUserInterests()
         
         // Refresh places with potentially updated interests
@@ -291,8 +295,8 @@ class ExploreActivity : AppCompatActivity() {
                 
                 // Only use spinner selection in manual filter mode
                 if (isManualFilterMode) {
-                    // Override user interests with manual selection
-                    userInterests = setOf(selectedCategory)
+                    // Store manual selection without overriding user interests
+                    manualSelectedCategory = selectedCategory
                     // Clear subcategory search when category changes
                     binding.subcategorySearch.setText("")
                     currentSubcategory = ""
@@ -352,8 +356,12 @@ class ExploreActivity : AppCompatActivity() {
             } else {
                 binding.categorySpinnerCard.visibility = View.GONE
                 binding.toggleFilterButton.text = "Manual Filter"
+                // Restore original user interests when switching back
+                userInterests = originalUserInterests
+                manualSelectedCategory = ""
                 Toast.makeText(this, "Showing places from your interests", Toast.LENGTH_SHORT).show()
             }
+            displayUserInterests()
             filterPlaces()
         }
     }
@@ -429,11 +437,17 @@ class ExploreActivity : AppCompatActivity() {
         // Clear the container immediately
         binding.placesContainer.removeAllViews()
 
-        // Create filters based on user interests instead of single category
-        val interestFilters = if (userInterests.isEmpty() || userInterests.contains("All")) {
+        // Create filters based on current mode
+        val currentInterests = if (isManualFilterMode && manualSelectedCategory.isNotEmpty()) {
+            setOf(manualSelectedCategory)
+        } else {
+            userInterests
+        }
+        
+        val interestFilters = if (currentInterests.isEmpty() || currentInterests.contains("All")) {
             emptyList() // Show all if no specific interests
         } else {
-            userInterests.mapNotNull { interest ->
+            currentInterests.mapNotNull { interest ->
                 when (interest) {
                     "Amusements" -> "amusements"
                     "Architecture" -> "architecture"
@@ -495,8 +509,8 @@ class ExploreActivity : AppCompatActivity() {
             if (filteredPlaces.isEmpty()) {
                 val message = if (currentSubcategory.isNotEmpty()) {
                     "No places found for: $currentSubcategory"
-                } else if (userInterests.isNotEmpty() && !userInterests.contains("All")) {
-                    "No places found for your interests: ${userInterests.joinToString(", ")}"
+                } else if (currentInterests.isNotEmpty() && !currentInterests.contains("All")) {
+                    "No places found for your interests: ${currentInterests.joinToString(", ")}"
                 } else {
                     "No places found nearby"
                 }

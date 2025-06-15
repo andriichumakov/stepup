@@ -154,12 +154,12 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Places Section -->
+            <!-- Places Section Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="8dp"
                 android:gravity="center_vertical">
 
                 <TextView
@@ -184,12 +184,33 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/mapToggleButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_height="36dp"
                     android:text="🗺️ Map"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:textColor="#FFFFFF"
                     app:backgroundTint="@color/primary_green"
+                    app:cornerRadius="18dp"
+                    style="@style/Widget.Material3.Button" />
+
+            </LinearLayout>
+
+            <!-- Filter Controls Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <!-- Filter Mode Toggle -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toggleFilterButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="Manual Filter"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="@color/dark_blue"
                     app:cornerRadius="16dp"
                     style="@style/Widget.Material3.Button.TextButton" />
 
@@ -198,7 +219,7 @@
                     android:id="@+id/categorySpinnerCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="12dp"
                     android:visibility="gone"
                     app:cardBackgroundColor="@color/light_yellow"
                     app:cardCornerRadius="8dp"
@@ -215,18 +236,25 @@
                         android:popupBackground="@color/light_yellow" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- Button to toggle manual category selection -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Clear All Filters Button -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/toggleFilterButton"
+                    android:id="@+id/clearAllFiltersButton"
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:text="Manual Filter"
+                    android:text="Clear All"
                     android:textSize="10sp"
-                    android:textColor="#FFFFFF"
-                    app:backgroundTint="@color/dark_blue"
+                    android:textColor="@color/dark_blue"
+                    android:visibility="gone"
+                    app:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/dark_blue"
+                    app:strokeWidth="1dp"
                     app:cornerRadius="16dp"
-                    style="@style/Widget.Material3.Button.TextButton" />
+                    style="@style/Widget.Material3.Button.OutlinedButton" />
 
             </LinearLayout>
 

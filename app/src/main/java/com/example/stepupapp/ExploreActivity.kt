@@ -2,6 +2,7 @@ package com.example.stepupapp
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.location.Location
 import android.net.Uri
@@ -84,6 +85,9 @@ class ExploreActivity : AppCompatActivity() {
         // Load user interests
         userInterests = UserPreferences.getUserInterests(this)
         originalUserInterests = userInterests
+        
+        Log.d(TAG, "Loaded user interests: $userInterests")
+        Log.d(TAG, "Original user interests: $originalUserInterests")
 
         // Initialize managers
         initializeManagers()
@@ -95,6 +99,7 @@ class ExploreActivity : AppCompatActivity() {
         setupCategorySpinner()
         setupSubcategorySearch()
         setupToggleButton()
+        setupClearAllButton()
         setupMapToggle()
         setupOSMMap()
         setupCenterLocationButton()
@@ -212,8 +217,15 @@ class ExploreActivity : AppCompatActivity() {
         }
         
         // Refresh user interests display and filter
-        userInterests = UserPreferences.getUserInterests(this)
-        originalUserInterests = userInterests
+        val newUserInterests = UserPreferences.getUserInterests(this)
+        Log.d(TAG, "onResume - Current interests: $userInterests, New interests: $newUserInterests")
+        
+        // Only update if not in manual filter mode
+        if (!isManualFilterMode) {
+            userInterests = newUserInterests
+            originalUserInterests = newUserInterests
+            Log.d(TAG, "Updated interests in onResume: $userInterests")
+        }
         displayUserInterests()
         
         // Refresh places with potentially updated interests
@@ -256,13 +268,24 @@ class ExploreActivity : AppCompatActivity() {
                     typeface = Typeface.DEFAULT_BOLD
                 }
                 
-                // Only use spinner selection in manual filter mode
-                if (isManualFilterMode) {
+                // Only use spinner selection in manual filter mode and avoid triggering on programmatic changes
+                if (isManualFilterMode && selectedCategory != manualSelectedCategory) {
+                    Log.d(TAG, "Category spinner selection changed to: $selectedCategory")
+                    
+                    // Cancel any ongoing filter operations
+                    filterJob?.cancel()
+                    
                     // Store manual selection without overriding user interests
                     manualSelectedCategory = selectedCategory
+                    
                     // Clear subcategory search when category changes
                     binding.subcategorySearch.setText("")
                     currentSubcategory = ""
+                    
+                    // Update clear button visibility
+                    updateClearAllButtonVisibility()
+                    
+                    // Apply new filter
                     filterPlaces()
                 }
             }
@@ -283,6 +306,7 @@ class ExploreActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 currentSubcategory = s.toString()
+                updateClearAllButtonVisibility()
                 filterPlaces()
             }
 
@@ -300,27 +324,101 @@ class ExploreActivity : AppCompatActivity() {
             binding.subcategorySearch.setText("")
             binding.subcategorySearch.clearFocus()
             currentSubcategory = ""
+            updateClearAllButtonVisibility()
             filterPlaces()
         }
     }
 
     private fun setupToggleButton() {
         binding.toggleFilterButton.setOnClickListener {
+            // Prevent rapid clicking by disabling button temporarily
+            binding.toggleFilterButton.isEnabled = false
+            
+            // Cancel any ongoing operations first
+            filterJob?.cancel()
+            
+            // Toggle the mode
             isManualFilterMode = !isManualFilterMode
-            if (isManualFilterMode) {
-                binding.categorySpinnerCard.visibility = View.VISIBLE
-                binding.toggleFilterButton.text = "Use My Interests"
-                Toast.makeText(this, "Manual filter mode enabled", Toast.LENGTH_SHORT).show()
-            } else {
-                binding.categorySpinnerCard.visibility = View.GONE
-                binding.toggleFilterButton.text = "Manual Filter"
-                // Restore original user interests when switching back
-                userInterests = originalUserInterests
-                manualSelectedCategory = ""
-                Toast.makeText(this, "Showing places from your interests", Toast.LENGTH_SHORT).show()
-            }
+            
+            // Update UI and apply changes
+            updateFilterModeUI()
             displayUserInterests()
-            filterPlaces()
+            
+            // Add a small delay before filtering to ensure UI state is fully updated
+            binding.toggleFilterButton.postDelayed({
+                validateAndFixInterestsState()
+                filterPlaces()
+                binding.toggleFilterButton.isEnabled = true
+            }, 300)
+        }
+    }
+    
+    private fun setupClearAllButton() {
+        binding.clearAllFiltersButton.setOnClickListener {
+            clearAllFilters()
+            Toast.makeText(this, "All filters cleared", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun updateFilterModeUI() {
+        Log.d(TAG, "Updating filter mode UI: isManualFilterMode=$isManualFilterMode")
+        
+        if (isManualFilterMode) {
+            // Manual filter mode
+            binding.categorySpinnerCard.visibility = View.VISIBLE
+            binding.toggleFilterButton.text = "Use My Interests"
+            binding.toggleFilterButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.primary_green))
+            binding.clearAllFiltersButton.visibility = View.VISIBLE
+            
+            // Reset category selection to first item if not already selected
+            if (manualSelectedCategory.isEmpty()) {
+                binding.categorySpinner.setSelection(0)
+                manualSelectedCategory = binding.categorySpinner.getItemAtPosition(0).toString()
+            }
+            
+            Toast.makeText(this, "Manual filter mode enabled", Toast.LENGTH_SHORT).show()
+        } else {
+            // Personal interests mode
+            binding.categorySpinnerCard.visibility = View.GONE
+            binding.toggleFilterButton.text = "Manual Filter"
+            binding.toggleFilterButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.dark_blue))
+            
+            // Clear manual selections and restore original user interests
+            manualSelectedCategory = ""
+            
+            // Reload fresh user interests from preferences to ensure we have the latest
+            val freshUserInterests = UserPreferences.getUserInterests(this)
+            Log.d(TAG, "Switching to personal interests - Fresh: $freshUserInterests, Original: $originalUserInterests")
+            
+            // Use fresh interests and update original as well
+            userInterests = freshUserInterests.toSet()
+            originalUserInterests = freshUserInterests.toSet()
+            
+            updateClearAllButtonVisibility()
+            Toast.makeText(this, "Showing places from your interests", Toast.LENGTH_SHORT).show()
+        }
+        
+        Log.d(TAG, "Filter mode updated - Manual: $isManualFilterMode, Category: $manualSelectedCategory, Interests: $userInterests")
+    }
+    
+    private fun updateClearAllButtonVisibility() {
+        // Show clear all button if any filters are active
+        val hasActiveFilters = currentSubcategory.isNotEmpty() || isManualFilterMode
+        binding.clearAllFiltersButton.visibility = if (hasActiveFilters) View.VISIBLE else View.GONE
+    }
+    
+    private fun validateAndFixInterestsState() {
+        // Ensure we always have valid interests when not in manual mode
+        if (!isManualFilterMode) {
+            val currentInterests = UserPreferences.getUserInterests(this)
+            Log.d(TAG, "Validating interests state - Current: $userInterests, From prefs: $currentInterests")
+            
+            if (userInterests != currentInterests) {
+                Log.d(TAG, "Interests mismatch detected, updating...")
+                userInterests = currentInterests.toSet()
+                originalUserInterests = currentInterests.toSet()
+                displayUserInterests()
+            }
         }
     }
 
@@ -401,15 +499,27 @@ class ExploreActivity : AppCompatActivity() {
     }
     
     private fun clearAllFilters() {
+        // Cancel any ongoing operations
+        filterJob?.cancel()
+        
+        // Reset all filter states
         currentSubcategory = ""
         isManualFilterMode = false
         manualSelectedCategory = ""
-        userInterests = originalUserInterests
+        
+        // Reload fresh interests from preferences
+        val freshInterests = UserPreferences.getUserInterests(this)
+        userInterests = freshInterests.toSet()
+        originalUserInterests = freshInterests.toSet()
+        
+        Log.d(TAG, "All filters cleared - restored to fresh interests: $userInterests")
+        
+        // Update UI elements
         binding.subcategorySearch.setText("")
         binding.subcategorySearch.clearFocus()
-        binding.categorySpinnerCard.visibility = View.GONE
-        binding.toggleFilterButton.text = "Manual Filter"
-        binding.toggleFilterButton.setBackgroundColor(getColor(R.color.dark_blue))
+        
+        // Update UI and apply changes
+        updateFilterModeUI()
         displayUserInterests()
         filterPlaces()
     }
@@ -433,6 +543,14 @@ class ExploreActivity : AppCompatActivity() {
         // Cancel any ongoing filter operation
         filterJob?.cancel()
         
+        // Capture current state to avoid race conditions
+        val currentManualMode = isManualFilterMode
+        val currentManualCategory = manualSelectedCategory
+        val currentUserInterests = userInterests.toSet()
+        val currentSubcat = currentSubcategory
+        
+        Log.d(TAG, "Starting filter with state - Manual: $currentManualMode, Category: $currentManualCategory, Interests: $currentUserInterests, Subcategory: $currentSubcat")
+        
         // Show mini skeleton loading during filtering
         showMiniSkeletonLoading()
 
@@ -442,49 +560,70 @@ class ExploreActivity : AppCompatActivity() {
         // Always add adult content filter for family safety
         filterManager.addFilter(AdultContentFilter())
         
-        // Add interest filter
-        val currentInterests = if (isManualFilterMode && manualSelectedCategory.isNotEmpty()) {
-            setOf(manualSelectedCategory)
+        // Determine which interests to use based on current mode
+        val currentInterests = if (currentManualMode && currentManualCategory.isNotEmpty()) {
+            setOf(currentManualCategory)
         } else {
-            userInterests
+            currentUserInterests
         }
+        
+        Log.d(TAG, "Using interests for filtering: $currentInterests")
+        Log.d(TAG, "Current mode: Manual=$currentManualMode, Category=$currentManualCategory")
+        Log.d(TAG, "Will show all places: ${currentInterests.isEmpty() || currentInterests.contains("All")}")
+        
+        // Always add the interest filter, even if it shows all
         filterManager.addFilter(InterestFilter(currentInterests))
         
         // Add subcategory filter if specified
-        if (currentSubcategory.isNotEmpty()) {
-            filterManager.addFilter(SubcategoryFilter(currentSubcategory))
+        if (currentSubcat.isNotEmpty()) {
+            filterManager.addFilter(SubcategoryFilter(currentSubcat))
         }
 
         filterJob = lifecycleScope.launch {
-            val filteredPlaces = filterManager.applyFilters(allPlacesList)
+            try {
+                val filteredPlaces = filterManager.applyFilters(allPlacesList)
 
-            // Hide skeleton loading
-            hideSkeletonLoading()
+                // Check if state has changed during filtering (race condition check)
+                if (currentManualMode != isManualFilterMode || 
+                    currentManualCategory != manualSelectedCategory ||
+                    currentUserInterests != userInterests ||
+                    currentSubcat != currentSubcategory) {
+                    Log.d(TAG, "State changed during filtering, ignoring results")
+                    return@launch
+                }
 
-            // Update filtered places list for map
-            filteredPlacesList = filteredPlaces
+                // Hide skeleton loading
+                hideSkeletonLoading()
 
-            if (filteredPlaces.isEmpty()) {
-                val message = if (currentSubcategory.isNotEmpty()) {
-                    "No places found for: $currentSubcategory"
-                } else if (currentInterests.isNotEmpty() && !currentInterests.contains("All")) {
-                    "No places found for your interests: ${currentInterests.joinToString(", ")}"
+                // Update filtered places list for map
+                filteredPlacesList = filteredPlaces
+
+                if (filteredPlaces.isEmpty()) {
+                    val message = if (currentSubcat.isNotEmpty()) {
+                        "No places found for: $currentSubcat"
+                    } else if (currentInterests.isNotEmpty() && !currentInterests.contains("All")) {
+                        "No places found for your interests: ${currentInterests.joinToString(", ")}"
+                    } else {
+                        "No places found nearby"
+                    }
+                    showEmptyState("No matching places", message)
+                    return@launch
+                }
+
+                // Update map markers if map view is active
+                if (isMapViewActive) {
+                    updateOSMMap()
                 } else {
-                    "No places found nearby"
+                    // Create place cards for list view
+                    for (place in filteredPlaces) {
+                        val details = placeRepository.getPlaceDetails(place.xid)
+                        createPlaceCard(place, details)
+                    }
                 }
-                showEmptyState("No matching places", message)
-                return@launch
-            }
-
-            // Update map markers if map view is active
-            if (isMapViewActive) {
-                updateOSMMap()
-            } else {
-                // Create place cards for list view
-                for (place in filteredPlaces) {
-                    val details = placeRepository.getPlaceDetails(place.xid)
-                    createPlaceCard(place, details)
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during filtering: ${e.message}", e)
+                hideSkeletonLoading()
+                showErrorState("Error filtering places", "Please try again")
             }
         }
     }
@@ -689,7 +828,7 @@ class ExploreActivity : AppCompatActivity() {
             binding.mapContainer.visibility = View.VISIBLE
             binding.placesContainer.visibility = View.GONE
             binding.mapToggleButton.text = "📋 List"
-            binding.mapToggleButton.setBackgroundColor(getColor(R.color.dark_blue))
+            binding.mapToggleButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.dark_blue))
             
             // Update map with current places
             updateOSMMap()
@@ -699,7 +838,7 @@ class ExploreActivity : AppCompatActivity() {
             binding.mapContainer.visibility = View.GONE
             binding.placesContainer.visibility = View.VISIBLE
             binding.mapToggleButton.text = "🗺️ Map"
-            binding.mapToggleButton.setBackgroundColor(getColor(R.color.primary_green))
+            binding.mapToggleButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.primary_green))
             
             // Clear any active route when switching to list view
             clearRoute()

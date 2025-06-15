@@ -1,24 +1,34 @@
 package com.example.stepupapp
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.widget.*
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.example.stepupapp.databinding.ActivityAddMemoryBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class AddMemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddMemoryBinding
     private var selectedImageUri: Uri? = null
+    private var imageUriFromCamera: Uri? = null
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1001
+        private const val CAMERA_REQUEST_CODE = 1002
+        private const val CAMERA_PERMISSION_CODE = 2001
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +43,10 @@ class AddMemoryActivity : AppCompatActivity() {
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
             }
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        }
+
+        binding.btnTakePicture.setOnClickListener {
+            checkCameraPermissionAndOpenCamera()
         }
 
         binding.btnSubmitMemory.setOnClickListener {
@@ -73,6 +87,48 @@ class AddMemoryActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkCameraPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_CODE
+            )
+        } else {
+            openCamera()
+        }
+    }
+
+    private fun openCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val imageFile = File.createTempFile("memory_", ".jpg", cacheDir)
+        imageUriFromCamera = FileProvider.getUriForFile(
+            this,
+            "${packageName}.provider",
+            imageFile
+        )
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUriFromCamera)
+        startActivityForResult(intent, CAMERA_REQUEST_CODE)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            openCamera()
+        } else {
+            Toast.makeText(this, "Camera permission is required to take photos.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -89,6 +145,9 @@ class AddMemoryActivity : AppCompatActivity() {
                     Toast.makeText(this, "Unable to access image", Toast.LENGTH_SHORT).show()
                 }
             }
+        } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = imageUriFromCamera
+            binding.imagePreview.setImageURI(selectedImageUri)
         }
     }
 }

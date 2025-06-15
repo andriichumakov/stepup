@@ -21,13 +21,31 @@
             android:contentDescription="Memory Image" />
 
         <!-- Button to Choose Image -->
-        <Button
-            android:id="@+id/btnChooseImage"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:backgroundTint="@color/primary_green"
-            android:text="Choose Image" />
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnChooseImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_green"
+                android:text="Choose Image" />
+
+            <Button
+                android:id="@+id/btnTakePicture"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_green"
+                android:text="Take Picture" />
+        </LinearLayout>
 
         <!-- Date Input -->
         <EditText

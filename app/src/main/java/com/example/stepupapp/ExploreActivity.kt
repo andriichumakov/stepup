@@ -54,6 +54,7 @@ class ExploreActivity : AppCompatActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var placeRepository: PlaceRepository
     private lateinit var filterManager: FilterManager
+    private lateinit var actionBarLocationManager: ActionBarLocationManager
     private val TAG = "ExploreActivity"
 
     private val STEP_LENGTH = 0.50 // Average step length in meters
@@ -91,6 +92,10 @@ class ExploreActivity : AppCompatActivity() {
 
         // Initialize managers
         initializeManagers()
+
+        // Initialize and setup ActionBar location
+        actionBarLocationManager = ActionBarLocationManager(this)
+        actionBarLocationManager.setupActionBarLocation()
 
         // Initialize OSMDroid configuration
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE))
@@ -177,6 +182,9 @@ class ExploreActivity : AppCompatActivity() {
 
         // Update UI
         binding.locationText.text = currentLocationName
+        
+        // Update the actionbar location as well
+        actionBarLocationManager.updateLocationFromCoordinates(currentLatitude, currentLongitude)
 
         // Load nearby places
         loadPlaces()
@@ -247,6 +255,11 @@ class ExploreActivity : AppCompatActivity() {
         }
         
         locationManager.stopLocationUpdates()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        actionBarLocationManager.onDestroy()
     }
 
     private fun setupCategorySpinner() {

@@ -21,6 +21,7 @@ class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
     private var target: Int = 6000 // Will be updated in onCreate
     private lateinit var localBroadcastManager: LocalBroadcastManager
+    private lateinit var actionBarLocationManager: ActionBarLocationManager
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -58,6 +59,10 @@ class HomeActivity : BaseActivity() {
 
         // Initialize LocalBroadcastManager
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
+
+        // Initialize and setup ActionBar location
+        actionBarLocationManager = ActionBarLocationManager(this)
+        actionBarLocationManager.setupActionBarLocation()
 
         // Set up the progress bar with dynamic target
         binding.stepProgressBar.max = target
@@ -135,7 +140,9 @@ class HomeActivity : BaseActivity() {
 
     private fun checkAndRequestPermissions() {
         val permissions = mutableListOf(
-                Manifest.permission.ACTIVITY_RECOGNITION
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -156,12 +163,12 @@ class HomeActivity : BaseActivity() {
                 // Show explanation dialog
                 androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Permission Required")
-                    .setMessage("This app needs permission to count your steps and show notifications. Without these permissions, the step counter won't work.")
+                    .setMessage("This app needs permission to count your steps, access your location for personalized features, and show notifications. Without these permissions, some features won't work properly.")
                     .setPositiveButton("Grant Permission") { _, _ ->
                         requestPermissionLauncher.launch(permissionsToRequest)
                     }
                     .setNegativeButton("Cancel") { _, _ ->
-                        Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
                         updateUI(0, 0.0, 0)
                     }
                     .create()
@@ -181,11 +188,16 @@ class HomeActivity : BaseActivity() {
     ) { permissions ->
         if (permissions.all { it.value }) {
             setupStepCounter()
+            // Also update actionbar location if location permission was granted
+            if (permissions.containsKey(Manifest.permission.ACCESS_FINE_LOCATION) && 
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
+                actionBarLocationManager.onPermissionGranted()
+            }
         } else {
             // Show dialog with option to open settings
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Permission Required")
-                .setMessage("Step counting requires permission to track your activity. Please grant the permission in Settings.")
+                .setMessage("This app requires permissions to track your activity and access your location for personalized features. Please grant the permissions in Settings.")
                 .setPositiveButton("Open Settings") { _, _ ->
                     val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = android.net.Uri.fromParts("package", packageName, null)
@@ -193,7 +205,7 @@ class HomeActivity : BaseActivity() {
                     startActivity(intent)
                 }
                 .setNegativeButton("Cancel") { _, _ ->
-                    Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
                     updateUI(0, 0.0, 0)
                 }
                 .create()
@@ -244,6 +256,7 @@ class HomeActivity : BaseActivity() {
         super.onDestroy()
         try {
             localBroadcastManager.unregisterReceiver(stepUpdateReceiver)
+            actionBarLocationManager.onDestroy()
         } catch (e: Exception) {
             android.util.Log.e("HomeActivity", "Error unregistering receiver", e)
         }

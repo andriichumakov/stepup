@@ -7,11 +7,16 @@ import com.example.stepupapp.databinding.SettingsPageBinding
 
 class SettingsActivity : BaseActivity() {
     private lateinit var binding: SettingsPageBinding
+    private lateinit var actionBarLocationManager: ActionBarLocationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize and setup ActionBar location
+        actionBarLocationManager = ActionBarLocationManager(this)
+        actionBarLocationManager.setupActionBarLocation()
 
         // Load current step target
         val currentTarget = UserPreferences.getStepTarget(this)
@@ -85,5 +90,10 @@ class SettingsActivity : BaseActivity() {
         }
         
         UserPreferences.saveUserInterests(this, selectedInterests)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        actionBarLocationManager.onDestroy()
     }
 } 

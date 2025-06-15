@@ -49,18 +49,19 @@ class HomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        android.util.Log.d("HomeActivity", "onCreate called")
-
-        // Initialize target from preferences
-        target = UserPreferences.getStepTarget(this)
-        updateTargetText()
-
-        // Initialize LocalBroadcastManager
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
 
-        // Set up the progress bar with dynamic target
+        // Get current target and set up progress bar
+        target = UserPreferences.getStepTarget(this)
         binding.stepProgressBar.max = target
+        updateTargetText()
+
+        // Get current step count from preferences and update UI
+        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+        val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+        val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+        updateUI(currentSteps, currentDistance, currentCalories)
 
         // Set up navigation buttons
         binding.imageButton3.setOnClickListener {
@@ -109,7 +110,6 @@ class HomeActivity : BaseActivity() {
         }
 
         // Initialize UI with zeros and a random quote
-        updateUI(0, 0.0, 0)
         updateQuote()
 
         // Register for local broadcasts
@@ -127,6 +127,12 @@ class HomeActivity : BaseActivity() {
         target = UserPreferences.getStepTarget(this)
         binding.stepProgressBar.max = target
         updateTargetText()
+
+        // Get current step count from preferences and update UI
+        val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+        val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+        val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+        updateUI(currentSteps, currentDistance, currentCalories)
     }
 
     private fun updateTargetText() {

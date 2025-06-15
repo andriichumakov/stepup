@@ -38,6 +38,7 @@ import java.util.*
 class StepsOverviewActivity : BaseActivity() {
     private lateinit var binding: ActivityStepsOverviewBinding
     private val target by lazy { UserPreferences.getStepTarget(this) }
+    private lateinit var actionBarLocationManager: ActionBarLocationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +48,10 @@ class StepsOverviewActivity : BaseActivity() {
             binding = ActivityStepsOverviewBinding.inflate(layoutInflater)
             setContentView(binding.root)
             Log.d("StepsOverviewActivity", "Layout inflated successfully")
+
+            // Initialize and setup ActionBar location
+            actionBarLocationManager = ActionBarLocationManager(this)
+            actionBarLocationManager.setupActionBarLocation()
 
             // Set up back button
             binding.backButton.setOnClickListener {
@@ -248,5 +253,10 @@ class StepsOverviewActivity : BaseActivity() {
             7 -> "You've been active all week!"
             else -> "$streak day streak, outstanding!"
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        actionBarLocationManager.onDestroy()
     }
 }

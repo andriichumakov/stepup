@@ -18,6 +18,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import androidx.exifinterface.media.ExifInterface
+import android.location.Geocoder
+import android.util.Log
+import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddMemoryActivity : AppCompatActivity() {
 
@@ -50,12 +56,18 @@ class AddMemoryActivity : AppCompatActivity() {
         }
 
         binding.btnSubmitMemory.setOnClickListener {
-            val date = binding.editTextDate.text.toString()
+            Log.d("MemoryDebug", "selectedImageUri=$selectedImageUri, imageUriFromCamera=$imageUriFromCamera")
+
+            val date = binding.textViewDate.text.toString()
             val location = binding.editTextLocation.text.toString()
             val steps = binding.editTextSteps.text.toString()
+            Log.d("MemoryDebug", "Submit pressed with: selectedImageUri=$selectedImageUri, imageUriFromCamera=$imageUriFromCamera")
+            Log.d("MemoryDebug", "Fields: date='$date', location='$location', steps='$steps'")
 
-            if (selectedImageUri == null || date.isBlank() || location.isBlank() || steps.isBlank()) {
-                Toast.makeText(this, "Please fill all fields and choose an image.", Toast.LENGTH_SHORT).show()
+            val imageUriToSave = selectedImageUri ?: imageUriFromCamera
+            if (imageUriToSave == null || date.isBlank() || location.isBlank() || steps.isBlank()) {
+                Toast.makeText(this, "Please fill all fields and choose or take an image.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             } else {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
@@ -63,7 +75,7 @@ class AddMemoryActivity : AppCompatActivity() {
                             name = location,
                             date_saved = date,
                             steps_taken = steps,
-                            imageUri = selectedImageUri.toString()
+                            imageUri = imageUriToSave.toString()
                         )
 
                         val db = PlaceDatabase.getDatabase(applicationContext)
@@ -106,7 +118,7 @@ class AddMemoryActivity : AppCompatActivity() {
         val imageFile = File.createTempFile("memory_", ".jpg", cacheDir)
         imageUriFromCamera = FileProvider.getUriForFile(
             this,
-            "${packageName}.provider",
+            "$packageName.provider",
             imageFile
         )
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUriFromCamera)
@@ -134,6 +146,7 @@ class AddMemoryActivity : AppCompatActivity() {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             selectedImageUri = data.data
+            imageUriFromCamera = null  // Clear camera URI since user picked image
             selectedImageUri?.let { uri ->
                 try {
                     contentResolver.takePersistableUriPermission(
@@ -141,13 +154,99 @@ class AddMemoryActivity : AppCompatActivity() {
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
                     )
                     binding.imagePreview.setImageURI(uri)
+
+                    val dateTaken = getDateFromImage(uri) ?: SimpleDateFormat("yy-MM-dd", Locale.getDefault()).format(Date())
+                    Log.d("MemoryDebug", "Setting date to: $dateTaken")
+                    binding.textViewDate.setText(dateTaken)
+
+                    val address = getLocationFromImage(uri)
+                    if (address != null) {
+                        binding.editTextLocation.setText(address)
+                        binding.editTextLocation.visibility = android.view.View.GONE
+                    } else {
+                        binding.editTextLocation.visibility = android.view.View.VISIBLE
+                        Toast.makeText(this, "No GPS data found. Please enter location manually.", Toast.LENGTH_SHORT).show()
+                    }
+
                 } catch (e: Exception) {
                     Toast.makeText(this, "Unable to access image", Toast.LENGTH_SHORT).show()
                 }
             }
-        } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            selectedImageUri = imageUriFromCamera
-            binding.imagePreview.setImageURI(selectedImageUri)
+
+        }else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            selectedImageUri = null  // Clear the gallery image URI
+
+            // ✅ Use imageUriFromCamera here!
+            imageUriFromCamera?.let { uri ->
+                binding.imagePreview.setImageURI(uri)
+
+                val dateTaken = getDateFromImage(uri)
+                binding.textViewDate.text = dateTaken ?: ""
+
+                val address = getLocationFromImage(uri)
+                if (address != null) {
+                    binding.editTextLocation.setText(address)
+                    binding.editTextLocation.visibility = android.view.View.GONE
+                } else {
+                    binding.editTextLocation.visibility = android.view.View.VISIBLE
+                    Toast.makeText(this, "No GPS data found. Please enter location manually.", Toast.LENGTH_SHORT).show()
+                }
+            } ?: run {
+                Toast.makeText(this, "Failed to capture image.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
+
+    private fun getLocationFromImage(uri: Uri): String? {
+        return try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                val exif = ExifInterface(inputStream)
+                val latLong = FloatArray(2)
+                val hasLatLong = exif.getLatLong(latLong)
+                Log.d("MemoryDebug", "EXIF has GPS? $hasLatLong, lat=${latLong.getOrNull(0)}, lon=${latLong.getOrNull(1)}")
+                if (hasLatLong) {
+                    val geocoder = Geocoder(this, Locale.getDefault())
+                    val addresses = geocoder.getFromLocation(latLong[0].toDouble(), latLong[1].toDouble(), 1)
+                    Log.d("MemoryDebug", "Geocoder returned addresses: $addresses")
+                    if (!addresses.isNullOrEmpty()) {
+                        val address = addresses[0]
+                        inputStream.close()
+                        return "${address.locality ?: "Unknown"}, ${address.countryName ?: ""}"
+                    } else {
+                        Log.d("MemoryDebug", "No addresses found from geocoder")
+                    }
+                }
+                inputStream.close()
+            }
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
+    private fun getDateFromImage(uri: Uri): String? {
+        return try {
+            val inputStream: InputStream? = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                val exif = ExifInterface(inputStream)
+                val dateTime = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+                    ?: exif.getAttribute(ExifInterface.TAG_DATETIME)
+                inputStream.close()
+                dateTime?.let {
+                    val parts = it.split(" ")[0].split(":")
+                    if (parts.size == 3) {
+                        val year = parts[0].takeLast(2)
+                        "$year-${parts[1]}-${parts[2]}"
+                    } else null
+                }
+            } else null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

@@ -19,7 +19,8 @@ core = "1.12.0"
 firebaseAppdistributionGradle = "5.1.1"
 common = "0.10.0"
 roomCommonJvm = "2.7.1"
-roomRuntimeAndroid = "2.7.1"  # Added this line
+roomRuntimeAndroid = "2.7.1"
+exifinterface = "1.4.1"  # Added this line
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,7 @@ firebase-appdistribution-gradle = { group = "com.google.firebase", name = "fireb
 common = { group = "com.google.ai.client.generativeai", name = "common", version.ref = "common" }
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomRuntimeAndroid" }
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

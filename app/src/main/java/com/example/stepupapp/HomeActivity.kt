@@ -16,11 +16,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.stepupapp.databinding.ActivityHomeBinding
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
     private var target: Int = 6000 // Will be updated in onCreate
     private lateinit var localBroadcastManager: LocalBroadcastManager
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -45,11 +47,45 @@ class HomeActivity : BaseActivity() {
         binding.quoteAuthor.text = "— ${quote.author}"
     }
 
+    private fun refreshStepCount() {
+        try {
+            android.util.Log.d("HomeActivity", "Refreshing step count")
+            // Get current step count from preferences and update UI
+            val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+            val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+            val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+            updateUI(currentSteps, currentDistance, currentCalories)
+            
+            // Also refresh the quote while we're at it
+            updateQuote()
+            
+            android.util.Log.d("HomeActivity", "Step count refreshed successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("HomeActivity", "Error refreshing step count", e)
+            Toast.makeText(this, "Error refreshing step count", Toast.LENGTH_SHORT).show()
+        } finally {
+            // Stop the refresh animation if it's running
+            swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
+
+        // Initialize SwipeRefreshLayout
+        swipeRefreshLayout = binding.swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshStepCount()
+        }
+        // Set the refresh colors
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.primary_green,
+            R.color.dark_green,
+            R.color.light_yellow
+        )
 
         // Get current target and set up progress bar
         target = UserPreferences.getStepTarget(this)

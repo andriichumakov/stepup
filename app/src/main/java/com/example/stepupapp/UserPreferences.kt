@@ -17,6 +17,7 @@ object UserPreferences {
     private const val KEY_DAILY_DISTANCE_PREFIX = "daily_distance_"
     private const val DEFAULT_CALORIE_TARGET = 300 // calories
     private const val DEFAULT_DISTANCE_TARGET = 5000 // meters
+    private const val KEY_SHOW_STEP_COUNTER_NOTIFICATION = "show_step_counter_notification"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -202,6 +203,16 @@ object UserPreferences {
     // Helper function to calculate distance from steps (approximately 0.762 meters per step)
     fun calculateDistanceFromSteps(steps: Int): Int {
         return (steps * 0.762).toInt()
+    }
+
+    // Step counter notification visibility functions
+    fun shouldShowStepCounterNotification(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_SHOW_STEP_COUNTER_NOTIFICATION, true) // Default to true
+    }
+
+    fun setStepCounterNotificationVisibility(context: Context, show: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_SHOW_STEP_COUNTER_NOTIFICATION, show).apply()
+        Log.d("UserPreferences", "Step counter notification visibility set to: $show")
     }
 
     data class DailyStepsData(

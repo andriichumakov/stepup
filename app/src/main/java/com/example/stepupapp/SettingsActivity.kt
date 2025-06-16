@@ -1,6 +1,7 @@
 package com.example.stepupapp
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import com.example.stepupapp.databinding.SettingsPageBinding
@@ -22,6 +23,9 @@ class SettingsActivity : BaseActivity() {
         val currentTarget = UserPreferences.getStepTarget(this)
         binding.editTextNumber2.setText(currentTarget.toString())
 
+        // Load current notification preference
+        binding.stepCounterNotificationSwitch.isChecked = UserPreferences.shouldShowStepCounterNotification(this)
+
         // Load current interests
         loadCurrentInterests()
 
@@ -30,12 +34,38 @@ class SettingsActivity : BaseActivity() {
             try {
                 val newTarget = binding.editTextNumber2.text.toString().toInt()
                 if (newTarget > 0) {
-                    UserPreferences.setStepTarget(this, newTarget)
+                    // Only reset notifications if the target is actually changing
+                    if (newTarget != currentTarget) {
+                        UserPreferences.setStepTarget(this, newTarget)
+                        // Reset notification states in the service
+                        StepCounterService.getInstance()?.resetNotificationStates()
+                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states reset")
+                    }
+                    
+                    // Save notification preference
+                    UserPreferences.setStepCounterNotificationVisibility(this, binding.stepCounterNotificationSwitch.isChecked)
                     
                     // Save interests
                     saveUserInterests()
                     
                     Toast.makeText(this, "Settings updated successfully", Toast.LENGTH_SHORT).show()
+
+                    // Get current step count from the service before restarting
+                    val currentService = StepCounterService.getInstance()
+                    val stepData = currentService?.getCurrentStepCountData() ?: StepCounterService.StepCountData(0, 0)
+
+                    // Restart the step counter service with preserved steps
+                    val serviceIntent = StepCounterService.createStartIntent(
+                        this,
+                        stepData.totalSteps,
+                        stepData.initialSteps
+                    )
+                    stopService(Intent(this, StepCounterService::class.java))
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(serviceIntent)
+                    } else {
+                        startService(serviceIntent)
+                    }
 
                     // Go back to home activity
                     val intent = Intent(this, HomeActivity::class.java)

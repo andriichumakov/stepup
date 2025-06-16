@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.content.Context
 
 class StepCounterService : Service(), SensorEventListener {
     private lateinit var sensorManager: SensorManager
@@ -28,6 +29,8 @@ class StepCounterService : Service(), SensorEventListener {
     private var isEmulatorMode = false
     private var serviceScope: CoroutineScope? = null
     private lateinit var localBroadcastManager: LocalBroadcastManager
+    private var lastResetDate: String = ""
+    private var lastSensorValue: Int = 0  // Track the last sensor value
 
     // Track notification states
     private var hasNotified75 = false
@@ -42,19 +45,90 @@ class StepCounterService : Service(), SensorEventListener {
         private const val STEPS_PER_KM = 1312.33595801 // Average steps per kilometer
         private const val CALORIES_PER_STEP = 0.04 // Average calories burned per step
         private const val EMULATOR_STEP_INTERVAL = 5000L // 5 seconds between steps in emulator mode
+        private const val MIDNIGHT_CHECK_INTERVAL = 60000L // Check for midnight every minute
+        private const val EXTRA_PRESERVED_STEPS = "preserved_steps"
+        private const val EXTRA_PRESERVED_INITIAL_STEPS = "preserved_initial_steps"
+
+        // Add a static instance to access the service
+        private var instance: StepCounterService? = null
+
+        fun getInstance(): StepCounterService? {
+            return instance
+        }
+
+        fun createStartIntent(context: Context, preservedSteps: Int = 0, preservedInitialSteps: Int = 0): Intent {
+            return Intent(context, StepCounterService::class.java).apply {
+                putExtra(EXTRA_PRESERVED_STEPS, preservedSteps)
+                putExtra(EXTRA_PRESERVED_INITIAL_STEPS, preservedInitialSteps)
+            }
+        }
+    }
+
+    // Add a data class to hold step count data
+    data class StepCountData(
+        val totalSteps: Int,
+        val initialSteps: Int
+    )
+
+    // Add a public method to get current step count data
+    fun getCurrentStepCountData(): StepCountData {
+        return StepCountData(totalSteps, initialSteps)
+    }
+
+    private fun getCurrentDate(): String {
+        return java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+    }
+
+    private fun checkAndResetAtMidnight() {
+        val currentDate = getCurrentDate()
+        if (currentDate != lastResetDate) {
+            android.util.Log.d("StepCounterService", "Midnight detected, resetting step count")
+            // Reset step count
+            totalSteps = 0
+            initialSteps = 0
+            isFirstStep = true
+            lastResetDate = currentDate
+            // Reset notification states
+            resetNotificationStates()
+            // Send update with reset steps
+            sendStepUpdate(0)
+        }
+    }
+
+    private fun startMidnightCheck() {
+        serviceScope?.launch(Dispatchers.Default) {
+            while (true) {
+                try {
+                    checkAndResetAtMidnight()
+                    kotlinx.coroutines.delay(MIDNIGHT_CHECK_INTERVAL)
+                } catch (e: Exception) {
+                    android.util.Log.e("StepCounterService", "Error in midnight check", e)
+                }
+            }
+        }
     }
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         try {
             android.util.Log.d("StepCounterService", "Service onCreate called")
             serviceScope = CoroutineScope(Dispatchers.Default)
             localBroadcastManager = LocalBroadcastManager.getInstance(this)
 
-            // Reset notification states at the start of a new day
-            resetNotificationStates()
+            // Initialize last reset date and check if we need to reset
+            val currentDate = getCurrentDate()
+            if (currentDate != lastResetDate) {
+                android.util.Log.d("StepCounterService", "New day detected, resetting step count")
+                totalSteps = 0
+                initialSteps = 0
+                isFirstStep = true
+                lastSensorValue = 0
+                lastResetDate = currentDate
+                resetNotificationStates()
+            }
 
-            // Send initial update immediately
+            // Send initial update with current steps
             sendStepUpdate(totalSteps)
 
             sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -67,15 +141,31 @@ class StepCounterService : Service(), SensorEventListener {
             createNotificationChannel()
             
             // Start as foreground service with health type
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NOTIFICATION_ID,
-                    createNotification(),
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
-                )
+            if (UserPreferences.shouldShowStepCounterNotification(this)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        createNotification(),
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+                    )
+                } else {
+                    startForeground(NOTIFICATION_ID, createNotification())
+                }
             } else {
-                startForeground(NOTIFICATION_ID, createNotification())
+                // If notifications are disabled, start as a background service
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        createMinimalNotification(),
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+                    )
+                } else {
+                    startForeground(NOTIFICATION_ID, createMinimalNotification())
+                }
             }
+
+            // Start midnight check
+            startMidnightCheck()
 
             // Only start emulator mode if we're actually in an emulator
             if (isEmulatorMode) {
@@ -148,6 +238,33 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             android.util.Log.d("StepCounterService", "Service onStartCommand called")
+            
+            // Check if we need to reset for a new day
+            val currentDate = getCurrentDate()
+            if (currentDate != lastResetDate) {
+                android.util.Log.d("StepCounterService", "New day detected in onStartCommand, resetting step count")
+                totalSteps = 0
+                initialSteps = 0
+                isFirstStep = true
+                lastSensorValue = 0
+                lastResetDate = currentDate
+                resetNotificationStates()
+            } else {
+                // Only restore steps if it's the same day
+                intent?.let {
+                    if (it.hasExtra(EXTRA_PRESERVED_STEPS) && it.hasExtra(EXTRA_PRESERVED_INITIAL_STEPS)) {
+                        totalSteps = it.getIntExtra(EXTRA_PRESERVED_STEPS, 0)
+                        initialSteps = it.getIntExtra(EXTRA_PRESERVED_INITIAL_STEPS, 0)
+                        isFirstStep = false
+                        lastSensorValue = initialSteps + totalSteps
+                        android.util.Log.d("StepCounterService", "Restored steps - Total: $totalSteps, Initial: $initialSteps, Last Sensor: $lastSensorValue")
+                    }
+                }
+            }
+
+            // Send an immediate update with the current step count
+            sendStepUpdate(totalSteps)
+
             if (!isEmulatorMode) {
                 stepSensor?.let {
                     sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
@@ -167,16 +284,24 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         try {
             if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                val currentSensorValue = event.values[0].toInt()
+                
                 if (isFirstStep) {
-                    initialSteps = event.values[0].toInt()
+                    // For the first step of the day, use the current sensor value as initial
+                    initialSteps = currentSensorValue
+                    lastSensorValue = currentSensorValue
                     isFirstStep = false
-                    android.util.Log.d("StepCounterService", "First step detected, initial steps: $initialSteps")
+                    android.util.Log.d("StepCounterService", "First step of the day - Initial steps: $initialSteps, Current sensor: $currentSensorValue")
+                } else {
+                    // Calculate steps since last update
+                    val stepsSinceLastUpdate = currentSensorValue - lastSensorValue
+                    if (stepsSinceLastUpdate > 0) {
+                        totalSteps += stepsSinceLastUpdate
+                        lastSensorValue = currentSensorValue
+                        android.util.Log.d("StepCounterService", "Step update - Steps since last: $stepsSinceLastUpdate, Total: $totalSteps, Current sensor: $currentSensorValue")
+                        sendStepUpdate(totalSteps)
+                    }
                 }
-
-                val currentSteps = event.values[0].toInt()
-                totalSteps = currentSteps - initialSteps
-                android.util.Log.d("StepCounterService", "Step sensor update - Current steps: $currentSteps, Initial steps: $initialSteps, Total steps: $totalSteps")
-                sendStepUpdate(totalSteps)
             }
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error in onSensorChanged", e)
@@ -291,8 +416,30 @@ class StepCounterService : Service(), SensorEventListener {
             .build()
     }
 
+    private fun createMinimalNotification(): android.app.Notification {
+        // Create a minimal notification that's not visible to the user
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("")
+            .setContentText("")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
+            .setSilent(true)
+            .setShowWhen(false)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .build()
+    }
+
     private fun updateNotification(steps: Int, distance: Double, calories: Int) {
         try {
+            if (!UserPreferences.shouldShowStepCounterNotification(this)) {
+                // If notifications are disabled, update with minimal notification
+                val notification = createMinimalNotification()
+                val notificationManager = getSystemService(NotificationManager::class.java)
+                notificationManager.notify(NOTIFICATION_ID, notification)
+                return
+            }
+
             val contentText = if (isEmulatorMode) {
                 "Steps: $steps | Distance: ${String.format("%.2f", distance)} km | Calories: $calories (Emulator Mode)"
             } else {
@@ -313,14 +460,18 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-    private fun resetNotificationStates() {
+    // Make resetNotificationStates public and accessible
+    fun resetNotificationStates() {
         hasNotified75 = false
         hasNotified90 = false
         hasNotified95 = false
         hasNotified100 = false
+        android.util.Log.d("StepCounterService", "Notification states reset")
     }
 
     override fun onDestroy() {
+        super.onDestroy()
+        instance = null
         try {
             android.util.Log.d("StepCounterService", "Service onDestroy called")
             if (!isEmulatorMode) {
@@ -330,7 +481,6 @@ class StepCounterService : Service(), SensorEventListener {
             serviceScope = null
             // Reset notification states when service is destroyed
             resetNotificationStates()
-            super.onDestroy()
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error in onDestroy", e)
         }

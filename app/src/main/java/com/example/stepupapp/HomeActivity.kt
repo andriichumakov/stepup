@@ -16,12 +16,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.stepupapp.databinding.ActivityHomeBinding
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
     private var target: Int = 6000 // Will be updated in onCreate
     private lateinit var localBroadcastManager: LocalBroadcastManager
-    private lateinit var actionBarLocationManager: ActionBarLocationManager
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -46,26 +47,57 @@ class HomeActivity : BaseActivity() {
         binding.quoteAuthor.text = "— ${quote.author}"
     }
 
+    private fun refreshStepCount() {
+        try {
+            android.util.Log.d("HomeActivity", "Refreshing step count")
+            // Get current step count from preferences and update UI
+            val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+            val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+            val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+            updateUI(currentSteps, currentDistance, currentCalories)
+            
+            // Also refresh the quote while we're at it
+            updateQuote()
+            
+            android.util.Log.d("HomeActivity", "Step count refreshed successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("HomeActivity", "Error refreshing step count", e)
+            Toast.makeText(this, "Error refreshing step count", Toast.LENGTH_SHORT).show()
+        } finally {
+            // Stop the refresh animation if it's running
+            swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        android.util.Log.d("HomeActivity", "onCreate called")
-
-        // Initialize target from preferences
-        target = UserPreferences.getStepTarget(this)
-        updateTargetText()
-
-        // Initialize LocalBroadcastManager
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
 
-        // Initialize and setup ActionBar location
-        actionBarLocationManager = ActionBarLocationManager(this)
-        actionBarLocationManager.setupActionBarLocation()
+        // Initialize SwipeRefreshLayout
+        swipeRefreshLayout = binding.swipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshStepCount()
+        }
+        // Set the refresh colors
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.primary_green,
+            R.color.dark_green,
+            R.color.light_yellow
+        )
 
-        // Set up the progress bar with dynamic target
+        // Get current target and set up progress bar
+        target = UserPreferences.getStepTarget(this)
         binding.stepProgressBar.max = target
+        updateTargetText()
+
+        // Get current step count from preferences and update UI
+        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+        val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+        val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+        updateUI(currentSteps, currentDistance, currentCalories)
 
         // Set up navigation buttons
         binding.imageButton3.setOnClickListener {
@@ -114,7 +146,6 @@ class HomeActivity : BaseActivity() {
         }
 
         // Initialize UI with zeros and a random quote
-        updateUI(0, 0.0, 0)
         updateQuote()
 
         // Register for local broadcasts
@@ -132,6 +163,12 @@ class HomeActivity : BaseActivity() {
         target = UserPreferences.getStepTarget(this)
         binding.stepProgressBar.max = target
         updateTargetText()
+
+        // Get current step count from preferences and update UI
+        val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
+        val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
+        val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
+        updateUI(currentSteps, currentDistance, currentCalories)
     }
 
     private fun updateTargetText() {
@@ -140,9 +177,7 @@ class HomeActivity : BaseActivity() {
 
     private fun checkAndRequestPermissions() {
         val permissions = mutableListOf(
-                Manifest.permission.ACTIVITY_RECOGNITION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACTIVITY_RECOGNITION
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -163,12 +198,12 @@ class HomeActivity : BaseActivity() {
                 // Show explanation dialog
                 androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Permission Required")
-                    .setMessage("This app needs permission to count your steps, access your location for personalized features, and show notifications. Without these permissions, some features won't work properly.")
+                    .setMessage("This app needs permission to count your steps and show notifications. Without these permissions, the step counter won't work.")
                     .setPositiveButton("Grant Permission") { _, _ ->
                         requestPermissionLauncher.launch(permissionsToRequest)
                     }
                     .setNegativeButton("Cancel") { _, _ ->
-                        Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
                         updateUI(0, 0.0, 0)
                     }
                     .create()
@@ -188,16 +223,11 @@ class HomeActivity : BaseActivity() {
     ) { permissions ->
         if (permissions.all { it.value }) {
             setupStepCounter()
-            // Also update actionbar location if location permission was granted
-            if (permissions.containsKey(Manifest.permission.ACCESS_FINE_LOCATION) && 
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-                actionBarLocationManager.onPermissionGranted()
-            }
         } else {
             // Show dialog with option to open settings
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Permission Required")
-                .setMessage("This app requires permissions to track your activity and access your location for personalized features. Please grant the permissions in Settings.")
+                .setMessage("Step counting requires permission to track your activity. Please grant the permission in Settings.")
                 .setPositiveButton("Open Settings") { _, _ ->
                     val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = android.net.Uri.fromParts("package", packageName, null)
@@ -205,7 +235,7 @@ class HomeActivity : BaseActivity() {
                     startActivity(intent)
                 }
                 .setNegativeButton("Cancel") { _, _ ->
-                    Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
                     updateUI(0, 0.0, 0)
                 }
                 .create()
@@ -256,7 +286,6 @@ class HomeActivity : BaseActivity() {
         super.onDestroy()
         try {
             localBroadcastManager.unregisterReceiver(stepUpdateReceiver)
-            actionBarLocationManager.onDestroy()
         } catch (e: Exception) {
             android.util.Log.e("HomeActivity", "Error unregistering receiver", e)
         }

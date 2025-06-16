@@ -75,12 +75,16 @@ class HomeActivity : BaseActivity() {
 
         binding.imageButtonMemory.setOnClickListener {
             val intent = Intent(this, MemoryActivity::class.java)
+            val currentSteps = binding.stepCountText.text.toString().split(" ")[0].toIntOrNull() ?: 0
+            intent.putExtra("currentSteps", currentSteps)
             startActivity(intent)
         }
 
         // Set up memory card click
         binding.memoriesCard.setOnClickListener {
             val intent = Intent(this, MemoryActivity::class.java)
+            val currentSteps = binding.stepCountText.text.toString().split(" ")[0].toIntOrNull() ?: 0
+            intent.putExtra("currentSteps", currentSteps)
             startActivity(intent)
         }
 

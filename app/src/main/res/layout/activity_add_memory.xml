@@ -69,13 +69,17 @@
             android:layout_height="wrap_content"
             android:hint="Enter description (optional)" />
 
-        <EditText
-            android:id="@+id/editTextSteps"
+        <!-- Display dynamically retrieved steps -->
+        <TextView
+            android:id="@+id/textViewSteps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter steps"
-            android:inputType="number"
-            />
+            android:padding="8dp"
+            android:text="Steps: loading..."
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_green" />
+
 
         <!-- Submit Button -->
         <Button

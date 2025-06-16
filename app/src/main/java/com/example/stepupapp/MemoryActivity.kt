@@ -25,8 +25,12 @@ class MemoryActivity : AppCompatActivity() {
         binding = ActivityMemoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Receive currentSteps from HomeActivity (default to 0 if not passed)
+        val currentSteps = intent.getIntExtra("currentSteps", 0)
+
         binding.btnAddPlace.setOnClickListener {
             val intent = Intent(this, AddMemoryActivity::class.java)
+            intent.putExtra("currentSteps", currentSteps)
             startActivity(intent)
         }
 

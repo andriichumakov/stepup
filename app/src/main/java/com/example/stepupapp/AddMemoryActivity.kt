@@ -42,6 +42,9 @@ class AddMemoryActivity : AppCompatActivity() {
         binding = ActivityAddMemoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val currentSteps = intent.getIntExtra("currentSteps", 0)
+        binding.textViewSteps.text = currentSteps.toString()
+
         binding.btnChooseImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 type = "image/*"
@@ -60,7 +63,7 @@ class AddMemoryActivity : AppCompatActivity() {
 
             val date = binding.textViewDate.text.toString()
             val location = binding.editTextLocation.text.toString()
-            val steps = binding.editTextSteps.text.toString()
+            val steps = binding.textViewSteps.text.toString()
             Log.d("MemoryDebug", "Submit pressed with: selectedImageUri=$selectedImageUri, imageUriFromCamera=$imageUriFromCamera")
             Log.d("MemoryDebug", "Fields: date='$date', location='$location', steps='$steps'")
 

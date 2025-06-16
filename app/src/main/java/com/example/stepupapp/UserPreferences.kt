@@ -204,6 +204,17 @@ object UserPreferences {
         return (steps * 0.762).toInt()
     }
 
+    fun setLastMemoryId(context: Context, id: Int) {
+        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("last_memory_id", id).apply()
+    }
+
+    fun getLastMemoryId(context: Context): Int {
+        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
+        return prefs.getInt("last_memory_id", -1)
+    }
+
+
     data class DailyStepsData(
         val day: String,
         val steps: Int,

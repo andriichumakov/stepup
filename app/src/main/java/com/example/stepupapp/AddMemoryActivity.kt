@@ -64,6 +64,9 @@ class AddMemoryActivity : AppCompatActivity() {
             val date = binding.textViewDate.text.toString()
             val location = binding.editTextLocation.text.toString()
             val steps = binding.textViewSteps.text.toString()
+            val description = binding.editTextDescription.text.toString()
+            val rating = binding.ratingBar.rating
+
             Log.d("MemoryDebug", "Submit pressed with: selectedImageUri=$selectedImageUri, imageUriFromCamera=$imageUriFromCamera")
             Log.d("MemoryDebug", "Fields: date='$date', location='$location', steps='$steps'")
 
@@ -78,7 +81,9 @@ class AddMemoryActivity : AppCompatActivity() {
                             name = location,
                             date_saved = date,
                             steps_taken = steps,
-                            imageUri = imageUriToSave.toString()
+                            imageUri = imageUriToSave.toString(),
+                            description = description,
+                            rating = rating
                         )
 
                         val db = PlaceDatabase.getDatabase(applicationContext)

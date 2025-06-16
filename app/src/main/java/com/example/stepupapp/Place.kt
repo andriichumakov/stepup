@@ -9,5 +9,7 @@ data class Place(
     val name: String,
     val date_saved: String,
     val steps_taken: String,
-    val imageUri: String  // store as string path
+    val imageUri: String,  // store as string path
+    val description: String,
+    val rating: Float
 )

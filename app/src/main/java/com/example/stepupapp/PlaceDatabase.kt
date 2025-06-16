@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Place::class], version = 1)
+@Database(entities = [Place::class], version = 3)
 abstract class PlaceDatabase : RoomDatabase() {
     abstract fun placeDao(): PlaceDao
 
@@ -18,7 +18,10 @@ abstract class PlaceDatabase : RoomDatabase() {
                     context.applicationContext,
                     PlaceDatabase::class.java,
                     "place_database"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration() // ← Auto-reset DB if schema changes
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }

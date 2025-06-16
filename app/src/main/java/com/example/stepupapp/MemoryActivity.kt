@@ -82,9 +82,8 @@ class MemoryActivity : AppCompatActivity() {
 
         (row1.getChildAt(1) as TextView).text = "👣 Steps: ${place.steps_taken}"
         (row2.getChildAt(1) as TextView).text = "📅 Date: ${place.date_saved}"
-        (row3.getChildAt(1) as TextView).text = "🕒 Recently visited"
-        (row4.getChildAt(1) as TextView).text = "🎵 Vibe memory"
-    }
+        (row3.getChildAt(1) as TextView).text = "📝 ${place.description}"
+        (row4.getChildAt(1) as TextView).text = "⭐️ Rating: ${place.rating}/5"    }
 
     private fun addMemory(place: Place, index: Int) {
         val context = this
@@ -132,11 +131,29 @@ class MemoryActivity : AppCompatActivity() {
             text = "📅 Date: ${place.date_saved}"
             textSize = 16f
         }
+        val description = TextView(context).apply {
+            text = "📝 ${place.description}"
+            textSize = 16f
+        }
+
+        val ratingBar = RatingBar(context).apply {
+            numStars = 5
+            stepSize = 0.5f
+            rating = place.rating
+            setIsIndicator(true)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
 
         layout.addView(imgView)
         layout.addView(placeName)
         layout.addView(steps)
         layout.addView(date)
+        layout.addView(description)
+        layout.addView(ratingBar)
+
 
         memoryViews.add(layout)
         binding.memoryContainer.addView(layout)

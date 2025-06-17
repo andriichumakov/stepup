@@ -349,8 +349,4 @@ class HomeActivity : BaseActivity() {
         snackbar.show()
     }
 
-
-
-
-
 }

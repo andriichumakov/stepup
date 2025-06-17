@@ -91,6 +91,7 @@ class AddMemoryActivity : AppCompatActivity() {
 
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@AddMemoryActivity, "Memory saved!", Toast.LENGTH_SHORT).show()
+                            setResult(Activity.RESULT_OK)
                             finish()
                         }
                     } catch (e: Exception) {
@@ -238,23 +239,29 @@ class AddMemoryActivity : AppCompatActivity() {
 
     private fun getDateFromImage(uri: Uri): String? {
         return try {
-            val inputStream: InputStream? = contentResolver.openInputStream(uri)
-            if (inputStream != null) {
-                val exif = ExifInterface(inputStream)
-                val dateTime = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
+            val inputStream = contentResolver.openInputStream(uri)
+            inputStream?.use {
+                val exif = ExifInterface(it)
+                val dateTimeStr = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
                     ?: exif.getAttribute(ExifInterface.TAG_DATETIME)
-                inputStream.close()
-                dateTime?.let {
-                    val parts = it.split(" ")[0].split(":")
-                    if (parts.size == 3) {
-                        val year = parts[0].takeLast(2)
-                        "$year-${parts[1]}-${parts[2]}"
-                    } else null
+
+                if (dateTimeStr != null) {
+                    // Expected format: "yyyy:MM:dd HH:mm:ss"
+                    val parser = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
+                    val formatter = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
+
+                    val date = parser.parse(dateTimeStr)
+                    val today = Date()
+                    if (date != null && !date.after(today)) {
+                        return formatter.format(date)
+                    }
                 }
-            } else null
+            }
+            null
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
+
 }

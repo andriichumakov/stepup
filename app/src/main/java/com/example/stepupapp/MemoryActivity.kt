@@ -1,5 +1,6 @@
 package com.example.stepupapp
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +20,7 @@ class MemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMemoryBinding
     private val memoryViews = mutableListOf<View>()
+    private val ADD_MEMORY_REQUEST_CODE = 1234
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +33,7 @@ class MemoryActivity : AppCompatActivity() {
         binding.btnAddPlace.setOnClickListener {
             val intent = Intent(this, AddMemoryActivity::class.java)
             intent.putExtra("currentSteps", currentSteps)
-            startActivity(intent)
-        }
+            startActivityForResult(intent, ADD_MEMORY_REQUEST_CODE)        }
 
         binding.backButton.setOnClickListener {
             startActivity(Intent(this, HomeActivity::class.java))
@@ -61,6 +62,7 @@ class MemoryActivity : AppCompatActivity() {
                         addMemory(place, index)
                     }
                 }
+                binding.contentContainer.visibility = View.VISIBLE
             }
         }
     }
@@ -173,4 +175,13 @@ class MemoryActivity : AppCompatActivity() {
 
         binding.placeListContainer.addView(button)
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == ADD_MEMORY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            loadPlacesFromRoom() // Refresh the list
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import com.example.stepupapp.databinding.SettingsPageBinding
 class SettingsActivity : BaseActivity() {
     private lateinit var binding: SettingsPageBinding
     private lateinit var actionBarLocationManager: ActionBarLocationManager
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +19,10 @@ class SettingsActivity : BaseActivity() {
         // Initialize and setup ActionBar location
         actionBarLocationManager = ActionBarLocationManager(this)
         actionBarLocationManager.setupActionBarLocation()
+
+        // Initialize and setup ActionBar greeting
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
 
         // Load current step target
         val currentTarget = UserPreferences.getStepTarget(this)

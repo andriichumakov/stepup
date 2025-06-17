@@ -11,6 +11,7 @@ object UserPreferences {
     private const val KEY_STEP_TARGET = "step_target"
     private const val KEY_SETUP_COMPLETED = "setup_completed"
     private const val KEY_USER_INTERESTS = "user_interests"
+    private const val KEY_USER_NAME = "user_name"
     private const val DEFAULT_STEP_TARGET = 6000
     private const val KEY_DAILY_STEPS_PREFIX = "daily_steps_"
     private const val KEY_DAILY_CALORIES_PREFIX = "daily_calories_"
@@ -42,6 +43,16 @@ object UserPreferences {
 
     fun setSetupCompleted(context: Context, completed: Boolean = true) {
         getPrefs(context).edit().putBoolean(KEY_SETUP_COMPLETED, completed).apply()
+    }
+
+    // User name management functions
+    fun saveUserName(context: Context, name: String) {
+        getPrefs(context).edit().putString(KEY_USER_NAME, name.trim()).apply()
+        Log.d("UserPreferences", "Saved user name: $name")
+    }
+
+    fun getUserName(context: Context): String {
+        return getPrefs(context).getString(KEY_USER_NAME, "") ?: ""
     }
 
     // Interest management functions

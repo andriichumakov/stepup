@@ -11,11 +11,16 @@ import com.example.stepupapp.databinding.ActivityMemoryBinding
 class MemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMemoryBinding
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMemoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Initialize and setup ActionBar greeting
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
 
         // Add a memory item manually (you can add more this way)
         addMemory(

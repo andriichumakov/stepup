@@ -23,6 +23,7 @@ class HomeActivity : BaseActivity() {
     private var target: Int = 6000 // Will be updated in onCreate
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -155,6 +156,10 @@ class HomeActivity : BaseActivity() {
 
         // Check permissions and start service
         checkAndRequestPermissions()
+
+        // Initialize ActionBarGreetingManager
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
     }
 
     override fun onResume() {
@@ -169,6 +174,9 @@ class HomeActivity : BaseActivity() {
         val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
         val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
         updateUI(currentSteps, currentDistance, currentCalories)
+
+        // Update greeting in case user name was changed
+        actionBarGreetingManager.updateGreeting()
     }
 
     private fun updateTargetText() {

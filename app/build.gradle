@@ -113,4 +113,7 @@ dependencies {
     implementation 'io.github.jan-tennert.supabase:postgrest-kt:2.4.2'
     // Include a Ktor client engine, e.g., CIO
     implementation 'io.ktor:ktor-client-android:2.3.12'
+
+    implementation 'com.github.PhilJay:MPAndroidChart:3.1.0'
+
 }

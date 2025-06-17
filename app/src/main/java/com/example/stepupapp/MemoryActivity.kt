@@ -30,6 +30,10 @@ class MemoryActivity : AppCompatActivity() {
         // Receive currentSteps from HomeActivity (default to 0 if not passed)
         val currentSteps = intent.getIntExtra("currentSteps", 0)
 
+        binding.btnMemoryDashboard.setOnClickListener {
+            startActivity(Intent(this, MemoryDashboardActivity::class.java))
+        }
+
         binding.btnAddPlace.setOnClickListener {
             val intent = Intent(this, AddMemoryActivity::class.java)
             intent.putExtra("currentSteps", currentSteps)

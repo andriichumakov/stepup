@@ -73,8 +73,7 @@
         <activity
             android:name=".MemoryActivity"
             android:exported="false" />
-        <activity
-                android:name=".StepsOverviewActivity"
+        <activity android:name=".StepsOverviewActivity"
                 android:exported="false" />
         <activity android:name=".AuthOptionsActivity"
                   android:exported="false" />
@@ -84,6 +83,8 @@
                   android:exported="false" />
         <activity android:name=".MainActivity"
                   android:exported="false" />
+        <activity android:name=".MemoryDashboardActivity"
+            android:exported="false" />
 
         <!-- Step Counter Service -->
         <service

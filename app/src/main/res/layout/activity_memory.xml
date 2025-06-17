@@ -176,6 +176,15 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginTop="24dp"/>
+
+                <Button
+                    android:id="@+id/btnMemoryDashboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Memory Dashboard"
+                    android:background="@color/background_cream"
+                    android:layout_marginBottom="8dp"/>
+
                 <!-- Add New Place button -->
                 <Button
                     android:id="@+id/btnAddPlace"

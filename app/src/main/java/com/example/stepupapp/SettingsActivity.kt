@@ -39,7 +39,9 @@ class SettingsActivity : BaseActivity() {
                         UserPreferences.setStepTarget(this, newTarget)
                         // Reset notification states in the service
                         StepCounterService.getInstance()?.resetNotificationStates()
-                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states reset")
+                        // Reset streak notification tracking so new streaks with new target are notified
+                        UserPreferences.resetStreakNotificationTracking(this)
+                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states and streak tracking reset")
                     }
                     
                     // Save notification preference

@@ -85,6 +85,16 @@ object ProfileService {
         }
     }
 
+    // Check if step goal has been set for current user
+    suspend fun hasSetStepGoal(): Boolean {
+        return try {
+            val profile = getCurrentProfile()
+            profile?.step_goal != null
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to check step goal: ${e.localizedMessage}", e)
+            false
+        }
+    }
 
     // User Sign Out
     suspend fun signOut(context: Context) {
@@ -144,14 +154,11 @@ object ProfileService {
         }
     }
 
-    // Update profile (server-side only)
     suspend fun updateProfile(userProfile: UserProfile): Boolean {
         val id = userProfile.id ?: return false
         return try {
             client.from("Profiles")
-                .update(userProfile) {
-                    filter { eq("id", id) }
-                }
+                .update(userProfile) { filter { eq("id", id) } }
             Log.d(TAG, "Profile updated successfully: $userProfile")
             true
         } catch (e: Exception) {
@@ -159,6 +166,7 @@ object ProfileService {
             false
         }
     }
+
 
     private fun extractSupabaseError(e: Exception): String {
         return when (e) {
@@ -168,4 +176,20 @@ object ProfileService {
             else -> e.message ?: "Unknown error"
         }
     }
+    // even though this is already accomplished in UpdateProfile, this method is here for your convenience
+    suspend fun updateStepGoal(stepGoal: Int): Boolean {
+        val id = auth.currentSessionOrNull()?.user?.id ?: return false
+        return try {
+            client.from("Profiles")
+                .update(mapOf("step_goal" to stepGoal)) {
+                    filter { eq("id", id) }
+                }
+            Log.d(TAG, "Step goal updated successfully: $stepGoal")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update step goal: ${e.localizedMessage}", e)
+            false
+        }
+    }
+
 }

@@ -41,6 +41,11 @@ class LoadingScreenActivity : BaseActivity() {
             setProgressBar(100)
 
             if (restored) {
+                if (ProfileService.hasSetStepGoal())
+                {
+                    goToHomeActivity()
+                    return@launch
+                }
                 goToMainActivity()
             } else {
                 goToAuthOptionsActivity()
@@ -50,6 +55,12 @@ class LoadingScreenActivity : BaseActivity() {
 
     private fun goToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun goToHomeActivity() {
+        val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
         finish()
     }

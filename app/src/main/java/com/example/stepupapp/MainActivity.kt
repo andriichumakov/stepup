@@ -26,11 +26,8 @@ class MainActivity : BaseActivity() {
                     return@withContext
                 }
             }
-
-            // Get current user's profile
-            val profile = ProfileService.getCurrentProfile()
             
-            if (profile?.setupCompleted == true) {
+            if (ProfileService.hasSetStepGoal()) {
                 withContext(Dispatchers.Main) {
                     // Skip setup and go directly to HomeActivity
                     startActivity(Intent(this@MainActivity, HomeActivity::class.java))
@@ -89,14 +86,10 @@ class MainActivity : BaseActivity() {
 
                         // Mark setup as completed in Supabase
                         CoroutineScope(Dispatchers.IO).launch {
-                            val currentProfile = ProfileService.getCurrentProfile()
-                            if (currentProfile != null) {
-                                val updatedProfile = currentProfile.copy(setupCompleted = true)
-                                ProfileService.updateProfile(updatedProfile)
-                            }
-                            
+                            val stepGoal = UserPreferences.getStepTarget(this@MainActivity)
+                            ProfileService.updateStepGoal(stepGoal)
+
                             withContext(Dispatchers.Main) {
-                                // Proceed to home activity
                                 val intent = Intent(this@MainActivity, HomeActivity::class.java)
                                 startActivity(intent)
                                 finish()

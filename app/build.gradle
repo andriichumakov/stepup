@@ -6,7 +6,7 @@ plugins {
 }
 
 def supabaseProperties = new Properties()
-def supabasePropsFile = rootProject.file("supabase.properties")
+def supabasePropsFile = rootProject.file("supabase.properties.example")
 if (supabasePropsFile.exists()) {
     supabaseProperties.load(new FileInputStream(supabasePropsFile))
 } else {

@@ -28,7 +28,7 @@ class MainActivity : BaseActivity() {
             }
 
             // Get current user's profile
-            val profile = ProfileService.getCurrentProfile(this@MainActivity)
+            val profile = ProfileService.getCurrentProfile()
             
             if (profile?.setupCompleted == true) {
                 withContext(Dispatchers.Main) {
@@ -89,10 +89,10 @@ class MainActivity : BaseActivity() {
 
                         // Mark setup as completed in Supabase
                         CoroutineScope(Dispatchers.IO).launch {
-                            val currentProfile = ProfileService.getCurrentProfile(this@MainActivity)
+                            val currentProfile = ProfileService.getCurrentProfile()
                             if (currentProfile != null) {
                                 val updatedProfile = currentProfile.copy(setupCompleted = true)
-                                ProfileService.updateServerProfile(updatedProfile)
+                                ProfileService.updateProfile(updatedProfile)
                             }
                             
                             withContext(Dispatchers.Main) {

@@ -37,7 +37,7 @@ class RegisterActivity : BaseActivity() {
 
             // Run registration in background
             CoroutineScope(Dispatchers.IO).launch {
-                val result = ProfileService.registerProfile(email, username, password)
+                val result = ProfileService.register(this@RegisterActivity, username, email, password)
                 withContext(Dispatchers.Main) {
                     if (result != null) {
                         Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()

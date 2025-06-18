@@ -23,7 +23,7 @@ class LoginActivity : BaseActivity() {
             val password = binding.passwordEditText.text.toString()
 
             lifecycleScope.launch {
-                val profile = ProfileService.login(email, password)
+                val profile = ProfileService.login(this@LoginActivity, email, password)
                 if (profile != null) {
                     LocalProfileStore.addOrUpdateProfile(applicationContext, profile)
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))

@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.SettingsPageBinding
+import com.example.stepupapp.services.ProfileService
+import kotlinx.coroutines.launch
 
 class SettingsActivity : BaseActivity() {
     private lateinit var binding: SettingsPageBinding
@@ -42,6 +45,12 @@ class SettingsActivity : BaseActivity() {
                     // Only reset notifications if the target is actually changing
                     if (newTarget != currentTarget) {
                         UserPreferences.setStepTarget(this, newTarget)
+                        lifecycleScope.launch {
+                            val success = ProfileService.updateStepGoal(newTarget)
+                            if (!success) {
+                                Toast.makeText(this@SettingsActivity, "Failed to update step goal remotely", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                         // Reset notification states in the service
                         StepCounterService.getInstance()?.resetNotificationStates()
                         // Reset streak notification tracking so new streaks with new target are notified
@@ -92,6 +101,20 @@ class SettingsActivity : BaseActivity() {
             startActivity(intent)
             finish()
         }
+        /*
+        binding.logoutButton.setOnClickListener {
+            lifecycleScope.launch {
+                // Sign out using ProfileService
+                ProfileService.signOut(this@SettingsActivity)
+
+                // Go back to login screen
+                val intent = Intent(this@SettingsActivity, AuthOptionsActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            }
+        }
+        */
     }
 
     private fun loadCurrentInterests() {

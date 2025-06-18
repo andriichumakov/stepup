@@ -10,8 +10,8 @@ data class UserProfile(
     val id: String?,
     val name: String,
     val email: String,
+    val step_goal: Int? = null,
     @SerialName("pfp_url") val pfpUrl: String? = null,
     @SerialName("created_at") val createdAt: String? = null,
-    @SerialName("last_updated") val lastUpdated: String? = null,
-    @SerialName("setup_completed") val setupCompleted: Boolean = false
+    @SerialName("last_updated") val lastUpdated: String? = null
 )

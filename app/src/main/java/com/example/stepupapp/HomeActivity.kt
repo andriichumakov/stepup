@@ -17,6 +17,10 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.stepupapp.databinding.ActivityHomeBinding
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -57,8 +61,9 @@ class HomeActivity : BaseActivity() {
             val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
             updateUI(currentSteps, currentDistance, currentCalories)
             
-            // Also refresh the quote while we're at it
+            // Also refresh the quote and weather while we're at it
             updateQuote()
+            fetchWeather()
             
             android.util.Log.d("HomeActivity", "Step count refreshed successfully")
         } catch (e: Exception) {
@@ -67,6 +72,46 @@ class HomeActivity : BaseActivity() {
         } finally {
             // Stop the refresh animation if it's running
             swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    private fun fetchWeather() {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                Log.d("HomeActivity", "Fetching weather data...")
+                val weatherInfo = withContext(Dispatchers.IO) {
+                    WeatherManager.getCurrentWeather(this@HomeActivity)
+                }
+                
+                if (weatherInfo != null) {
+                    updateWeatherUI(weatherInfo)
+                    Log.d("HomeActivity", "Weather updated successfully")
+                } else {
+                    Log.w("HomeActivity", "Failed to fetch weather data")
+                    // Keep the default weather display
+                }
+            } catch (e: Exception) {
+                Log.e("HomeActivity", "Error fetching weather", e)
+                // Keep the default weather display on error
+            }
+        }
+    }
+
+    private fun updateWeatherUI(weatherInfo: WeatherManager.WeatherInfo) {
+        try {
+            // Update temperature
+            binding.weatherTemp.text = "${weatherInfo.temperature.toInt()}°C"
+            
+            // Update weather icon
+            binding.weatherIcon.setImageResource(weatherInfo.weatherIcon)
+            
+            // Update weather message
+            val weatherMessage = WeatherManager.getWeatherMessage(weatherInfo.temperature, weatherInfo.weatherCode)
+            binding.weatherMessage.text = weatherMessage
+            
+            Log.d("HomeActivity", "Weather UI updated: ${weatherInfo.temperature}°C, ${weatherInfo.weatherDescription}")
+        } catch (e: Exception) {
+            Log.e("HomeActivity", "Error updating weather UI", e)
         }
     }
 
@@ -148,6 +193,9 @@ class HomeActivity : BaseActivity() {
 
         // Initialize UI with zeros and a random quote
         updateQuote()
+        
+        // Fetch weather data
+        fetchWeather()
 
         // Register for local broadcasts
         val filter = IntentFilter("LOCAL_STEP_COUNT_UPDATE")
@@ -175,8 +223,14 @@ class HomeActivity : BaseActivity() {
         val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
         updateUI(currentSteps, currentDistance, currentCalories)
 
+        
+        // Refresh weather data when resuming
+        fetchWeather()
+
+
         // Update greeting in case user name was changed
         actionBarGreetingManager.updateGreeting()
+
     }
 
     private fun updateTargetText() {
@@ -192,6 +246,10 @@ class HomeActivity : BaseActivity() {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        // Add location permissions for weather functionality
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+
         val permissionsToRequest = permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
@@ -206,12 +264,12 @@ class HomeActivity : BaseActivity() {
                 // Show explanation dialog
                 androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Permission Required")
-                    .setMessage("This app needs permission to count your steps and show notifications. Without these permissions, the step counter won't work.")
+                    .setMessage("This app needs permission to count your steps, show notifications, and access location for weather information. Without these permissions, some features won't work.")
                     .setPositiveButton("Grant Permission") { _, _ ->
                         requestPermissionLauncher.launch(permissionsToRequest)
                     }
                     .setNegativeButton("Cancel") { _, _ ->
-                        Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
                         updateUI(0, 0.0, 0)
                     }
                     .create()
@@ -235,7 +293,7 @@ class HomeActivity : BaseActivity() {
             // Show dialog with option to open settings
             androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Permission Required")
-                .setMessage("Step counting requires permission to track your activity. Please grant the permission in Settings.")
+                .setMessage("This app requires permissions to track your activity and access location for weather information. Please grant the permissions in Settings.")
                 .setPositiveButton("Open Settings") { _, _ ->
                     val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = android.net.Uri.fromParts("package", packageName, null)
@@ -243,7 +301,7 @@ class HomeActivity : BaseActivity() {
                     startActivity(intent)
                 }
                 .setNegativeButton("Cancel") { _, _ ->
-                    Toast.makeText(this, "Permissions are required for step counting", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Permissions are required for full functionality", Toast.LENGTH_LONG).show()
                     updateUI(0, 0.0, 0)
                 }
                 .create()

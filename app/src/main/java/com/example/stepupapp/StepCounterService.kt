@@ -137,6 +137,7 @@ class StepCounterService : Service(), SensorEventListener {
             // Check if we're running on an emulator
             isEmulatorMode = isEmulator()
             android.util.Log.d("StepCounterService", "Running in ${if (isEmulatorMode) "emulator" else "device"} mode")
+            android.util.Log.d("StepCounterService", "MODEL=${Build.MODEL}, FINGERPRINT=${Build.FINGERPRINT}, MANUFACTURER=${Build.MANUFACTURER}")
 
             createNotificationChannel()
             
@@ -193,6 +194,7 @@ class StepCounterService : Service(), SensorEventListener {
                 || Build.MODEL.contains("google_sdk")
                 || Build.MODEL.contains("Emulator")
                 || Build.MODEL.contains("Android SDK built for x86")
+                || Build.FINGERPRINT.contains("emu")
                 || Build.MANUFACTURER.contains("Genymotion")
                 || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
                 || "google_sdk" == Build.PRODUCT)

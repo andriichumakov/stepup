@@ -5,8 +5,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.LoginPageBinding
+import com.example.stepupapp.models.UserProfile
+import com.example.stepupapp.services.AuthResult
 import com.example.stepupapp.services.ProfileService
-import com.example.stepupapp.storage.LocalProfileStore
 import kotlinx.coroutines.launch
 
 class LoginActivity : BaseActivity() {
@@ -23,20 +24,26 @@ class LoginActivity : BaseActivity() {
             val password = binding.passwordEditText.text.toString()
 
             lifecycleScope.launch {
-                val profile = ProfileService.login(this@LoginActivity, email, password)
-                if (profile != null) {
-                    LocalProfileStore.addOrUpdateProfile(applicationContext, profile)
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    finish()
-                } else {
-                    Toast.makeText(this@LoginActivity, "Login failed. Try again.", Toast.LENGTH_SHORT).show()
-                }
+                val result = ProfileService.login(this@LoginActivity, email, password)
+                handleLoginResult(result)
             }
         }
 
         // REGISTER LINK
         binding.registerPrompt.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+    }
+
+    private fun handleLoginResult(result: AuthResult<UserProfile>) {
+        when (result) {
+            is AuthResult.Success -> {
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            is AuthResult.Error -> {
+                Toast.makeText(this, "Login failed: ${result.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

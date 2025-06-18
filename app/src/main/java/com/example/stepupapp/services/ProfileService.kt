@@ -65,19 +65,26 @@ object ProfileService {
     }
 
     // User Login
-    suspend fun login(context: Context, email: String, password: String): UserProfile? {
+    suspend fun login(context: Context, email: String, password: String): AuthResult<UserProfile> {
         return try {
             auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
             storeRefreshToken(context)
-            getCurrentProfile()
+            val profile = getCurrentProfile()
+            if (profile != null) {
+                AuthResult.Success(profile)
+            } else {
+                AuthResult.Error("Failed to load user profile.")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Login failed: ${e.localizedMessage}", e)
-            null
+            val errorMessage = extractSupabaseError(e)
+            Log.e(TAG, "Login failed: $errorMessage", e)
+            AuthResult.Error(errorMessage)
         }
     }
+
 
     // User Sign Out
     suspend fun signOut(context: Context) {
@@ -90,33 +97,34 @@ object ProfileService {
     }
 
     // User Registration (auth + profile insert)
-    suspend fun register(context: Context, username: String, email: String, password: String): UserProfile? {
+    suspend fun register(context: Context, username: String, email: String, password: String): AuthResult<UserProfile> {
         return try {
             auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
             }
 
-            val userId = auth.currentSessionOrNull()?.user?.id ?: run {
-                Log.e(TAG, "Sign-up failed: user ID not available.")
-                return null
-            }
+            val userId = auth.currentSessionOrNull()?.user?.id ?: return AuthResult.Error("User ID not found after signup.")
 
-            // Insert into Profiles table manually
             val profileInsert = mapOf(
                 "id" to userId,
                 "name" to username,
                 "email" to email,
                 "pfp_url" to null
             )
-
             client.from("Profiles").insert(profileInsert)
             storeRefreshToken(context)
-            getCurrentProfile()
 
+            val profile = getCurrentProfile()
+            if (profile != null) {
+                AuthResult.Success(profile)
+            } else {
+                AuthResult.Error("Failed to load user profile.")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Registration failed: ${e.localizedMessage}", e)
-            null
+            val errorMessage = extractSupabaseError(e)
+            Log.e(TAG, "Registration failed: $errorMessage", e)
+            AuthResult.Error(errorMessage)
         }
     }
 
@@ -149,6 +157,15 @@ object ProfileService {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to update profile: ${e.localizedMessage}", e)
             false
+        }
+    }
+
+    private fun extractSupabaseError(e: Exception): String {
+        return when (e) {
+            is io.github.jan.supabase.exceptions.RestException -> {
+                e.error ?: e.message ?: "Unknown error"
+            }
+            else -> e.message ?: "Unknown error"
         }
     }
 }

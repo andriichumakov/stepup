@@ -28,6 +28,11 @@
     <string name="interest_eight">Historical</string>
     <string name="interest_nine">Natural</string>
     <string name="interest_ten">Other</string>
+    <string name="greeting_hello">Hello, %s</string>
+    <string name="greeting_default">Hello, User</string>
+    <string name="error_name_required">Please enter your name to continue</string>
+    <string name="hint_name_required">Enter your name (required)</string>
+    <string name="error_name_too_short">Name must be at least 2 characters long</string>
     
     <!-- Place Categories for Filter -->
     <string-array name="place_categories">

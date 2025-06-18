@@ -354,6 +354,9 @@ class StepCounterService : Service(), SensorEventListener {
                 currentSteps >= target && !hasNotified100 -> {
                     sendGoalReminder(currentSteps, target, 100)
                     hasNotified100 = true
+                    
+                    // Check for streak achievement
+                    checkAndSendStreakNotification()
                 }
                 percentage >= 95 && !hasNotified95 && !hasNotified100 -> {
                     sendGoalReminder(currentSteps, target, 95)
@@ -370,6 +373,33 @@ class StepCounterService : Service(), SensorEventListener {
             }
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error checking goal reminder", e)
+        }
+    }
+
+    private fun checkAndSendStreakNotification() {
+        try {
+            // Update streak when goal is achieved
+            UserPreferences.updateStreakOnGoalAchievement(this)
+            
+            // Get the current streak after update
+            val currentStreak = UserPreferences.getCurrentStreak(this)
+            val lastNotifiedStreak = UserPreferences.getLastStreakNotification(this)
+            
+            android.util.Log.d("StepCounterService", "Checking streak notification - Current streak: $currentStreak, Last notified: $lastNotifiedStreak")
+            
+            // Check if we should send a streak notification
+            if (UserPreferences.shouldSendStreakNotification(this, currentStreak)) {
+                android.util.Log.d("StepCounterService", "Sending streak notification for $currentStreak day streak")
+                AddReminders.sendStreakNotification(this, currentStreak)
+                
+                // Update the last notified streak
+                UserPreferences.setLastStreakNotification(this, currentStreak)
+                android.util.Log.d("StepCounterService", "Streak notification sent and tracking updated")
+            } else {
+                android.util.Log.d("StepCounterService", "No streak notification needed - current streak: $currentStreak, last notified: $lastNotifiedStreak")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("StepCounterService", "Error checking streak notification", e)
         }
     }
 

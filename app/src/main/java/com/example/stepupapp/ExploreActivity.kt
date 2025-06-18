@@ -30,6 +30,7 @@ class ExploreActivity : AppCompatActivity(),
     private lateinit var mapController: MapController
     private lateinit var uiManager: ExploreUIManager
     private lateinit var actionBarLocationManager: ActionBarLocationManager
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
     
     private val TAG = "ExploreActivity"
     
@@ -260,6 +261,7 @@ class ExploreActivity : AppCompatActivity(),
 
     private fun initializeComponents() {
         actionBarLocationManager = ActionBarLocationManager(this)
+        actionBarGreetingManager = ActionBarGreetingManager(this)
         
         locationManager = LocationManager(this) { location ->
             handleLocationUpdate(location)
@@ -281,6 +283,7 @@ class ExploreActivity : AppCompatActivity(),
         uiManager.setListener(this)
         
         actionBarLocationManager.setupActionBarLocation()
+        actionBarGreetingManager.updateGreeting()
         
         mapController.initializeMap(binding.osmMapView)
         

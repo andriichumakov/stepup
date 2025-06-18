@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:ems="10"
-            android:hint="John Doe"
+            android:hint="@string/hint_name_required"
             android:inputType="text"
             android:text=""
             tools:ignore="TouchTargetSizeCheck" />

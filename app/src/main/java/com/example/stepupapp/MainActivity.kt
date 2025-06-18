@@ -66,6 +66,24 @@ class MainActivity : BaseActivity() {
                 // Set up continue button
                 binding.button10.setOnClickListener {
                     try {
+                        // Validate that user has entered a name
+                        val userName = binding.editTextText2.text.toString().trim()
+                        if (userName.isEmpty()) {
+                            Toast.makeText(this@MainActivity, getString(R.string.error_name_required), Toast.LENGTH_SHORT).show()
+                            binding.editTextText2.requestFocus()
+                            return@setOnClickListener
+                        }
+                        
+                        // Additional validation: ensure name has at least 2 characters
+                        if (userName.length < 2) {
+                            Toast.makeText(this@MainActivity, getString(R.string.error_name_too_short), Toast.LENGTH_SHORT).show()
+                            binding.editTextText2.requestFocus()
+                            return@setOnClickListener
+                        }
+
+                        // Save user's name
+                        UserPreferences.saveUserName(this@MainActivity, userName)
+
                         // Check if custom step target is entered
                         val customSteps = binding.editTextNumber.text.toString()
                         if (customSteps != getString(R.string.custom_steps)) {

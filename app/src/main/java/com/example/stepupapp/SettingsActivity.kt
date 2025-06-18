@@ -9,6 +9,7 @@ import com.example.stepupapp.databinding.SettingsPageBinding
 class SettingsActivity : BaseActivity() {
     private lateinit var binding: SettingsPageBinding
     private lateinit var actionBarLocationManager: ActionBarLocationManager
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +19,10 @@ class SettingsActivity : BaseActivity() {
         // Initialize and setup ActionBar location
         actionBarLocationManager = ActionBarLocationManager(this)
         actionBarLocationManager.setupActionBarLocation()
+
+        // Initialize and setup ActionBar greeting
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
 
         // Load current step target
         val currentTarget = UserPreferences.getStepTarget(this)
@@ -39,7 +44,9 @@ class SettingsActivity : BaseActivity() {
                         UserPreferences.setStepTarget(this, newTarget)
                         // Reset notification states in the service
                         StepCounterService.getInstance()?.resetNotificationStates()
-                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states reset")
+                        // Reset streak notification tracking so new streaks with new target are notified
+                        UserPreferences.resetStreakNotificationTracking(this)
+                        android.util.Log.d("SettingsActivity", "Step target changed from $currentTarget to $newTarget, notification states and streak tracking reset")
                     }
                     
                     // Save notification preference

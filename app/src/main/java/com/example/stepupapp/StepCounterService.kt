@@ -34,6 +34,7 @@ class StepCounterService : Service(), SensorEventListener {
     private var hasNotified90 = false
     private var hasNotified95 = false
     private var hasNotified100 = false
+    private var hasNotifiedGoalFailed = false
 
     companion object {
         private const val NOTIFICATION_ID = 1
@@ -242,9 +243,10 @@ class StepCounterService : Service(), SensorEventListener {
                 }
             }
 
-            //Send notification if the goal is not reached
-            if (currentSteps < target) {
+            // Send notification if the goal is not reached, but only once per day
+            if (currentSteps < target && !hasNotifiedGoalFailed) {
                 sendGoalFailedNotification()
+                hasNotifiedGoalFailed = true
             }
         } catch (e: Exception) {
             android.util.Log.e("StepCounterService", "Error checking goal reminder", e)
@@ -268,7 +270,7 @@ class StepCounterService : Service(), SensorEventListener {
     // Notification for goal failed
     private fun sendGoalFailedNotification() {
         val title = "Step Goal Not Reached"
-        val message = "You didn’t reach your step goal today, but you can do it tomorrow!"
+        val message = "You haven't reached your step goal yet, go take a walk!"
 
         val notificationManager = getSystemService(NotificationManager::class.java)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -339,6 +341,7 @@ class StepCounterService : Service(), SensorEventListener {
         hasNotified90 = false
         hasNotified95 = false
         hasNotified100 = false
+        hasNotifiedGoalFailed = false
     }
 
     override fun onDestroy() {

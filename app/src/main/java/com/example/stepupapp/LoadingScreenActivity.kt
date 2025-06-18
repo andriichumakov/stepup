@@ -29,6 +29,7 @@ class LoadingScreenActivity : BaseActivity() {
 
             override fun onFinish() {
                 binding.progressBar.progress = 100
+                // Restore original logic: check if signed in
                 if (ProfileService.isSignedIn()) {
                     goToMainActivity()
                 } else {

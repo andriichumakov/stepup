@@ -16,8 +16,6 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Check if user is signed in and setup is completed
         CoroutineScope(Dispatchers.IO).launch {
             if (!ProfileService.isSignedIn()) {
                 withContext(Dispatchers.Main) {

@@ -17,14 +17,22 @@ class ReminderScheduler {
             val intent = Intent(context, StepGoalNotificationReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            // Set the alarm to trigger the notification at a specific time
-            val triggerTime = SystemClock.elapsedRealtime() + 5 * 60 * 1000 // For testing: 5 minutes from now
-
-            // Schedule the alarm to repeat every day at the specified time
+            // Set the alarm to trigger the notification at 4:00 PM every day
+            val calendar = java.util.Calendar.getInstance().apply {
+                timeInMillis = System.currentTimeMillis()
+                set(java.util.Calendar.HOUR_OF_DAY, 16)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+                // If it's already past 4pm today, schedule for tomorrow
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(java.util.Calendar.DAY_OF_YEAR, 1)
+                }
+            }
             alarmManager.setRepeating(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                triggerTime,
-                AlarmManager.INTERVAL_DAY, // Repeat every day
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                AlarmManager.INTERVAL_DAY,
                 pendingIntent
             )
 

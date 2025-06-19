@@ -327,6 +327,12 @@ object UserPreferences {
         Log.d("UserPreferences", "Streak notification tracking reset - will notify for next streak achievement")
     }
 
+    fun clear(context: Context) {
+        val sharedPrefs = context.getSharedPreferences("step_preferences", Context.MODE_PRIVATE)
+        sharedPrefs.edit().clear().apply()
+    }
+
+
     data class DailyStepsData(
         val day: String,
         val steps: Int,

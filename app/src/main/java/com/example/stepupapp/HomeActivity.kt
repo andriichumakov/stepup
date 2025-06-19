@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import android.widget.ImageView
 
 
 class HomeActivity : BaseActivity() {
@@ -134,6 +135,8 @@ class HomeActivity : BaseActivity() {
 
         createNotificationChannel()
 
+        // Update the memories widget with real data
+        updateMemoriesWidget()
     }
 
     override fun onResume() {
@@ -144,6 +147,8 @@ class HomeActivity : BaseActivity() {
         updateTargetText()
 
         checkAndNotifyNewMemory()
+        // Update the memories widget with real data
+        updateMemoriesWidget()
     }
 
     private fun updateTargetText() {
@@ -347,6 +352,61 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
         snackbar.show()
+    }
+
+    private fun updateMemoriesWidget() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val db = PlaceDatabase.getDatabase(applicationContext)
+            val latestMemory = db.placeDao().getLatestPlace()
+            withContext(Dispatchers.Main) {
+                if (latestMemory == null) {
+                    // No memories yet: show a message, keep the rest of the widget as is
+                    binding.memoryText.text = "No memories yet. Add your first memory!"
+                    binding.memoryImage.setImageResource(R.drawable.memory_zoo) // fallback/default image
+                    binding.memoryDate.text = ""
+                    binding.memorySteps.text = ""
+                    // Set all stars to empty or faded (optional)
+                    setMemoryStars(0f)
+                } else {
+                    // Show real memory data
+                    try {
+                        val uri = Uri.parse(latestMemory.imageUri)
+                        binding.memoryImage.setImageURI(uri)
+                    } catch (e: Exception) {
+                        binding.memoryImage.setImageResource(R.drawable.memory_zoo)
+                    }
+                    binding.memoryDate.text = latestMemory.date_saved
+                    binding.memoryText.text = latestMemory.description.ifBlank { latestMemory.name }
+                    binding.memorySteps.text = latestMemory.steps_taken + " steps"
+                    setMemoryStars(latestMemory.rating)
+                }
+            }
+        }
+    }
+
+    private fun setMemoryStars(rating: Float) {
+        // The widget has 5 ImageViews for stars, all are always present in the layout
+        val starIds = listOf(
+            R.id.memoryStar1,
+            R.id.memoryStar2,
+            R.id.memoryStar3,
+            R.id.memoryStar4,
+            R.id.memoryStar5
+        )
+        for (i in 0 until 5) {
+            val starView = findViewById<ImageView>(starIds[i])
+            if (rating >= i + 1) {
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0xFFFFD700.toInt()) // Gold
+            } else if (rating > i && rating < i + 1) {
+                // Half star logic if you want (not implemented, just use full/empty)
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0x80FFD700.toInt()) // Faded gold
+            } else {
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0x33FFD700) // More faded
+            }
+        }
     }
 
 }

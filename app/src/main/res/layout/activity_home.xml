@@ -344,6 +344,7 @@
                                 android:orientation="horizontal">
 
                                 <ImageView
+                                    android:id="@+id/memoryStar1"
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:layout_marginEnd="2dp"
@@ -351,6 +352,7 @@
                                     android:tint="#FFD700" />
 
                                 <ImageView
+                                    android:id="@+id/memoryStar2"
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:layout_marginEnd="2dp"
@@ -358,6 +360,7 @@
                                     android:tint="#FFD700" />
 
                                 <ImageView
+                                    android:id="@+id/memoryStar3"
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:layout_marginEnd="2dp"
@@ -365,6 +368,7 @@
                                     android:tint="#FFD700" />
 
                                 <ImageView
+                                    android:id="@+id/memoryStar4"
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:layout_marginEnd="2dp"
@@ -372,6 +376,7 @@
                                     android:tint="#FFD700" />
 
                                 <ImageView
+                                    android:id="@+id/memoryStar5"
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
                                     android:src="@drawable/ic_star"

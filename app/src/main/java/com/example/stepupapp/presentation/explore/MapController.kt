@@ -79,6 +79,25 @@ class MapController(
         setupMyLocationOverlay()
     }
     
+    fun initializeMapForLocationDetails(mapView: MapView) {
+        this.mapView = mapView
+        
+        // Initialize OSMDroid configuration
+        Configuration.getInstance().load(context, context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
+        
+        // Set tile source to OpenStreetMap
+        mapView.setTileSource(TileSourceFactory.MAPNIK)
+        
+        // Enable zoom controls
+        mapView.setBuiltInZoomControls(true)
+        mapView.setMultiTouchControls(true)
+        
+        // Set initial zoom level
+        mapView.controller.setZoom(15.0)
+        
+        setupMyLocationOverlayWithoutFollow()
+    }
+    
     fun updateUserLocation(latitude: Double, longitude: Double) {
         currentLatitude = latitude
         currentLongitude = longitude
@@ -90,6 +109,17 @@ class MapController(
         myLocationOverlay?.let { overlay ->
             overlay.enableMyLocation()
             overlay.enableFollowLocation()
+        }
+    }
+    
+    fun setUserLocationWithoutFollow(latitude: Double, longitude: Double) {
+        currentLatitude = latitude
+        currentLongitude = longitude
+        
+        // Update my location overlay but don't enable follow location or center map
+        myLocationOverlay?.let { overlay ->
+            overlay.enableMyLocation()
+            // Don't enable follow location to prevent auto-centering
         }
     }
     
@@ -116,6 +146,26 @@ class MapController(
         mapView.controller.animateTo(userLocation)
         mapView.controller.setZoom(16.0)
         listener?.showToast("Centered on your location")
+    }
+    
+    fun centerOnLocation(latitude: Double, longitude: Double, locationName: String) {
+        val location = GeoPoint(latitude, longitude)
+        mapView.controller.setCenter(location)
+        mapView.controller.setZoom(16.0)
+        
+        // Add a marker for this specific location
+        val marker = Marker(mapView)
+        marker.position = location
+        marker.title = locationName
+        marker.snippet = "Tap for more details"
+        marker.icon = createCustomMarker(android.R.color.holo_red_light)
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        
+        // Disable click listener for location details view (no route drawing)
+        marker.setOnMarkerClickListener { _, _ -> false }
+        
+        mapView.overlays.add(marker)
+        mapView.invalidate()
     }
     
     fun clearRoute() {
@@ -152,6 +202,26 @@ class MapController(
         }
         
         mapView.overlays.add(myLocationOverlay)
+    }
+    
+    private fun setupMyLocationOverlayWithoutFollow() {
+        myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), mapView)
+        myLocationOverlay?.let { overlay ->
+            // Only enable my location display but not location updates or following
+            overlay.enableMyLocation()
+            overlay.disableFollowLocation()
+            
+            // Set custom user location icon
+            overlay.setPersonIcon(createUserLocationBitmap())
+            overlay.setDirectionIcon(createUserLocationBitmap())
+            overlay.isDrawAccuracyEnabled = true
+        }
+        
+        mapView.overlays.add(myLocationOverlay)
+    }
+    
+    fun disableLocationFollow() {
+        myLocationOverlay?.disableFollowLocation()
     }
     
     private fun addPlaceMarker(place: OpenTripMapResponse) {

@@ -14,14 +14,40 @@
         android:contentDescription="Logo"
         android:src="@drawable/stepup_logo_bunny_small" />
 
-    <TextView
-        android:id="@+id/actionbar_location"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginStart="16dp"
-        android:text="Emmen, Netherlands"
-        android:textColor="@color/primary_green"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/actionbar_greeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/greeting_default"
+            android:textColor="@color/primary_green"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/actionbar_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Emmen, Netherlands"
+            android:textColor="@color/primary_green"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/actionbar_profile_picture"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/rounded_image_background"
+        android:contentDescription="Profile Picture"
+        android:scaleType="centerCrop"
+        android:src="@drawable/outline_image_24" />
 
 </LinearLayout> 

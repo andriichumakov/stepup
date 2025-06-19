@@ -63,12 +63,24 @@ class SettingsActivity : BaseActivity() {
 
         // Setup profile change listeners
         setupProfileChangeListeners()
+        
+        // Add a refresh listener to reload data when user taps the name field (for debugging)
+        binding.newNameEditText.setOnClickListener {
+            android.util.Log.d("SettingsActivity", "Name field clicked - reloading profile data")
+            loadCurrentProfileData()
+        }
 
-        // SAVE STEP GOAL & INTERESTS
+        // SAVE STEP GOAL, INTERESTS & NICKNAME
         binding.button2.setOnClickListener {
             try {
                 val newTarget = binding.editTextNumber2.text.toString().toInt()
                 if (newTarget > 0) {
+                    // Save nickname/display name
+                    val newNickname = binding.newNameEditText.text.toString().trim()
+                    if (newNickname.isNotEmpty() && newNickname.length >= 2) {
+                        saveNameChange(newNickname)
+                    }
+                    
                     // Only reset notifications if the target is actually changing
                     if (newTarget != currentTarget) {
                         UserPreferences.setStepTarget(this, newTarget)
@@ -339,41 +351,46 @@ class SettingsActivity : BaseActivity() {
 
     private fun loadCurrentProfileData() {
         lifecycleScope.launch {
+            // Always load profile picture first (no dependencies)
+            runOnUiThread {
+                ProfilePictureLoader.loadProfilePicture(
+                    context = this@SettingsActivity,
+                    imageView = binding.currentProfileImageView,
+                    showDefault = true
+                )
+            }
+            
+            // Load nickname with better error handling and fallback logic
+            var currentNickname = ""
+            
             try {
-                // Load profile from database first
+                // 1. Try to load nickname from database first
                 val profile = ProfileService.getCurrentProfile()
-                
-                runOnUiThread {
-                    // Load profile picture using the ProfilePictureLoader
-                    ProfilePictureLoader.loadProfilePicture(
-                        context = this@SettingsActivity,
-                        imageView = binding.currentProfileImageView,
-                        showDefault = true
-                    )
+                if (profile?.nickname != null && profile.nickname.isNotEmpty()) {
+                    currentNickname = profile.nickname
+                    android.util.Log.d("SettingsActivity", "Loaded nickname from database: $currentNickname")
                     
-                    // Load nickname from database or local storage
-                    val currentNickname = profile?.nickname ?: UserPreferences.getUserNickname(this@SettingsActivity)
-                    if (currentNickname.isNotEmpty()) {
-                        binding.newNameEditText.setText(currentNickname)
-                    }
+                    // Update local storage with database value for consistency
+                    UserPreferences.saveUserNickname(this@SettingsActivity, currentNickname)
+                    UserPreferences.markNicknameNeedingSync(this@SettingsActivity, false)
                 }
-                
             } catch (e: Exception) {
-                android.util.Log.w("SettingsActivity", "Failed to load profile data: ${e.message}")
-                
-                runOnUiThread {
-                    // Load local profile picture
-                    ProfilePictureLoader.loadProfilePicture(
-                        context = this@SettingsActivity,
-                        imageView = binding.currentProfileImageView,
-                        showDefault = true
-                    )
-                    
-                    // Load nickname from local storage as fallback
-                    val currentNickname = UserPreferences.getUserNickname(this@SettingsActivity)
-                    if (currentNickname.isNotEmpty()) {
-                        binding.newNameEditText.setText(currentNickname)
-                    }
+                android.util.Log.w("SettingsActivity", "Failed to load nickname from database: ${e.message}")
+            }
+            
+            // 2. If database loading failed or returned empty, try local storage
+            if (currentNickname.isEmpty()) {
+                currentNickname = UserPreferences.getUserNickname(this@SettingsActivity)
+                android.util.Log.d("SettingsActivity", "Loaded nickname from local storage: $currentNickname")
+            }
+            
+            // 3. Update UI on main thread
+            runOnUiThread {
+                if (currentNickname.isNotEmpty()) {
+                    binding.newNameEditText.setText(currentNickname)
+                    android.util.Log.d("SettingsActivity", "Set nickname in UI: $currentNickname")
+                } else {
+                    android.util.Log.d("SettingsActivity", "No nickname found - field will remain empty")
                 }
             }
         }
@@ -500,10 +517,18 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun saveNameChange(newName: String) {
+        if (newName.trim().isEmpty()) {
+            Toast.makeText(this, "Nickname cannot be empty", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        android.util.Log.d("SettingsActivity", "Saving name change: '$newName'")
+        
         lifecycleScope.launch {
             try {
                 // Save locally first (guaranteed to succeed)
                 UserPreferences.saveUserNickname(this@SettingsActivity, newName)
+                android.util.Log.d("SettingsActivity", "Nickname saved locally: '$newName'")
                 
                 runOnUiThread {
                     // Update ActionBar greeting with new nickname
@@ -514,6 +539,7 @@ class SettingsActivity : BaseActivity() {
                 // Try to sync to database in background
                 try {
                     val success = ProfileService.updateNickname(newName)
+                    android.util.Log.d("SettingsActivity", "Database sync result: $success")
                     
                     runOnUiThread {
                         if (!success) {
@@ -523,6 +549,7 @@ class SettingsActivity : BaseActivity() {
                         } else {
                             // Clear sync flag on successful upload
                             UserPreferences.markNicknameNeedingSync(this@SettingsActivity, false)
+                            android.util.Log.d("SettingsActivity", "Nickname successfully synced to database")
                         }
                     }
                     

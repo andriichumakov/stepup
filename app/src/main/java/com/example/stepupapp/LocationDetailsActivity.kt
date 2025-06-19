@@ -3,6 +3,7 @@ package com.example.stepupapp
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
@@ -35,6 +36,9 @@ class LocationDetailsActivity : AppCompatActivity() {
         latitude = intent.getDoubleExtra("latitude", 0.0)
         longitude = intent.getDoubleExtra("longitude", 0.0)
         locationName = name
+        
+        // Debug logging
+        Log.d("LocationDetails", "Received coordinates: lat=$latitude, lng=$longitude, name=$locationName")
 
         findViewById<TextView>(R.id.locationName).text = name
         findViewById<TextView>(R.id.locationType).text = type
@@ -55,46 +59,70 @@ class LocationDetailsActivity : AppCompatActivity() {
     
     private fun openLocationInMaps() {
         try {
-            // First try: Google Maps with geo URI and coordinates
-            val geoUri = Uri.parse("geo:$latitude,$longitude?q=" +
-                    URLEncoder.encode(locationName, "UTF-8"))
-            val mapsIntent = Intent(Intent.ACTION_VIEW, geoUri)
-            mapsIntent.setPackage("com.google.android.apps.maps")
+            Log.d("LocationDetails", "Attempting to open maps with coordinates: lat=$latitude, lng=$longitude")
             
-            // Check if Google Maps is installed and can handle this intent
-            if (mapsIntent.resolveActivity(packageManager) != null) {
-                startActivity(mapsIntent)
+            // Check if coordinates are valid
+            if (latitude == 0.0 && longitude == 0.0) {
+                Log.e("LocationDetails", "Invalid coordinates: both latitude and longitude are 0.0")
+                Toast.makeText(this, "Invalid location coordinates", Toast.LENGTH_SHORT).show()
                 return
             }
             
-            // Second try: Google Maps with market URI (different format)
-            val marketUri = Uri.parse("https://maps.google.com/?q=$latitude,$longitude(" +
-                    URLEncoder.encode(locationName, "UTF-8") + ")")
-            val marketIntent = Intent(Intent.ACTION_VIEW, marketUri)
-            marketIntent.setPackage("com.google.android.apps.maps")
-            
-            if (marketIntent.resolveActivity(packageManager) != null) {
-                startActivity(marketIntent)
+            // Try 1: Google Maps Navigation URI with walking mode
+            try {
+                val navigationUri = Uri.parse("google.navigation:q=$latitude,$longitude&mode=w")
+                val navigationIntent = Intent(Intent.ACTION_VIEW, navigationUri)
+                startActivity(navigationIntent)
+                Log.d("LocationDetails", "Successfully opened Google Maps navigation (walking)")
+                Toast.makeText(this, "Opening walking navigation", Toast.LENGTH_SHORT).show()
                 return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Walking navigation intent failed: ${e.message}")
             }
             
-            // Third try: Any app that can handle maps (including web browser for Google Maps)
-            val webMapsUri = Uri.parse("https://maps.google.com/?q=$latitude,$longitude(" +
-                    URLEncoder.encode(locationName, "UTF-8") + ")")
-            val webIntent = Intent(Intent.ACTION_VIEW, webMapsUri)
+            // Try 2: Standard geo URI (works with any mapping app)
+            try {
+                val geoUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+                val geoIntent = Intent(Intent.ACTION_VIEW, geoUri)
+                startActivity(geoIntent)
+                Log.d("LocationDetails", "Successfully opened with geo URI")
+                Toast.makeText(this, "Opening location in maps", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Geo URI intent failed: ${e.message}")
+            }
             
-            if (webIntent.resolveActivity(packageManager) != null) {
+            // Try 3: Google Maps URL with walking directions
+            try {
+                val mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=walking"
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
                 startActivity(webIntent)
+                Log.d("LocationDetails", "Successfully opened web maps with walking directions")
+                Toast.makeText(this, "Opening walking directions in browser", Toast.LENGTH_SHORT).show()
                 return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Web walking maps intent failed: ${e.message}")
             }
             
-            // Last resort: Fallback to Google Search
-            openLocationInGoogleSearch()
+            // Try 4: Alternative Google Maps walking URL format
+            try {
+                val walkingUrl = "https://maps.google.com/maps?saddr=My+Location&daddr=$latitude,$longitude&dirflg=w"
+                val walkingIntent = Intent(Intent.ACTION_VIEW, Uri.parse(walkingUrl))
+                startActivity(walkingIntent)
+                Log.d("LocationDetails", "Successfully opened alternative walking maps")
+                Toast.makeText(this, "Opening walking route in browser", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Alternative walking intent failed: ${e.message}")
+            }
+            
+            // If all else fails
+            Log.e("LocationDetails", "All mapping intents failed")
+            Toast.makeText(this, "Unable to open maps. Please check if you have a maps app installed.", Toast.LENGTH_LONG).show()
             
         } catch (e: Exception) {
-            Toast.makeText(this, "Could not open location in maps", Toast.LENGTH_SHORT).show()
-            // Try Google Search as backup
-            openLocationInGoogleSearch()
+            Log.e("LocationDetails", "Error in openLocationInMaps: ${e.message}")
+            Toast.makeText(this, "Error opening maps: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
     

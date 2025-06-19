@@ -305,6 +305,15 @@ object UserPreferences {
     fun calculateDistanceFromSteps(steps: Int): Int {
         return (steps * 0.762).toInt()
     }
+    fun setLastMemoryId(context: Context, id: Int) {
+        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putInt("last_memory_id", id).apply()
+    }
+
+    fun getLastMemoryId(context: Context): Int {
+        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
+        return prefs.getInt("last_memory_id", -1)
+    }
 
     // Step counter notification visibility functions
     fun shouldShowStepCounterNotification(context: Context): Boolean {

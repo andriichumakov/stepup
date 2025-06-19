@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlinx-serialization")
+    kotlin("android") version "1.9.22" apply false
+    kotlin("plugin.serialization") version "1.9.22" apply false
 }
 android {
     namespace = "com.example.stepupapp"
@@ -44,7 +46,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
@@ -86,4 +88,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+
+    implemetation ("com.github.PhilJay:MPAndroidChart:3.1.0")
+
 }

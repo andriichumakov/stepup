@@ -1,6 +1,7 @@
 package com.example.stepupapp
 
 import android.Manifest
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +22,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import android.widget.ImageView
+
 import com.example.stepupapp.services.ProfileService
 
 class HomeActivity : BaseActivity() {
@@ -160,12 +165,16 @@ class HomeActivity : BaseActivity() {
 
         binding.imageButtonMemory.setOnClickListener {
             val intent = Intent(this, MemoryActivity::class.java)
+            val currentSteps = binding.stepCountText.text.toString().split(" ")[0].toIntOrNull() ?: 0
+            intent.putExtra("currentSteps", currentSteps)
             startActivity(intent)
         }
 
         // Set up memory card click
         binding.memoriesCard.setOnClickListener {
             val intent = Intent(this, MemoryActivity::class.java)
+            val currentSteps = binding.stepCountText.text.toString().split(" ")[0].toIntOrNull() ?: 0
+            intent.putExtra("currentSteps", currentSteps)
             startActivity(intent)
         }
 
@@ -207,15 +216,10 @@ class HomeActivity : BaseActivity() {
         // Check permissions and start service
         checkAndRequestPermissions()
 
-        // Initialize ActionBar managers
-        actionBarGreetingManager = ActionBarGreetingManager(this)
-        actionBarGreetingManager.updateGreeting()
-        
-        actionBarProfileManager = ActionBarProfileManager(this)
-        actionBarProfileManager.updateProfilePicture()
-        
-        // Try to sync any pending interests in background
-        tryBackgroundSync()
+        createNotificationChannel()
+
+        // Update the memories widget with real data
+        updateMemoriesWidget()
     }
 
     override fun onResume() {
@@ -225,21 +229,9 @@ class HomeActivity : BaseActivity() {
         binding.stepProgressBar.max = target
         updateTargetText()
 
-        // Get current step count from preferences and update UI
-        val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
-        val currentDistance = currentSteps / 1312.33595801 // Convert steps to kilometers
-        val currentCalories = (currentSteps * 0.04).toInt() // Convert steps to calories
-        updateUI(currentSteps, currentDistance, currentCalories)
-
-        
-        // Refresh weather data when resuming
-        fetchWeather()
-
-
-        // Update greeting and profile picture in case user data was changed
-        actionBarGreetingManager.updateGreeting()
-        actionBarProfileManager.updateProfilePicture()
-
+        checkAndNotifyNewMemory()
+        // Update the memories widget with real data
+        updateMemoriesWidget()
     }
 
     private fun updateTargetText() {
@@ -432,4 +424,143 @@ class HomeActivity : BaseActivity() {
             android.util.Log.e("HomeActivity", "Error unregistering receiver", e)
         }
     }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Memory Notifications"
+            val descriptionText = "Notifications for newly added memories"
+            val importance = android.app.NotificationManager.IMPORTANCE_DEFAULT
+            val channel = android.app.NotificationChannel("memory_channel", name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: android.app.NotificationManager =
+                getSystemService(android.app.NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun checkAndNotifyNewMemory() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val db = PlaceDatabase.getDatabase(applicationContext)
+            val latestMemory = db.placeDao().getLatestPlace()
+            latestMemory?.let { place ->
+                val lastNotifiedId = UserPreferences.getLastMemoryId(applicationContext)
+                if (place.id != lastNotifiedId) {
+                    UserPreferences.setLastMemoryId(applicationContext, place.id)
+                    withContext(Dispatchers.Main) {
+                        showInAppSnackbar(place)
+                        sendMemoryNotification(place)
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun sendMemoryNotification(place: Place) {
+        val intent = Intent(this, MemoryActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("highlightMemoryId", place.id) // optional
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(this, "memory_channel")
+            .setSmallIcon(R.drawable.stepup_logo_bunny) // Your own memory icon
+            .setContentTitle("New Memory Added")
+            .setContentText("You added ${place.name} on ${place.date_saved}")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        val notificationManager = androidx.core.app.NotificationManagerCompat.from(this)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        notificationManager.notify(1001, builder.build())
+    }
+
+    private fun showInAppSnackbar(place: Place) {
+        val snackbar = com.google.android.material.snackbar.Snackbar.make(
+            binding.root,
+            "New memory added: ${place.name} (${place.date_saved})",
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        )
+        snackbar.setAction("View") {
+            val intent = Intent(this, MemoryActivity::class.java).apply {
+                putExtra("highlightMemoryId", place.id) // optional
+            }
+            startActivity(intent)
+        }
+        snackbar.show()
+    }
+
+    private fun updateMemoriesWidget() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val db = PlaceDatabase.getDatabase(applicationContext)
+            val latestMemory = db.placeDao().getLatestPlace()
+            withContext(Dispatchers.Main) {
+                if (latestMemory == null) {
+                    // No memories yet: show a message, keep the rest of the widget as is
+                    binding.memoryText.text = "No memories yet. Add your first memory!"
+                    binding.memoryImage.setImageResource(R.drawable.memory_zoo) // fallback/default image
+                    binding.memoryDate.text = ""
+                    binding.memorySteps.text = ""
+                    // Set all stars to empty or faded (optional)
+                    setMemoryStars(0f)
+                } else {
+                    // Show real memory data
+                    try {
+                        val uri = Uri.parse(latestMemory.imageUri)
+                        binding.memoryImage.setImageURI(uri)
+                    } catch (e: Exception) {
+                        binding.memoryImage.setImageResource(R.drawable.memory_zoo)
+                    }
+                    binding.memoryDate.text = latestMemory.date_saved
+                    binding.memoryText.text = latestMemory.description.ifBlank { latestMemory.name }
+                    binding.memorySteps.text = latestMemory.steps_taken + " steps"
+                    setMemoryStars(latestMemory.rating)
+                }
+            }
+        }
+    }
+
+    private fun setMemoryStars(rating: Float) {
+        // The widget has 5 ImageViews for stars, all are always present in the layout
+        val starIds = listOf(
+            R.id.memoryStar1,
+            R.id.memoryStar2,
+            R.id.memoryStar3,
+            R.id.memoryStar4,
+            R.id.memoryStar5
+        )
+        for (i in 0 until 5) {
+            val starView = findViewById<ImageView>(starIds[i])
+            if (rating >= i + 1) {
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0xFFFFD700.toInt()) // Gold
+            } else if (rating > i && rating < i + 1) {
+                // Half star logic if you want (not implemented, just use full/empty)
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0x80FFD700.toInt()) // Faded gold
+            } else {
+                starView.setImageResource(R.drawable.ic_star)
+                starView.setColorFilter(0x33FFD700) // More faded
+            }
+        }
+    }
+
 }

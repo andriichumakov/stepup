@@ -21,39 +21,75 @@
             android:contentDescription="Memory Image" />
 
         <!-- Button to Choose Image -->
-        <Button
-            android:id="@+id/btnChooseImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="@color/primary_green"
-            android:text="Choose Image" />
-
-        <!-- Date Input -->
-        <EditText
-            android:id="@+id/editTextDate"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Date (e.g. 2025-05-09)"
-            android:inputType="date"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="2">
 
-        <!-- Location Input -->
+            <Button
+                android:id="@+id/btnChooseImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_green"
+                android:text="Choose Image" />
+
+            <Button
+                android:id="@+id/btnTakePicture"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primary_green"
+                android:text="Take Picture" />
+        </LinearLayout>
+
+        <!-- Date Input -->
+        <TextView
+            android:id="@+id/textViewDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date: Unknown"
+            android:textSize="16sp"
+            android:padding="8dp" />
+
+
         <EditText
             android:id="@+id/editTextLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Location (e.g. Hanoi, Vietnam)"
-            android:inputType="text"
-            android:layout_marginTop="12dp" />
+            android:hint="Enter location (if not detected automatically)" />
 
         <EditText
-            android:id="@+id/editTextSteps"
+            android:id="@+id/editTextDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter steps"
-            android:inputType="number"
+            android:hint="Enter description (optional)" />
+
+        <!-- Display dynamically retrieved steps -->
+        <TextView
+            android:id="@+id/textViewSteps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Steps: loading..."
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_green" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:rating="3.5"
+            android:layout_marginTop="12dp"
             />
+
 
         <!-- Submit Button -->
         <Button

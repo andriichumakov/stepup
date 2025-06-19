@@ -78,4 +78,9 @@ object LocalProfileStore {
         val updated = getAllProfiles(context).filter { it.id != profileId }
         saveAllProfiles(context, updated)
     }
+
+    //
+    suspend fun clearProfiles(context: Context) {
+        saveAllProfiles(context, emptyList())
+    }
 }

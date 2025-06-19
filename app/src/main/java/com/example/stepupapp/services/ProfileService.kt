@@ -7,6 +7,7 @@ import com.example.stepupapp.models.UserProfile
 import com.example.stepupapp.storage.SecureSessionStorage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.auth
@@ -18,7 +19,7 @@ object ProfileService {
     private const val TAG = "ProfileService"
     private val sessionStorage = SecureSessionStorage
 
-    private val client: SupabaseClient = createSupabaseClient(
+    val client: SupabaseClient = createSupabaseClient(
         supabaseUrl = BuildConfig.SUPABASE_URL,
         supabaseKey = BuildConfig.SUPABASE_KEY,
     ) {
@@ -30,9 +31,8 @@ object ProfileService {
         }
     }
 
-    private val auth = client.auth
+    val auth = client.auth
 
-    // Check if there's currently a session in memory
     fun isSignedIn(): Boolean {
         return auth.currentSessionOrNull() != null
     }
@@ -48,11 +48,10 @@ object ProfileService {
         }
     }
 
-    // Attempt to restore session from securely stored refresh token
     suspend fun restoreSessionFromToken(context: Context): Boolean {
         val refreshToken = sessionStorage.loadRefreshToken(context)
-        if (refreshToken != null) {
-            return try {
+        return if (refreshToken != null) {
+            try {
                 auth.refreshSession(refreshToken)
                 Log.d(TAG, "Session successfully restored from refresh token.")
                 true
@@ -60,11 +59,11 @@ object ProfileService {
                 Log.e(TAG, "Failed to restore session: ${e.localizedMessage}", e)
                 false
             }
+        } else {
+            false
         }
-        return false
     }
 
-    // User Login
     suspend fun login(context: Context, email: String, password: String): AuthResult<UserProfile> {
         return try {
             auth.signInWith(Email) {
@@ -85,7 +84,6 @@ object ProfileService {
         }
     }
 
-    // Check if step goal has been set for current user
     suspend fun hasSetStepGoal(): Boolean {
         return try {
             val profile = getCurrentProfile()
@@ -96,7 +94,6 @@ object ProfileService {
         }
     }
 
-    // User Sign Out
     suspend fun signOut(context: Context) {
         try {
             auth.signOut()
@@ -106,7 +103,6 @@ object ProfileService {
         }
     }
 
-    // User Registration (auth + profile insert)
     suspend fun register(context: Context, username: String, email: String, password: String): AuthResult<UserProfile> {
         return try {
             auth.signUpWith(Email) {
@@ -138,7 +134,6 @@ object ProfileService {
         }
     }
 
-    // Fetch currently logged-in user's profile from server
     suspend fun getCurrentProfile(): UserProfile? {
         return try {
             val userId = auth.currentSessionOrNull()?.user?.id ?: return null
@@ -167,16 +162,6 @@ object ProfileService {
         }
     }
 
-
-    private fun extractSupabaseError(e: Exception): String {
-        return when (e) {
-            is io.github.jan.supabase.exceptions.RestException -> {
-                e.error ?: e.message ?: "Unknown error"
-            }
-            else -> e.message ?: "Unknown error"
-        }
-    }
-    // even though this is already accomplished in UpdateProfile, this method is here for your convenience
     suspend fun updateStepGoal(stepGoal: Int): Boolean {
         val id = auth.currentSessionOrNull()?.user?.id ?: return false
         return try {
@@ -192,4 +177,23 @@ object ProfileService {
         }
     }
 
+    suspend fun updatePassword(newPassword: String): Boolean {
+        return try {
+            auth.updateUser {
+                password = newPassword
+            }
+            Log.d(TAG, "Password updated successfully.")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to update password: ${e.localizedMessage}", e)
+            false
+        }
+    }
+
+    private fun extractSupabaseError(e: Exception): String {
+        return when (e) {
+            is RestException -> e.error ?: e.message ?: "Unknown error"
+            else -> e.message ?: "Unknown error"
+        }
+    }
 }

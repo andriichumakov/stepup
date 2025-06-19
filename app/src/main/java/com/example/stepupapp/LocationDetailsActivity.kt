@@ -3,19 +3,33 @@ package com.example.stepupapp
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.stepupapp.presentation.explore.MapController
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.osmdroid.views.MapView
 import java.net.URLEncoder
 
-class LocationDetailsActivity : AppCompatActivity() {
-    
+class LocationDetailsActivity : AppCompatActivity(), MapController.MapControllerListener {
+
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var locationName: String = ""
+    private lateinit var mapController: MapController
+    private lateinit var mapView: MapView
+    private lateinit var locationManager: LocationManager
     
+    // User's actual location (separate from place location)
+    private var userLatitude: Double = 52.788040 // Default coordinates
+    private var userLongitude: Double = 6.893176
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_details)
@@ -24,80 +38,233 @@ class LocationDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Location Details"
 
+        // Get data from intent
         val name = intent.getStringExtra("name") ?: "Unnamed Place"
         val type = intent.getStringExtra("type") ?: "Unknown"
         val description = intent.getStringExtra("description") ?: "No description available"
-        val rating = intent.getStringExtra("rating") ?: "No rating"
+        val rating = intent.getStringExtra("rating") ?: "No rating available"
         val steps = intent.getStringExtra("steps") ?: ""
         val openingHours = intent.getStringExtra("openingHours") ?: ""
-        
-        // Get coordinates from intent
+        val facebookUrl = intent.getStringExtra("facebookUrl")
+        val instagramUrl = intent.getStringExtra("instagramUrl")
+        val tiktokUrl = intent.getStringExtra("tiktokUrl")
+        val xUrl = intent.getStringExtra("xUrl")
+
         latitude = intent.getDoubleExtra("latitude", 0.0)
         longitude = intent.getDoubleExtra("longitude", 0.0)
         locationName = name
 
+        Log.d("LocationDetails", "Coordinates: $latitude, $longitude")
+
+        // Initialize location manager to get user's actual location
+        locationManager = LocationManager(this) { location ->
+            userLatitude = location.latitude
+            userLongitude = location.longitude
+            Log.d("LocationDetails", "User location updated: $userLatitude, $userLongitude")
+            
+            // Update the map controller with user's real location
+            mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
+        }
+
+        // Initialize map
+        initializeMap()
+        
+        // Start getting user's location
+        if (locationManager.checkLocationPermission()) {
+            locationManager.startLocationUpdates()
+        }
+
+        // Set text content
         findViewById<TextView>(R.id.locationName).text = name
         findViewById<TextView>(R.id.locationType).text = type
         findViewById<TextView>(R.id.locationDescription).text = description
         findViewById<TextView>(R.id.locationRating).text = "⭐ $rating"
         findViewById<TextView>(R.id.locationStepsAway).text = steps
         findViewById<TextView>(R.id.locationOpeningHours).text = openingHours
-        
-        // Set up button click listeners
-        findViewById<Button>(R.id.btnBack).setOnClickListener {
-            finish() // Go back to previous activity
+
+        // Handle social media links
+        findViewById<ImageView>(R.id.facebookIcon).setOnClickListener {
+            openSocialMedia("https://www.facebook.com/${name}")
         }
-        
+        findViewById<ImageView>(R.id.instagramIcon).setOnClickListener {
+            openSocialMedia("https://www.instagram.com/${name}")
+        }
+        findViewById<ImageView>(R.id.tiktokIcon).setOnClickListener {
+            openSocialMedia("https://www.tiktok.com/@${name}")
+        }
+        findViewById<ImageView>(R.id.xIcon).setOnClickListener {
+            openSocialMedia("https://twitter.com/${name}")
+        }
+
+        // Buttons
+        findViewById<Button>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+
         findViewById<Button>(R.id.btnOpenMaps).setOnClickListener {
             openLocationInMaps()
         }
     }
-    
-    private fun openLocationInMaps() {
-        try {
-            // First try: Google Maps with geo URI and coordinates
-            val geoUri = Uri.parse("geo:$latitude,$longitude?q=" +
-                    URLEncoder.encode(locationName, "UTF-8"))
-            val mapsIntent = Intent(Intent.ACTION_VIEW, geoUri)
-            mapsIntent.setPackage("com.google.android.apps.maps")
-            
-            // Check if Google Maps is installed and can handle this intent
-            if (mapsIntent.resolveActivity(packageManager) != null) {
-                startActivity(mapsIntent)
-                return
-            }
-            
-            // Second try: Google Maps with market URI (different format)
-            val marketUri = Uri.parse("https://maps.google.com/?q=$latitude,$longitude(" +
-                    URLEncoder.encode(locationName, "UTF-8") + ")")
-            val marketIntent = Intent(Intent.ACTION_VIEW, marketUri)
-            marketIntent.setPackage("com.google.android.apps.maps")
-            
-            if (marketIntent.resolveActivity(packageManager) != null) {
-                startActivity(marketIntent)
-                return
-            }
-            
-            // Third try: Any app that can handle maps (including web browser for Google Maps)
-            val webMapsUri = Uri.parse("https://maps.google.com/?q=$latitude,$longitude(" +
-                    URLEncoder.encode(locationName, "UTF-8") + ")")
-            val webIntent = Intent(Intent.ACTION_VIEW, webMapsUri)
-            
-            if (webIntent.resolveActivity(packageManager) != null) {
-                startActivity(webIntent)
-                return
-            }
-            
-            // Last resort: Fallback to Google Search
-            openLocationInGoogleSearch()
-            
-        } catch (e: Exception) {
-            Toast.makeText(this, "Could not open location in maps", Toast.LENGTH_SHORT).show()
-            // Try Google Search as backup
-            openLocationInGoogleSearch()
+
+    private fun initializeMap() {
+        mapView = findViewById(R.id.mapPreview)
+        mapController = MapController(this, lifecycleScope)
+        mapController.setListener(this)
+        mapController.initializeMapForLocationDetails(mapView)
+        
+        // Explicitly disable location following
+        mapController.disableLocationFollow()
+        
+        // Set user's location (will be updated when location is received)
+        mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
+        
+        // Center map on the place location and add marker
+        if (latitude != 0.0 && longitude != 0.0) {
+            mapController.centerOnLocation(latitude, longitude, locationName)
+        }
+        
+        // Handle center on user button
+        findViewById<FloatingActionButton>(R.id.btnCenterOnUser).setOnClickListener {
+            mapController.centerOnUser()
         }
     }
-    
+
+    override fun onResume() {
+        super.onResume()
+        if (::mapView.isInitialized) {
+            mapView.onResume()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::mapView.isInitialized) {
+            mapView.onPause()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::locationManager.isInitialized) {
+            locationManager.stopLocationUpdates()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LocationManager.REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                locationManager.startLocationUpdates()
+            } else {
+                // Use default coordinates if permission denied
+                mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
+            }
+        }
+    }
+
+    // MapController.MapControllerListener Implementation
+    override fun onRouteCalculated(steps: Int, placeName: String) {
+        // Not used in details view
+    }
+
+    override fun onRouteCleared() {
+        // Not used in details view
+    }
+
+    override fun onMapError(message: String) {
+        Toast.makeText(this, "Map error: $message", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupSocialLink(viewId: Int, url: String?) {
+        val icon = findViewById<ImageView>(viewId)
+        if (url.isNullOrBlank()) {
+            icon.visibility = View.GONE
+        } else {
+            icon.visibility = View.VISIBLE
+            icon.setOnClickListener {
+                try {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Unable to open link", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun openLocationInMaps() {
+        try {
+            Log.d("LocationDetails", "Attempting to open maps with coordinates: lat=$latitude, lng=$longitude")
+            
+            // Check if coordinates are valid
+            if (latitude == 0.0 && longitude == 0.0) {
+                Log.e("LocationDetails", "Invalid coordinates: both latitude and longitude are 0.0")
+                Toast.makeText(this, "Invalid location coordinates", Toast.LENGTH_SHORT).show()
+                return
+            }
+            
+            // Try 1: Google Maps Navigation URI with walking mode
+            try {
+                val navigationUri = Uri.parse("google.navigation:q=$latitude,$longitude&mode=w")
+                val navigationIntent = Intent(Intent.ACTION_VIEW, navigationUri)
+                startActivity(navigationIntent)
+                Log.d("LocationDetails", "Successfully opened Google Maps navigation (walking)")
+                Toast.makeText(this, "Opening walking navigation", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Walking navigation intent failed: ${e.message}")
+            }
+            
+            // Try 2: Standard geo URI (works with any mapping app)
+            try {
+                val geoUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+                val geoIntent = Intent(Intent.ACTION_VIEW, geoUri)
+                startActivity(geoIntent)
+                Log.d("LocationDetails", "Successfully opened with geo URI")
+                Toast.makeText(this, "Opening location in maps", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Geo URI intent failed: ${e.message}")
+            }
+            
+            // Try 3: Google Maps URL with walking directions
+            try {
+                val mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude&travelmode=walking"
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUrl))
+                startActivity(webIntent)
+                Log.d("LocationDetails", "Successfully opened web maps with walking directions")
+                Toast.makeText(this, "Opening walking directions in browser", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Web walking maps intent failed: ${e.message}")
+            }
+            
+            // Try 4: Alternative Google Maps walking URL format
+            try {
+                val walkingUrl = "https://maps.google.com/maps?saddr=My+Location&daddr=$latitude,$longitude&dirflg=w"
+                val walkingIntent = Intent(Intent.ACTION_VIEW, Uri.parse(walkingUrl))
+                startActivity(walkingIntent)
+                Log.d("LocationDetails", "Successfully opened alternative walking maps")
+                Toast.makeText(this, "Opening walking route in browser", Toast.LENGTH_SHORT).show()
+                return
+            } catch (e: Exception) {
+                Log.d("LocationDetails", "Alternative walking intent failed: ${e.message}")
+            }
+            
+            // If all else fails
+            Log.e("LocationDetails", "All mapping intents failed")
+            Toast.makeText(this, "Unable to open maps. Please check if you have a maps app installed.", Toast.LENGTH_LONG).show()
+            
+        } catch (e: Exception) {
+            Log.e("LocationDetails", "Error in openLocationInMaps: ${e.message}")
+            Toast.makeText(this, "Error opening maps: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun openLocationInGoogleSearch() {
         try {
             val searchQuery = URLEncoder.encode("$locationName location", "UTF-8")
@@ -109,7 +276,6 @@ class LocationDetailsActivity : AppCompatActivity() {
         }
     }
 
-    // Handle back button press
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -118,5 +284,10 @@ class LocationDetailsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun openSocialMedia(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
     }
 }

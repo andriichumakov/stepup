@@ -21,18 +21,27 @@ class MemoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMemoryBinding
     private val memoryViews = mutableListOf<View>()
     private val ADD_MEMORY_REQUEST_CODE = 1234
+    private lateinit var actionBarGreetingManager: ActionBarGreetingManager
+    private lateinit var actionBarProfileManager: ActionBarProfileManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMemoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Receive currentSteps from HomeActivity (default to 0 if not passed)
-        val currentSteps = intent.getIntExtra("currentSteps", 0)
+        // Initialize and setup ActionBar greeting
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
+        
+        actionBarProfileManager = ActionBarProfileManager(this)
+        actionBarProfileManager.updateProfilePicture()
 
-        binding.btnMemoryDashboard.setOnClickListener {
-            startActivity(Intent(this, MemoryDashboardActivity::class.java))
-        }
+        // Add a memory item manually (you can add more this way)
+        addMemory(
+            imageRes = R.drawable.ic_launcher_background,
+            date = "2025-05-09",
+            location = "Hanoi, Vietnam"
+        )
 
         binding.btnAddPlace.setOnClickListener {
             val intent = Intent(this, AddMemoryActivity::class.java)

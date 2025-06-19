@@ -3,12 +3,12 @@ package com.example.stepupapp
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.RegisterPageBinding
+import com.example.stepupapp.models.AuthResult
 import com.example.stepupapp.services.ProfileService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.example.stepupapp.storage.LocalProfileStore
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RegisterActivity : BaseActivity() {
     private lateinit var binding: RegisterPageBinding
@@ -24,7 +24,6 @@ class RegisterActivity : BaseActivity() {
             val password = binding.passwordEditText.text.toString()
             val confirmPassword = binding.confirmPasswordEditText.text.toString()
 
-            // Basic validation
             if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -35,25 +34,24 @@ class RegisterActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            // Run registration in background
-            CoroutineScope(Dispatchers.IO).launch {
-                val result = ProfileService.registerProfile(email, username, password)
-                withContext(Dispatchers.Main) {
-                    if (result != null) {
+            lifecycleScope.launch {
+                val result = ProfileService.register(this@RegisterActivity, username, email, password)
+
+                when (result) {
+                    is AuthResult.Success -> {
                         Toast.makeText(this@RegisterActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                        startActivity(intent)
+                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
                         finish()
-                    } else {
-                        Toast.makeText(this@RegisterActivity, "Registration failed", Toast.LENGTH_SHORT).show()
+                    }
+                    is AuthResult.Error -> {
+                        Toast.makeText(this@RegisterActivity, "Registration failed: ${result.message}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
         }
 
         binding.loginPrompt.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
     }

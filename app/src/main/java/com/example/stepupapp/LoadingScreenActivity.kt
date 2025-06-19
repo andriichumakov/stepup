@@ -2,9 +2,13 @@ package com.example.stepupapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.CountDownTimer
-import com.example.stepupapp.services.ProfileService
+import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.LoadingScreenBinding
+import com.example.stepupapp.services.ProfileService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoadingScreenActivity : BaseActivity() {
     private lateinit var binding: LoadingScreenBinding
@@ -14,35 +18,53 @@ class LoadingScreenActivity : BaseActivity() {
         binding = LoadingScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        startProgressBar()
+        // Start session check immediately
+        startSessionCheck()
     }
 
-    private fun startProgressBar() {
-        val totalTime = 3000L  // 5 seconds
-        val interval = 30L     // Update every 30ms for smoother animation
+    private fun setProgressBar(progress: Int) {
+        binding.progressBar.progress = progress
+    }
 
-        object : CountDownTimer(totalTime, interval) {
-            override fun onTick(millisUntilFinished: Long) {
-                val progress = ((totalTime - millisUntilFinished).toFloat() / totalTime * 100).toInt()
-                binding.progressBar.progress = progress
+    private fun startSessionCheck() {
+        lifecycleScope.launch {
+            setProgressBar(20)
+
+            // Try to restore session from refresh token
+            val restored = withContext(Dispatchers.IO) {
+                ProfileService.restoreSessionFromToken(applicationContext)
             }
 
-            override fun onFinish() {
-                binding.progressBar.progress = 100
-                if (ProfileService.isSignedIn()) {
-                    goToMainActivity()
-                } else {
-                    goToAuthOptionsActivity()
+            setProgressBar(80)
+
+            delay(300)  // Small artificial delay to smooth visual experience
+            setProgressBar(100)
+
+            if (restored) {
+                if (ProfileService.hasSetStepGoal())
+                {
+                    goToHomeActivity()
+                    return@launch
                 }
+                goToMainActivity()
+            } else {
+                goToAuthOptionsActivity()
             }
-        }.start()
+        }
     }
 
     private fun goToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-        finish() // Close loading screen so it doesn't stay in back stack
+        finish()
     }
+
+    private fun goToHomeActivity() {
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
     private fun goToAuthOptionsActivity() {
         val intent = Intent(this, AuthOptionsActivity::class.java)
         startActivity(intent)

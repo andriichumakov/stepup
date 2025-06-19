@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.LoginPageBinding
 import com.example.stepupapp.models.UserProfile
-import com.example.stepupapp.services.AuthResult
+import com.example.stepupapp.models.AuthResult
 import com.example.stepupapp.services.ProfileService
 import kotlinx.coroutines.launch
 

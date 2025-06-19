@@ -40,6 +40,7 @@ class StepsOverviewActivity : BaseActivity() {
     private val target by lazy { UserPreferences.getStepTarget(this) }
     private lateinit var actionBarLocationManager: ActionBarLocationManager
     private lateinit var actionBarGreetingManager: ActionBarGreetingManager
+    private lateinit var actionBarProfileManager: ActionBarProfileManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +56,11 @@ class StepsOverviewActivity : BaseActivity() {
             actionBarLocationManager.setupActionBarLocation()
 
             // Initialize and setup ActionBar greeting
-            actionBarGreetingManager = ActionBarGreetingManager(this)
-            actionBarGreetingManager.updateGreeting()
+                    actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
+        
+        actionBarProfileManager = ActionBarProfileManager(this)
+        actionBarProfileManager.updateProfilePicture()
 
             // Set up back button
             binding.backButton.setOnClickListener {

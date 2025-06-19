@@ -31,6 +31,7 @@ class ExploreActivity : AppCompatActivity(),
     private lateinit var uiManager: ExploreUIManager
     private lateinit var actionBarLocationManager: ActionBarLocationManager
     private lateinit var actionBarGreetingManager: ActionBarGreetingManager
+    private lateinit var actionBarProfileManager: ActionBarProfileManager
     
     private val TAG = "ExploreActivity"
     
@@ -284,6 +285,9 @@ class ExploreActivity : AppCompatActivity(),
         
         actionBarLocationManager.setupActionBarLocation()
         actionBarGreetingManager.updateGreeting()
+        
+        actionBarProfileManager = ActionBarProfileManager(this)
+        actionBarProfileManager.updateProfilePicture()
         
         mapController.initializeMap(binding.osmMapView)
         

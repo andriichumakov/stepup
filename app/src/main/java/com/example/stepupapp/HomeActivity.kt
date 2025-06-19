@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.stepupapp.services.ProfileService
 
 class HomeActivity : BaseActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -28,6 +29,7 @@ class HomeActivity : BaseActivity() {
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var actionBarGreetingManager: ActionBarGreetingManager
+    private lateinit var actionBarProfileManager: ActionBarProfileManager
 
     private val stepUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -205,9 +207,15 @@ class HomeActivity : BaseActivity() {
         // Check permissions and start service
         checkAndRequestPermissions()
 
-        // Initialize ActionBarGreetingManager
+        // Initialize ActionBar managers
         actionBarGreetingManager = ActionBarGreetingManager(this)
         actionBarGreetingManager.updateGreeting()
+        
+        actionBarProfileManager = ActionBarProfileManager(this)
+        actionBarProfileManager.updateProfilePicture()
+        
+        // Try to sync any pending interests in background
+        tryBackgroundSync()
     }
 
     override fun onResume() {
@@ -228,8 +236,9 @@ class HomeActivity : BaseActivity() {
         fetchWeather()
 
 
-        // Update greeting in case user name was changed
+        // Update greeting and profile picture in case user data was changed
         actionBarGreetingManager.updateGreeting()
+        actionBarProfileManager.updateProfilePicture()
 
     }
 
@@ -345,6 +354,73 @@ class HomeActivity : BaseActivity() {
             android.util.Log.d("HomeActivity", "UI update complete")
         } catch (e: Exception) {
             android.util.Log.e("HomeActivity", "Error updating UI", e)
+        }
+    }
+
+    private fun tryBackgroundSync() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                var syncedSomething = false
+                
+                // Sync pending interests
+                if (UserPreferences.doInterestsNeedSync(this@HomeActivity)) {
+                    android.util.Log.d("HomeActivity", "Attempting to sync pending interests...")
+                    val interestsSuccess = ProfileService.syncPendingInterests(this@HomeActivity)
+                    
+                    if (interestsSuccess) {
+                        android.util.Log.d("HomeActivity", "Successfully synced pending interests")
+                        syncedSomething = true
+                    } else {
+                        android.util.Log.w("HomeActivity", "Failed to sync pending interests")
+                    }
+                }
+                
+                // Sync pending profile picture
+                if (UserPreferences.doesProfileImageNeedSync(this@HomeActivity)) {
+                    android.util.Log.d("HomeActivity", "Attempting to sync pending profile picture...")
+                    val pictureSuccess = ProfileService.syncPendingProfilePicture(this@HomeActivity)
+                    
+                    if (pictureSuccess) {
+                        android.util.Log.d("HomeActivity", "Successfully synced pending profile picture")
+                        syncedSomething = true
+                    } else {
+                        android.util.Log.w("HomeActivity", "Failed to sync pending profile picture")
+                    }
+                }
+
+                // Sync pending nickname
+                if (UserPreferences.doesNicknameNeedSync(this@HomeActivity)) {
+                    android.util.Log.d("HomeActivity", "Attempting to sync pending nickname...")
+                    val nicknameSuccess = ProfileService.syncPendingNickname(this@HomeActivity)
+                    
+                    if (nicknameSuccess) {
+                        android.util.Log.d("HomeActivity", "Successfully synced pending nickname")
+                        syncedSomething = true
+                    } else {
+                        android.util.Log.w("HomeActivity", "Failed to sync pending nickname")
+                    }
+                }
+
+                // Sync pending name
+                if (UserPreferences.doesNameNeedSync(this@HomeActivity)) {
+                    android.util.Log.d("HomeActivity", "Attempting to sync pending name...")
+                    val nameSuccess = ProfileService.syncPendingName(this@HomeActivity)
+                    
+                    if (nameSuccess) {
+                        android.util.Log.d("HomeActivity", "Successfully synced pending name")
+                        syncedSomething = true
+                    } else {
+                        android.util.Log.w("HomeActivity", "Failed to sync pending name")
+                    }
+                }
+                
+                if (!syncedSomething) {
+                    android.util.Log.d("HomeActivity", "No data needs syncing")
+                }
+                
+            } catch (e: Exception) {
+                android.util.Log.e("HomeActivity", "Error during background sync: ${e.message}", e)
+            }
         }
     }
 

@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.databinding.RegisterPageBinding
-import com.example.stepupapp.services.AuthResult
+import com.example.stepupapp.models.AuthResult
 import com.example.stepupapp.services.ProfileService
 import com.example.stepupapp.storage.LocalProfileStore
 import kotlinx.coroutines.launch

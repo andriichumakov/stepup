@@ -7,12 +7,12 @@ import android.widget.TextView
 class ActionBarGreetingManager(private val activity: Activity) {
     
     fun updateGreeting() {
-        val userName = UserPreferences.getUserName(activity)
+        val userNickname = UserPreferences.getUserNickname(activity)
         val greetingTextView = activity.findViewById<TextView>(R.id.actionbar_greeting)
         
         if (greetingTextView != null) {
-            if (userName.isNotEmpty()) {
-                greetingTextView.text = activity.getString(R.string.greeting_hello, userName)
+            if (userNickname.isNotEmpty()) {
+                greetingTextView.text = activity.getString(R.string.greeting_hello, userNickname)
             } else {
                 greetingTextView.text = activity.getString(R.string.greeting_default)
             }

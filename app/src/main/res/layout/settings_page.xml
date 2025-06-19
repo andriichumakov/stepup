@@ -45,6 +45,98 @@
                 android:shadowDy="1"
                 android:shadowRadius="2"/>
 
+            <!-- Profile Card (Blue) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#5C9EFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/dark_blue"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="@string/change_profile"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:drawableStartCompat="@android:drawable/ic_menu_edit"
+                        app:drawableTint="#FFFFFF" />
+
+                    <!-- Current Profile Picture -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/currentProfileImageView"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginEnd="16dp"
+                            android:background="@drawable/rounded_image_background"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/outline_image_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/changeProfilePictureButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/change_profile_picture"
+                            android:textColor="@color/dark_blue"
+                            app:backgroundTint="#FFFFFF"
+                            app:cornerRadius="8dp"
+                            app:icon="@drawable/outline_image_24"
+                            app:iconTint="@color/dark_blue" />
+                    </LinearLayout>
+
+                    <!-- Name Section -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/change_name"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="@string/new_name"
+                        app:boxBackgroundColor="@android:color/white"
+                        app:boxStrokeColor="#FFFFFF"
+                        app:hintTextColor="#5C9EFF">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/newNameEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:textColor="#1A237E"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Name automatically saves when you finish editing -->
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Step Goal Card (Yellow) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

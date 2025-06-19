@@ -292,7 +292,7 @@ class ExploreUIManager(
         val rating = (2..9).random()
         val distanceInMeters = if (place.dist < 50) (place.dist * 1000).roundToInt() else place.dist.roundToInt()
         val steps = (distanceInMeters / STEP_LENGTH).roundToInt()
-        val stepsText = if (steps >= 1000) "${steps / 1000}k steps away" else "$steps steps away"
+        val stepsText = "$steps steps away"
 
         cardBinding.placeName.text = name
         cardBinding.placeType.text = type

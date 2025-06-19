@@ -94,23 +94,29 @@ object UserPreferences {
 
     // User nickname management functions (user-specific)
     fun saveUserNickname(context: Context, nickname: String) {
+        val trimmedNickname = nickname.trim()
         val userId = getCurrentUserId()
+        Log.d("UserPreferences", "Saving nickname '$trimmedNickname' for user ID: $userId")
+        
         if (userId != null) {
             val key = "${KEY_USER_NICKNAME}_$userId"
-            getPrefs(context).edit().putString(key, nickname.trim()).apply()
-            Log.d("UserPreferences", "Saved user nickname for user $userId: $nickname")
+            getPrefs(context).edit().putString(key, trimmedNickname).apply()
+            Log.d("UserPreferences", "Saved user nickname for user $userId: $trimmedNickname")
         } else {
             // Fallback to global key if no user is logged in (for backward compatibility)
-            getPrefs(context).edit().putString(KEY_USER_NICKNAME, nickname.trim()).apply()
-            Log.d("UserPreferences", "Saved user nickname globally (no user logged in): $nickname")
+            getPrefs(context).edit().putString(KEY_USER_NICKNAME, trimmedNickname).apply()
+            Log.d("UserPreferences", "Saved user nickname globally (no user logged in): $trimmedNickname")
         }
     }
 
     fun getUserNickname(context: Context): String {
         val userId = getCurrentUserId()
+        Log.d("UserPreferences", "Getting nickname for user ID: $userId")
+        
         return if (userId != null) {
             val key = "${KEY_USER_NICKNAME}_$userId"
             var userNickname = getPrefs(context).getString(key, "") ?: ""
+            Log.d("UserPreferences", "Found user-specific nickname: '$userNickname'")
             
             // Migration: If no user-specific nickname but global nickname exists, migrate it
             if (userNickname.isEmpty()) {
@@ -119,13 +125,18 @@ object UserPreferences {
                     Log.d("UserPreferences", "Migrating global nickname to user-specific: '$globalNickname' for user $userId")
                     getPrefs(context).edit().putString(key, globalNickname).apply()
                     userNickname = globalNickname
+                } else {
+                    Log.d("UserPreferences", "No global nickname found for migration")
                 }
             }
             
+            Log.d("UserPreferences", "Returning nickname: '$userNickname'")
             userNickname
         } else {
             // Fallback to global key if no user is logged in
-            getPrefs(context).getString(KEY_USER_NICKNAME, "") ?: ""
+            val globalNickname = getPrefs(context).getString(KEY_USER_NICKNAME, "") ?: ""
+            Log.d("UserPreferences", "No user ID, returning global nickname: '$globalNickname'")
+            globalNickname
         }
     }
 

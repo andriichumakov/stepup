@@ -3,6 +3,7 @@ package com.example.stepupapp
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.example.stepupapp.managers.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,260 +41,92 @@ object UserPreferences {
     }
 
     fun getStepTarget(context: Context): Int {
-        return getPrefs(context).getInt(KEY_STEP_TARGET, DEFAULT_STEP_TARGET)
+        return PreferencesManagerFactory.createStepPreferencesManager(context).getStepTarget()
     }
 
     fun setStepTarget(context: Context, target: Int) {
-        getPrefs(context).edit().putInt(KEY_STEP_TARGET, target).apply()
+        PreferencesManagerFactory.createStepPreferencesManager(context).setStepTarget(target)
     }
 
     fun isSetupCompleted(context: Context): Boolean {
-        return getPrefs(context).getBoolean(KEY_SETUP_COMPLETED, false)
+        return PreferencesManagerFactory.createAppConfigPreferencesManager(context).isSetupCompleted()
     }
 
     fun setSetupCompleted(context: Context, completed: Boolean = true) {
-        getPrefs(context).edit().putBoolean(KEY_SETUP_COMPLETED, completed).apply()
+        PreferencesManagerFactory.createAppConfigPreferencesManager(context).setSetupCompleted(completed)
     }
 
     // User name management functions (user-specific)
     fun saveUserName(context: Context, name: String) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "${KEY_USER_NAME}_$userId"
-            getPrefs(context).edit().putString(key, name.trim()).apply()
-            Log.d("UserPreferences", "Saved user name for user $userId: $name")
-        } else {
-            // Fallback to global key if no user is logged in (for backward compatibility)
-            getPrefs(context).edit().putString(KEY_USER_NAME, name.trim()).apply()
-            Log.d("UserPreferences", "Saved user name globally (no user logged in): $name")
-        }
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).saveUserName(name)
     }
 
     fun getUserName(context: Context): String {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "${KEY_USER_NAME}_$userId"
-            var userName = getPrefs(context).getString(key, "") ?: ""
-            
-            // Migration: If no user-specific name but global name exists, migrate it
-            if (userName.isEmpty()) {
-                val globalName = getPrefs(context).getString(KEY_USER_NAME, "") ?: ""
-                if (globalName.isNotEmpty()) {
-                    Log.d("UserPreferences", "Migrating global name to user-specific: '$globalName' for user $userId")
-                    getPrefs(context).edit().putString(key, globalName).apply()
-                    userName = globalName
-                }
-            }
-            
-            userName
-        } else {
-            // Fallback to global key if no user is logged in
-            getPrefs(context).getString(KEY_USER_NAME, "") ?: ""
-        }
+        return PreferencesManagerFactory.createUserProfilePreferencesManager(context).getUserName()
     }
 
     // User nickname management functions (user-specific)
     fun saveUserNickname(context: Context, nickname: String) {
-        val trimmedNickname = nickname.trim()
-        val userId = getCurrentUserId()
-        Log.d("UserPreferences", "Saving nickname '$trimmedNickname' for user ID: $userId")
-        
-        if (userId != null) {
-            val key = "${KEY_USER_NICKNAME}_$userId"
-            getPrefs(context).edit().putString(key, trimmedNickname).apply()
-            Log.d("UserPreferences", "Saved user nickname for user $userId: $trimmedNickname")
-        } else {
-            // Fallback to global key if no user is logged in (for backward compatibility)
-            getPrefs(context).edit().putString(KEY_USER_NICKNAME, trimmedNickname).apply()
-            Log.d("UserPreferences", "Saved user nickname globally (no user logged in): $trimmedNickname")
-        }
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).saveUserNickname(nickname)
     }
 
     fun getUserNickname(context: Context): String {
-        val userId = getCurrentUserId()
-        Log.d("UserPreferences", "Getting nickname for user ID: $userId")
-        
-        return if (userId != null) {
-            val key = "${KEY_USER_NICKNAME}_$userId"
-            var userNickname = getPrefs(context).getString(key, "") ?: ""
-            Log.d("UserPreferences", "Found user-specific nickname: '$userNickname'")
-            
-            // Migration: If no user-specific nickname but global nickname exists, migrate it
-            if (userNickname.isEmpty()) {
-                val globalNickname = getPrefs(context).getString(KEY_USER_NICKNAME, "") ?: ""
-                if (globalNickname.isNotEmpty()) {
-                    Log.d("UserPreferences", "Migrating global nickname to user-specific: '$globalNickname' for user $userId")
-                    getPrefs(context).edit().putString(key, globalNickname).apply()
-                    userNickname = globalNickname
-                } else {
-                    Log.d("UserPreferences", "No global nickname found for migration")
-                }
-            }
-            
-            Log.d("UserPreferences", "Returning nickname: '$userNickname'")
-            userNickname
-        } else {
-            // Fallback to global key if no user is logged in
-            val globalNickname = getPrefs(context).getString(KEY_USER_NICKNAME, "") ?: ""
-            Log.d("UserPreferences", "No user ID, returning global nickname: '$globalNickname'")
-            globalNickname
-        }
+        return PreferencesManagerFactory.createUserProfilePreferencesManager(context).getUserNickname()
     }
 
     // Interest management functions
     fun saveUserInterests(context: Context, interests: Set<String>) {
-        val interestsString = interests.joinToString(",")
-        getPrefs(context).edit().putString(KEY_USER_INTERESTS, interestsString).apply()
-        Log.d("UserPreferences", "Saved interests: $interestsString")
+        PreferencesManagerFactory.createInterestPreferencesManager(context).saveUserInterests(interests)
     }
 
     fun getUserInterests(context: Context): Set<String> {
-        val interestsString = getPrefs(context).getString(KEY_USER_INTERESTS, "")
-        return if (interestsString.isNullOrEmpty()) {
-            emptySet()
-        } else {
-            interestsString.split(",").toSet()
-        }
+        return PreferencesManagerFactory.createInterestPreferencesManager(context).getUserInterests()
     }
 
     fun getFirstUserInterest(context: Context): String {
-        val interests = getUserInterests(context)
-        return when {
-            interests.isEmpty() -> "All"
-            interests.contains("Amusements") -> "Amusements"
-            interests.contains("Architecture") -> "Architecture"
-            interests.contains("Cultural") -> "Cultural"
-            interests.contains("Shops") -> "Shops"
-            interests.contains("Foods") -> "Foods"
-            interests.contains("Sport") -> "Sport"
-            interests.contains("Historical") -> "Historical"
-            interests.contains("Natural") -> "Natural"
-            interests.contains("Other") -> "Other"
-            else -> interests.first()
-        }
+        return PreferencesManagerFactory.createInterestPreferencesManager(context).getFirstUserInterest()
     }
 
     fun saveDailySteps(context: Context, steps: Int) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = dateFormat.format(Date())
-        getPrefs(context).edit().apply {
-            putInt("$KEY_DAILY_STEPS_PREFIX$today", steps)
-            putInt("$KEY_DAILY_CALORIES_PREFIX$today", calculateCaloriesFromSteps(steps))
-            putInt("$KEY_DAILY_DISTANCE_PREFIX$today", calculateDistanceFromSteps(steps))
-        }.apply()
+        PreferencesManagerFactory.createStepPreferencesManager(context).saveDailySteps(steps)
     }
 
     fun getDailySteps(context: Context, date: Date): Int {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val dateStr = dateFormat.format(date)
-        return getPrefs(context).getInt("$KEY_DAILY_STEPS_PREFIX$dateStr", 0)
+        return PreferencesManagerFactory.createStepPreferencesManager(context).getDailySteps(date)
     }
 
     fun getWeeklySteps(context: Context): List<DailyStepsData> {
-        try {
-            val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            val result = mutableListOf<DailyStepsData>()
-
-            // Get the last 7 days
-            for (i in 6 downTo 0) {
-                calendar.time = Date()
-                calendar.add(Calendar.DAY_OF_YEAR, -i)
-                val date = calendar.time
-                val dateStr = dateFormat.format(date)
-                val dayName = dayFormat.format(date)
-                val steps = getPrefs(context).getInt("$KEY_DAILY_STEPS_PREFIX$dateStr", 0)
-                Log.d("UserPreferences", "Getting steps for $dateStr ($dayName): $steps")
-                result.add(DailyStepsData(dayName, steps, getStepTarget(context), date))
-            }
-
-            Log.d("UserPreferences", "Generated weekly data with ${result.size} days")
-            return result
-        } catch (e: Exception) {
-            Log.e("UserPreferences", "Error getting weekly steps", e)
-            return emptyList()
-        }
+        return PreferencesManagerFactory.createStepPreferencesManager(context).getWeeklySteps()
     }
 
-    fun saveDailyCalories(context: Context, calories: Int) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = dateFormat.format(Date())
-        getPrefs(context).edit().putInt("$KEY_DAILY_CALORIES_PREFIX$today", calories).apply()
-    }
 
-    fun saveDailyDistance(context: Context, distance: Int) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = dateFormat.format(Date())
-        getPrefs(context).edit().putInt("$KEY_DAILY_DISTANCE_PREFIX$today", distance).apply()
-    }
-
-    fun getDailyCalories(context: Context, date: Date): Int {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val dateStr = dateFormat.format(date)
-        return getPrefs(context).getInt("$KEY_DAILY_CALORIES_PREFIX$dateStr", 0)
-    }
-
-    fun getDailyDistance(context: Context, date: Date): Int {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val dateStr = dateFormat.format(date)
-        return getPrefs(context).getInt("$KEY_DAILY_DISTANCE_PREFIX$dateStr", 0)
-    }
 
     fun getWeeklyCalories(context: Context): List<DailyStepsData> {
-        try {
-            val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            val result = mutableListOf<DailyStepsData>()
-
-            // Get the last 7 days
-            for (i in 6 downTo 0) {
-                calendar.time = Date()
-                calendar.add(Calendar.DAY_OF_YEAR, -i)
-                val date = calendar.time
-                val dateStr = dateFormat.format(date)
-                val dayName = dayFormat.format(date)
-                // Get the stored calories value
-                val calories = getPrefs(context).getInt("$KEY_DAILY_CALORIES_PREFIX$dateStr", 0)
-                Log.d("UserPreferences", "Getting stored calories for $dateStr ($dayName): $calories")
-                result.add(DailyStepsData(dayName, calories, DEFAULT_CALORIE_TARGET, date))
-            }
-
-            Log.d("UserPreferences", "Generated weekly calories data with ${result.size} days")
-            return result
-        } catch (e: Exception) {
-            Log.e("UserPreferences", "Error getting weekly calories", e)
-            return emptyList()
-        }
+        return PreferencesManagerFactory.createStepPreferencesManager(context).getWeeklyCalories()
     }
 
     fun getWeeklyDistance(context: Context): List<DailyStepsData> {
-        try {
-            val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-            val result = mutableListOf<DailyStepsData>()
+        return PreferencesManagerFactory.createStepPreferencesManager(context).getWeeklyDistance()
+    }
 
-            // Get the last 7 days
-            for (i in 6 downTo 0) {
-                calendar.time = Date()
-                calendar.add(Calendar.DAY_OF_YEAR, -i)
-                val date = calendar.time
-                val dateStr = dateFormat.format(date)
-                val dayName = dayFormat.format(date)
-                // Get the stored distance value
-                val distance = getPrefs(context).getInt("$KEY_DAILY_DISTANCE_PREFIX$dateStr", 0)
-                Log.d("UserPreferences", "Getting stored distance for $dateStr ($dayName): $distance")
-                result.add(DailyStepsData(dayName, distance, DEFAULT_DISTANCE_TARGET, date))
-            }
+    fun saveDailyCalories(context: Context, calories: Int) {
+        // This is handled automatically by saveDailySteps in the new implementation
+        Log.d("UserPreferences", "saveDailyCalories called - calories are auto-calculated from steps")
+    }
 
-            Log.d("UserPreferences", "Generated weekly distance data with ${result.size} days")
-            return result
-        } catch (e: Exception) {
-            Log.e("UserPreferences", "Error getting weekly distance", e)
-            return emptyList()
-        }
+    fun saveDailyDistance(context: Context, distance: Int) {
+        // This is handled automatically by saveDailySteps in the new implementation
+        Log.d("UserPreferences", "saveDailyDistance called - distance is auto-calculated from steps")
+    }
+
+    fun getDailyCalories(context: Context, date: Date): Int {
+        val steps = getDailySteps(context, date)
+        return calculateCaloriesFromSteps(steps)
+    }
+
+    fun getDailyDistance(context: Context, date: Date): Int {
+        val steps = getDailySteps(context, date)
+        return calculateDistanceFromSteps(steps)
     }
 
     // Helper function to calculate calories from steps (approximately 0.04 calories per step)
@@ -306,130 +139,75 @@ object UserPreferences {
         return (steps * 0.762).toInt()
     }
     fun setLastMemoryId(context: Context, id: Int) {
-        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putInt("last_memory_id", id).apply()
+        PreferencesManagerFactory.createMemoryPreferencesManager(context).setLastMemoryId(id)
     }
 
     fun getLastMemoryId(context: Context): Int {
-        val prefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
-        return prefs.getInt("last_memory_id", -1)
+        return PreferencesManagerFactory.createMemoryPreferencesManager(context).getLastMemoryId()
     }
 
     // Step counter notification visibility functions
     fun shouldShowStepCounterNotification(context: Context): Boolean {
-        return getPrefs(context).getBoolean(KEY_SHOW_STEP_COUNTER_NOTIFICATION, true) // Default to true
+        return PreferencesManagerFactory.createAppConfigPreferencesManager(context).shouldShowStepCounterNotification()
     }
 
     fun setStepCounterNotificationVisibility(context: Context, show: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_SHOW_STEP_COUNTER_NOTIFICATION, show).apply()
-        Log.d("UserPreferences", "Step counter notification visibility set to: $show")
+        PreferencesManagerFactory.createAppConfigPreferencesManager(context).setStepCounterNotificationVisibility(show)
     }
 
     // Streak tracking functions
     fun getCurrentStreak(context: Context): Int {
-        return calculateCurrentStreakFromWeeklyData(context)
+        return PreferencesManagerFactory.createStreakPreferencesManager(context).getCurrentStreak()
     }
 
     fun setCurrentStreak(context: Context, streak: Int) {
-        getPrefs(context).edit().putInt(KEY_CURRENT_STREAK, streak).apply()
-        Log.d("UserPreferences", "Current streak set to: $streak")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).setCurrentStreak(streak)
     }
 
     fun getLastStreakNotification(context: Context): Int {
-        return getPrefs(context).getInt(KEY_LAST_STREAK_NOTIFICATION, 0)
+        return PreferencesManagerFactory.createStreakPreferencesManager(context).getLastStreakNotification()
     }
 
     fun setLastStreakNotification(context: Context, streak: Int) {
-        getPrefs(context).edit().putInt(KEY_LAST_STREAK_NOTIFICATION, streak).apply()
-        Log.d("UserPreferences", "Last streak notification set to: $streak")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).setLastStreakNotification(streak)
     }
 
     fun getLastGoalAchievedDate(context: Context): String {
-        return getPrefs(context).getString(KEY_LAST_GOAL_ACHIEVED_DATE, "") ?: ""
+        return PreferencesManagerFactory.createStreakPreferencesManager(context).getLastGoalAchievedDate()
     }
 
     fun setLastGoalAchievedDate(context: Context, date: String) {
-        getPrefs(context).edit().putString(KEY_LAST_GOAL_ACHIEVED_DATE, date).apply()
-        Log.d("UserPreferences", "Last goal achieved date set to: $date")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).setLastGoalAchievedDate(date)
     }
 
     fun shouldSendStreakNotification(context: Context, currentStreak: Int): Boolean {
-        val lastNotifiedStreak = getLastStreakNotification(context)
-        val lastGoalDate = getLastGoalAchievedDate(context)
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        
-        // Always send notification if:
-        // 1. Current streak is greater than last notified streak, OR
-        // 2. We achieved goal today and have a streak (even if same as last notified)
-        val shouldNotify = currentStreak > lastNotifiedStreak || 
-                          (lastGoalDate == today && currentStreak > 0)
-        
-        Log.d("UserPreferences", "Streak notification check - Current: $currentStreak, Last notified: $lastNotifiedStreak, Goal today: ${lastGoalDate == today}, Should notify: $shouldNotify")
-        
-        return shouldNotify
-    }
-
-    // Calculate streak based on actual weekly data (same logic as StepsOverviewActivity)
-    private fun calculateCurrentStreakFromWeeklyData(context: Context): Int {
-        try {
-            val weeklyData = getWeeklySteps(context)
-            var streak = 0
-            
-            // Sort data by date in descending order (most recent first)
-            val sortedData = weeklyData.sortedByDescending { it.date }
-            
-            // Check consecutive days from most recent
-            for (data in sortedData) {
-                if (data.steps >= data.target) {
-                    streak++
-                } else {
-                    break
-                }
-            }
-            
-            Log.d("UserPreferences", "Calculated streak from weekly data: $streak")
-            return streak
-        } catch (e: Exception) {
-            Log.e("UserPreferences", "Error calculating streak from weekly data", e)
-            return 0
-        }
+        return PreferencesManagerFactory.createStreakPreferencesManager(context).shouldSendStreakNotification(currentStreak)
     }
 
     fun updateStreakOnGoalAchievement(context: Context) {
-        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val lastGoalDate = getLastGoalAchievedDate(context)
-        
-        if (lastGoalDate == today) {
-            // Already achieved goal today, don't update streak
-            Log.d("UserPreferences", "Goal already achieved today, streak calculation will be based on weekly data")
-            return
-        }
-        
-        // Mark that we achieved the goal today
-        setLastGoalAchievedDate(context, today)
-        Log.d("UserPreferences", "Goal achieved today, streak will be calculated from weekly data")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).updateStreakOnGoalAchievement()
     }
 
     fun checkAndResetStreakIfNeeded(context: Context) {
-        // This method is no longer needed since we calculate streak from actual data
-        // But keeping it for backward compatibility
-        Log.d("UserPreferences", "checkAndResetStreakIfNeeded called - streak now calculated from weekly data")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).checkAndResetStreakIfNeeded()
     }
 
     fun resetStreakNotificationTracking(context: Context) {
-        setLastStreakNotification(context, 0)
-        Log.d("UserPreferences", "Streak notification tracking reset - will notify for next streak achievement")
+        PreferencesManagerFactory.createStreakPreferencesManager(context).resetStreakNotificationTracking()
     }
 
     fun clear(context: Context) {
-        val sharedPrefs = context.getSharedPreferences("step_preferences", Context.MODE_PRIVATE)
-        sharedPrefs.edit().clear().apply()
+        getPrefs(context).edit().clear().apply()
+        // Also clear memory preferences
+        val memoryPrefs = context.getSharedPreferences("memory_prefs", Context.MODE_PRIVATE)
+        memoryPrefs.edit().clear().apply()
+        // Clear manager cache
+        PreferencesManagerFactory.clearCache()
     }
 
-    // Helper function to get current user ID
+    // Helper function to get current user ID - kept for backward compatibility
     private fun getCurrentUserId(): String? {
         return try {
-            // Import ProfileService to get the current user
             com.example.stepupapp.services.ProfileService.auth.currentSessionOrNull()?.user?.id
         } catch (e: Exception) {
             Log.e("UserPreferences", "Error getting current user ID", e)
@@ -439,93 +217,23 @@ object UserPreferences {
 
     // Profile image management functions (user-specific)
     fun saveProfileImagePath(context: Context, imagePath: String) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_PATH}_$userId"
-            getPrefs(context).edit().putString(key, imagePath).apply()
-            Log.d("UserPreferences", "Saved profile image path for user $userId: $imagePath")
-        } else {
-            Log.w("UserPreferences", "Cannot save profile image path - no user logged in")
-        }
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).saveProfileImagePath(imagePath)
     }
 
     fun getProfileImagePath(context: Context): String? {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_PATH}_$userId"
-            getPrefs(context).getString(key, null)
-        } else {
-            null
-        }
+        return PreferencesManagerFactory.createUserProfilePreferencesManager(context).getProfileImagePath()
     }
 
     fun hasProfileImage(context: Context): Boolean {
-        val imagePath = getProfileImagePath(context)
-        return !imagePath.isNullOrEmpty() && java.io.File(imagePath).exists()
+        return PreferencesManagerFactory.createUserProfilePreferencesManager(context).hasProfileImage()
     }
 
     fun clearProfileImage(context: Context) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            // Clear file if it exists
-            val imagePath = getProfileImagePath(context)
-            if (!imagePath.isNullOrEmpty()) {
-                try {
-                    java.io.File(imagePath).delete()
-                } catch (e: Exception) {
-                    Log.e("UserPreferences", "Error deleting profile image file", e)
-                }
-            }
-            
-            // Clear all user-specific profile image preferences
-            val pathKey = "${KEY_PROFILE_IMAGE_PATH}_$userId"
-            val base64Key = "${KEY_PROFILE_IMAGE_BASE64}_$userId"
-            val syncKey = "${KEY_PROFILE_IMAGE_NEEDS_SYNC}_$userId"
-            
-            getPrefs(context).edit().apply {
-                remove(pathKey)
-                remove(base64Key)
-                remove(syncKey)
-            }.apply()
-            
-            Log.d("UserPreferences", "Profile image cleared for user $userId")
-        }
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).clearProfileImage()
     }
 
     fun clearAllUserSpecificData(context: Context, userId: String) {
-        // Clear profile image file if it exists
-        val pathKey = "${KEY_PROFILE_IMAGE_PATH}_$userId"
-        val imagePath = getPrefs(context).getString(pathKey, null)
-        if (!imagePath.isNullOrEmpty()) {
-            try {
-                java.io.File(imagePath).delete()
-            } catch (e: Exception) {
-                Log.e("UserPreferences", "Error deleting profile image file", e)
-            }
-        }
-        
-        // Clear all user-specific preferences
-        val base64Key = "${KEY_PROFILE_IMAGE_BASE64}_$userId"
-        val syncKey = "${KEY_PROFILE_IMAGE_NEEDS_SYNC}_$userId"
-        val nameKey = "${KEY_USER_NAME}_$userId"
-        val nameSyncKey = "name_needs_sync_$userId"
-        val nicknameKey = "${KEY_USER_NICKNAME}_$userId"
-        val nicknameSyncKey = "nickname_needs_sync_$userId"
-        
-        getPrefs(context).edit().apply {
-            // Profile image data
-            remove(pathKey)
-            remove(base64Key)
-            remove(syncKey)
-            // Name data
-            remove(nameKey)
-            remove(nameSyncKey)
-            // Nickname data
-            remove(nicknameKey)
-            remove(nicknameSyncKey)
-        }.apply()
-        
-        Log.d("UserPreferences", "All user-specific data cleared for user $userId")
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).clearAllUserSpecificData(userId)
     }
 
     // Keep the old method name for backward compatibility
@@ -535,138 +243,61 @@ object UserPreferences {
 
     // Base64 profile image management functions (user-specific)
     fun saveProfileImageBase64(context: Context, base64Image: String) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_BASE64}_$userId"
-            getPrefs(context).edit().putString(key, base64Image).apply()
-            Log.d("UserPreferences", "Saved profile image base64 locally for user $userId")
-        } else {
-            Log.w("UserPreferences", "Cannot save profile image base64 - no user logged in")
-        }
+        PreferencesManagerFactory.createUserProfilePreferencesManager(context).saveProfileImageBase64(base64Image)
     }
 
     fun getProfileImageBase64(context: Context): String? {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_BASE64}_$userId"
-            getPrefs(context).getString(key, null)
-        } else {
-            null
-        }
+        return PreferencesManagerFactory.createUserProfilePreferencesManager(context).getProfileImageBase64()
     }
 
     fun markProfileImageNeedingSync(context: Context, needsSync: Boolean) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_NEEDS_SYNC}_$userId"
-            getPrefs(context).edit().putBoolean(key, needsSync).apply()
-            Log.d("UserPreferences", "Profile image sync flag set to: $needsSync for user $userId")
-        } else {
-            Log.w("UserPreferences", "Cannot set profile image sync flag - no user logged in")
-        }
+        PreferencesManagerFactory.createSyncPreferencesManager(context).markProfileImageNeedingSync(needsSync)
     }
 
     fun doesProfileImageNeedSync(context: Context): Boolean {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "${KEY_PROFILE_IMAGE_NEEDS_SYNC}_$userId"
-            getPrefs(context).getBoolean(key, false)
-        } else {
-            false
-        }
+        return PreferencesManagerFactory.createSyncPreferencesManager(context).doesProfileImageNeedSync()
     }
     
-    /**
-     * Migration helper: Get interests code from current local preferences
-     * This helps transition existing users to the new database system
-     */
     fun getInterestsCodeFromLocal(context: Context): String {
-        val interests = getUserInterests(context)
-        return InterestCodeManager.interestsToCode(interests)
+        return PreferencesManagerFactory.createInterestPreferencesManager(context).getInterestsCodeFromLocal()
     }
     
-    // Local interests code management functions
     fun saveInterestsCodeLocally(context: Context, interestsCode: String) {
-        getPrefs(context).edit().putString(KEY_LOCAL_INTERESTS_CODE, interestsCode).apply()
-        Log.d("UserPreferences", "Saved interests code locally: $interestsCode")
+        PreferencesManagerFactory.createInterestPreferencesManager(context).saveInterestsCodeLocally(interestsCode)
     }
 
     fun getInterestsCodeLocally(context: Context): String? {
-        return getPrefs(context).getString(KEY_LOCAL_INTERESTS_CODE, null)
+        return PreferencesManagerFactory.createInterestPreferencesManager(context).getInterestsCodeLocally()
     }
 
     fun markInterestsNeedingSync(context: Context, needsSync: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_INTERESTS_NEEDS_SYNC, needsSync).apply()
-        Log.d("UserPreferences", "Interests sync flag set to: $needsSync")
+        PreferencesManagerFactory.createSyncPreferencesManager(context).markInterestsNeedingSync(needsSync)
     }
 
     fun doInterestsNeedSync(context: Context): Boolean {
-        return getPrefs(context).getBoolean(KEY_INTERESTS_NEEDS_SYNC, false)
+        return PreferencesManagerFactory.createSyncPreferencesManager(context).doInterestsNeedSync()
     }
     
-    /**
-     * Get the most recent interests, prioritizing local cache for speed
-     * Falls back gracefully if data is missing
-     */
     fun getMostRecentInterests(context: Context): Set<String> {
-        // Try local interests code first (fastest)
-        val localCode = getInterestsCodeLocally(context)
-        if (localCode != null) {
-            return InterestCodeManager.codeToInterests(localCode)
-        }
-        
-        // Fall back to string-based interests
-        val stringInterests = getUserInterests(context)
-        if (stringInterests.isNotEmpty()) {
-            return stringInterests
-        }
-        
-        // Ultimate fallback
-        return setOf("All")
+        return PreferencesManagerFactory.createInterestPreferencesManager(context).getMostRecentInterests()
     }
 
     // Name sync management functions (user-specific)
     fun markNameNeedingSync(context: Context, needsSync: Boolean) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "name_needs_sync_$userId"
-            getPrefs(context).edit().putBoolean(key, needsSync).apply()
-            Log.d("UserPreferences", "Name sync flag set to: $needsSync for user $userId")
-        } else {
-            Log.w("UserPreferences", "Cannot set name sync flag - no user logged in")
-        }
+        PreferencesManagerFactory.createSyncPreferencesManager(context).markNameNeedingSync(needsSync)
     }
 
     fun doesNameNeedSync(context: Context): Boolean {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "name_needs_sync_$userId"
-            getPrefs(context).getBoolean(key, false)
-        } else {
-            false
-        }
+        return PreferencesManagerFactory.createSyncPreferencesManager(context).doesNameNeedSync()
     }
 
     // Nickname sync management functions (user-specific)
     fun markNicknameNeedingSync(context: Context, needsSync: Boolean) {
-        val userId = getCurrentUserId()
-        if (userId != null) {
-            val key = "nickname_needs_sync_$userId"
-            getPrefs(context).edit().putBoolean(key, needsSync).apply()
-            Log.d("UserPreferences", "Nickname sync flag set to: $needsSync for user $userId")
-        } else {
-            Log.w("UserPreferences", "Cannot set nickname sync flag - no user logged in")
-        }
+        PreferencesManagerFactory.createSyncPreferencesManager(context).markNicknameNeedingSync(needsSync)
     }
 
     fun doesNicknameNeedSync(context: Context): Boolean {
-        val userId = getCurrentUserId()
-        return if (userId != null) {
-            val key = "nickname_needs_sync_$userId"
-            getPrefs(context).getBoolean(key, false)
-        } else {
-            false
-        }
+        return PreferencesManagerFactory.createSyncPreferencesManager(context).doesNicknameNeedSync()
     }
 
 

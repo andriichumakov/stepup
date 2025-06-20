@@ -317,7 +317,7 @@ class MainActivity : BaseActivity() {
             currentPhotoPath = file.absolutePath
             val photoURI = FileProvider.getUriForFile(
                 this,
-                "${packageName}.fileprovider",
+                "${packageName}.provider",
                 file
             )
             cameraLauncher.launch(photoURI)

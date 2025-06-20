@@ -58,6 +58,13 @@ class MemoryActivity : AppCompatActivity() {
         loadPlacesFromRoom()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Update header components when returning from settings or other activities
+        actionBarGreetingManager.updateGreeting()
+        actionBarProfileManager.updateProfilePicture()
+    }
+
     private fun loadPlacesFromRoom() {
         CoroutineScope(Dispatchers.IO).launch {
             val db = PlaceDatabase.getDatabase(applicationContext)

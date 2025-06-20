@@ -115,14 +115,17 @@
                         android:textStyle="bold" />
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:hint="@string/new_name"
                         app:boxBackgroundColor="@android:color/white"
-                        app:boxStrokeColor="#FFFFFF"
-                        app:hintTextColor="#5C9EFF">
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
+                        app:hintTextColor="@color/dark_blue"
+                        app:boxStrokeColor="@color/dark_blue">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/newNameEditText"
@@ -166,14 +169,17 @@
                         app:drawableTint="#1A237E"/>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:hint="Enter daily step goal"
                         app:boxBackgroundColor="@android:color/white"
-                        app:boxStrokeColor="#1A237E"
-                        app:hintTextColor="#1A237E">
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
+                        app:boxStrokeColor="@color/dark_blue"
+                        app:hintTextColor="@color/dark_blue">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextNumber2"
@@ -181,7 +187,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:textColor="#1A237E"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -345,32 +351,36 @@
 
             <!-- Username -->
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:hint="New Username"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:boxStrokeColor="@color/dark_blue"
+                app:hintTextColor="@color/dark_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"/>
+                    android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Password -->
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="New Password"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                app:boxStrokeColor="@color/dark_blue"
+                app:hintTextColor="@color/dark_blue">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"/>
+                    android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Save Account Info Button -->

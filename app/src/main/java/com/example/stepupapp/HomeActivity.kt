@@ -236,6 +236,10 @@ class HomeActivity : BaseActivity() {
         binding.stepProgressBar.max = target
         updateTargetText()
 
+        // Update header components when returning from settings or other activities
+        actionBarGreetingManager.updateGreeting()
+        actionBarProfileManager.updateProfilePicture()
+
         checkAndNotifyNewMemory()
         // Update the memories widget with real data
         updateMemoriesWidget()

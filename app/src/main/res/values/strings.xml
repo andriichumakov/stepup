@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StepUpApp</string>
+    <string name="intro_setup">Welcome To StepUp!</string>
+    <string name="prompt_name">What\'s your name?</string>
+    <string name="prompt_goal">What are you aiming for?</string>
+    <string name="goal_steps_one">5000 steps</string>
+    <string name="goal_steps_two">6500 steps</string>
+    <string name="goal_steps_three">8000 steps</string>
+    <string name="prompt_location">What are you interested in?</string>
+    <string name="location_one">Emmen, WildLands</string>
+    <string name="location_two">Emmen, Museum of Contemporary Tibetan Art</string>
+    <string name="location_three">Emmen, Restaurant Galerie De Kamer</string>
+    <string name="location_four">Emmen, Cafe de Brasserie</string>
+    <string name="location_five">Emmen, Rensenpark</string>
+    <string name="user_name">Name</string>
+    <string name="custom_steps">Custom Number of Steps</string>
+    <string name="settings">Settings</string>
+    <string name="settings_h3">Customize daily step goal:</string>
+    <string name="setting_h4">Interests:</string>
+    <string name="interest_two">Amusements</string>
+    <string name="interest_three">Architecture</string>
+    <string name="interest_four">Cultural</string>
+    <string name="setting_save">Save Changes</string>
+    <string name="interest_five">Shops</string>
+    <string name="interest_six">Foods</string>
+    <string name="interest_seven">Sport</string>
+    <string name="interest_eight">Historical</string>
+    <string name="interest_nine">Natural</string>
+    <string name="interest_ten">Other</string>
+    <string name="greeting_hello">Hello, %s</string>
+    <string name="greeting_default">Hello, User</string>
+    <string name="error_name_required">Please enter your name to continue</string>
+    <string name="hint_name_required">Enter your name (required)</string>
+    <string name="error_name_too_short">Name must be at least 2 characters long</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="select_photo">Select Photo</string>
+    <string name="change_profile">Change Profile</string>
+    <string name="change_name">Change Name</string>
+    <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="new_name">New Name</string>
+
+    
+    <!-- Place Categories for Filter -->
+    <string-array name="place_categories">
+        <item>All</item>
+        <item>Amusements</item>
+        <item>Architecture</item>
+        <item>Cultural</item>
+        <item>Shops</item>
+        <item>Foods</item>
+        <item>Sport</item>
+        <item>Historical</item>
+        <item>Natural</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Subcategories based on OpenTripMap catalog (family-friendly only) -->
+    <string-array name="subcategories_all">
+        <item>All Types</item>
+    </string-array>
+
+    <string-array name="subcategories_foods">
+        <item>All Food Places</item>
+        <item>Restaurant</item>
+        <item>Fast Food</item>
+        <item>Cafe</item>
+        <item>Pizza</item>
+        <item>Ice Cream</item>
+        <item>Bakery</item>
+        <item>Food Court</item>
+        <item>Bistro</item>
+        <item>Sandwich Shop</item>
+    </string-array>
+
+    <string-array name="subcategories_shops">
+        <item>All Shops</item>
+        <item>Shopping Mall</item>
+        <item>Supermarket</item>
+        <item>Bookstore</item>
+        <item>Clothing Store</item>
+        <item>Electronics Store</item>
+        <item>Toy Store</item>
+        <item>Gift Shop</item>
+        <item>Pharmacy</item>
+        <item>Convenience Store</item>
+        <item>Department Store</item>
+    </string-array>
+
+    <string-array name="subcategories_amusements">
+        <item>All Entertainment</item>
+        <item>Theme Park</item>
+        <item>Zoo</item>
+        <item>Aquarium</item>
+        <item>Cinema</item>
+        <item>Playground</item>
+        <item>Bowling</item>
+        <item>Arcade</item>
+        <item>Mini Golf</item>
+        <item>Escape Room</item>
+    </string-array>
+
+    <string-array name="subcategories_cultural">
+        <item>All Cultural</item>
+        <item>Museum</item>
+        <item>Art Gallery</item>
+        <item>Theatre</item>
+        <item>Library</item>
+        <item>Cultural Center</item>
+        <item>Concert Hall</item>
+        <item>Exhibition Center</item>
+    </string-array>
+
+    <string-array name="subcategories_sport">
+        <item>All Sports</item>
+        <item>Swimming Pool</item>
+        <item>Gym</item>
+        <item>Tennis Court</item>
+        <item>Basketball Court</item>
+        <item>Soccer Field</item>
+        <item>Golf Course</item>
+        <item>Skating Rink</item>
+        <item>Sports Center</item>
+    </string-array>
+
+    <string-array name="subcategories_historical">
+        <item>All Historical</item>
+        <item>Monument</item>
+        <item>Memorial</item>
+        <item>Historic Building</item>
+        <item>Castle</item>
+        <item>Archaeological Site</item>
+        <item>Heritage Site</item>
+    </string-array>
+
+    <string-array name="subcategories_architecture">
+        <item>All Architecture</item>
+        <item>Church</item>
+        <item>Tower</item>
+        <item>Bridge</item>
+        <item>Historic House</item>
+        <item>Government Building</item>
+        <item>University</item>
+    </string-array>
+
+    <string-array name="subcategories_natural">
+        <item>All Natural</item>
+        <item>Park</item>
+        <item>Garden</item>
+        <item>Beach</item>
+        <item>Lake</item>
+        <item>Forest</item>
+        <item>Nature Reserve</item>
+        <item>Viewpoint</item>
+        <item>Hiking Trail</item>
+    </string-array>
+
+    <string-array name="subcategories_other">
+        <item>All Other</item>
+        <item>Hospital</item>
+        <item>School</item>
+        <item>Bank</item>
+        <item>Post Office</item>
+        <item>Gas Station</item>
+        <item>Hotel</item>
+        <item>Tourist Information</item>
+    </string-array>
+
+    <!-- Comprehensive searchable subcategories (family-friendly only) -->
+    <string-array name="all_subcategories">
+        <!-- Most Popular Subcategories -->
+        <item>Restaurant</item>
+        <item>Cafe</item>
+        <item>Museum</item>
+        <item>Park</item>
+        <item>Shopping Mall</item>
+        <item>Hotel</item>
+        <item>Church</item>
+        <item>Beach</item>
+        <item>Monument</item>
+        <item>Zoo</item>
+        <item>Aquarium</item>
+        <item>Theatre</item>
+        <item>Castle</item>
+        <item>Bridge</item>
+        <item>Tower</item>
+        <item>Garden</item>
+        <item>Lake</item>
+        <item>Viewpoint</item>
+        <item>Stadium</item>
+        <item>Swimming Pool</item>
+        <item>Library</item>
+        <item>Art Gallery</item>
+        <item>Cinema</item>
+        <item>Supermarket</item>
+        <item>Hospital</item>
+        <item>School</item>
+        <item>Bank</item>
+        <item>Gas Station</item>
+        <item>Theme Park</item>
+        <item>Historic Building</item>
+    </string-array>
+</resources>

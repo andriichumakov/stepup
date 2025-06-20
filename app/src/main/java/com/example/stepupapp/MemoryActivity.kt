@@ -90,17 +90,11 @@ class MemoryActivity : AppCompatActivity() {
         }
 
         binding.txtPlaceName.text = place.name
-
-        val infoLayout = (binding.txtPlaceName.parent as ViewGroup).getChildAt(2) as LinearLayout
-        val row1 = infoLayout.getChildAt(0) as LinearLayout
-        val row2 = infoLayout.getChildAt(1) as LinearLayout
-        val row3 = infoLayout.getChildAt(2) as LinearLayout
-        val row4 = infoLayout.getChildAt(3) as LinearLayout
-
-        (row1.getChildAt(1) as TextView).text = "👣 Steps: ${place.steps_taken}"
-        (row2.getChildAt(1) as TextView).text = "📅 Date: ${place.date_saved}"
-        (row3.getChildAt(1) as TextView).text = "📝 ${place.description}"
-        (row4.getChildAt(1) as TextView).text = "⭐️ Rating: ${place.rating}/5"    }
+        binding.txtSteps.text = "👣 Steps: ${place.steps_taken}"
+        binding.txtDate.text = "📅 Date: ${place.date_saved}"
+        binding.txtDescription.text = "📝 ${place.description}"
+        binding.txtRating.text = "⭐️ Rating: ${place.rating}/5"
+    }
 
     private fun addMemory(place: Place, index: Int) {
         val context = this
@@ -108,21 +102,27 @@ class MemoryActivity : AppCompatActivity() {
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             visibility = View.GONE // start hidden
+            background = resources.getDrawable(R.drawable.memory_container_background, null)
+            elevation = 8f
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).also {
-                val margin = resources.getDimensionPixelSize(R.dimen.default_margin)
-                (it as ViewGroup.MarginLayoutParams).setMargins(margin)
+                val smallMargin = 8 // Reduced margins for wider container
+                (it as ViewGroup.MarginLayoutParams).setMargins(smallMargin, 16, smallMargin, 24)
             }
         }
 
         val imgView = ImageView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                400
-            )
+                650
+            ).also {
+                it.setMargins(0, 0, 0, 24)
+            }
             scaleType = ImageView.ScaleType.CENTER_CROP
+            background = resources.getDrawable(R.drawable.memory_image_background, null)
+            clipToOutline = true
 
             try {
                 val uri = Uri.parse(place.imageUri)
@@ -134,23 +134,52 @@ class MemoryActivity : AppCompatActivity() {
         }
 
         val placeName = TextView(context).apply {
-            text = "📍 Location: ${place.name}"
-            textSize = 18f
-            setTextColor(getColor(R.color.primary_green))
+            text = place.name
+            textSize = 20f
+            setTextColor(getColor(R.color.dark_green))
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.setMargins(0, 0, 0, 16)
+            }
         }
 
         val steps = TextView(context).apply {
             text = "👣 Steps: ${place.steps_taken}"
             textSize = 16f
+            setTextColor(getColor(R.color.dark_blue))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.setMargins(0, 0, 0, 8)
+            }
         }
 
         val date = TextView(context).apply {
             text = "📅 Date: ${place.date_saved}"
             textSize = 16f
+            setTextColor(getColor(R.color.dark_blue))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.setMargins(0, 0, 0, 8)
+            }
         }
+        
         val description = TextView(context).apply {
             text = "📝 ${place.description}"
             textSize = 16f
+            setTextColor(getColor(R.color.dark_blue))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.setMargins(0, 0, 0, 16)
+            }
         }
 
         val ratingBar = RatingBar(context).apply {
@@ -158,6 +187,8 @@ class MemoryActivity : AppCompatActivity() {
             stepSize = 0.5f
             rating = place.rating
             setIsIndicator(true)
+            progressTintList = resources.getColorStateList(R.color.gold_accent, null)
+            secondaryProgressTintList = resources.getColorStateList(R.color.light_green, null)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT

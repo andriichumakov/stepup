@@ -190,7 +190,6 @@ class AddMemoryActivity : AppCompatActivity() {
         }else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             selectedImageUri = null  // Clear the gallery image URI
 
-            // ✅ Use imageUriFromCamera here!
             imageUriFromCamera?.let { uri ->
                 binding.imagePreview.setImageURI(uri)
 

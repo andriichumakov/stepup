@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.presentation.explore.MapController
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.osmdroid.views.MapView
 import java.net.URLEncoder
 
@@ -24,11 +23,6 @@ class LocationDetailsActivity : AppCompatActivity(), MapController.MapController
     private var locationName: String = ""
     private lateinit var mapController: MapController
     private lateinit var mapView: MapView
-    private lateinit var locationManager: LocationManager
-    
-    // User's actual location (separate from place location)
-    private var userLatitude: Double = 52.788040 // Default coordinates
-    private var userLongitude: Double = 6.893176
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,23 +50,8 @@ class LocationDetailsActivity : AppCompatActivity(), MapController.MapController
 
         Log.d("LocationDetails", "Coordinates: $latitude, $longitude")
 
-        // Initialize location manager to get user's actual location
-        locationManager = LocationManager(this) { location ->
-            userLatitude = location.latitude
-            userLongitude = location.longitude
-            Log.d("LocationDetails", "User location updated: $userLatitude, $userLongitude")
-            
-            // Update the map controller with user's real location
-            mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
-        }
-
         // Initialize map
         initializeMap()
-        
-        // Start getting user's location
-        if (locationManager.checkLocationPermission()) {
-            locationManager.startLocationUpdates()
-        }
 
         // Set text content
         findViewById<TextView>(R.id.locationName).text = name
@@ -112,20 +91,9 @@ class LocationDetailsActivity : AppCompatActivity(), MapController.MapController
         mapController.setListener(this)
         mapController.initializeMapForLocationDetails(mapView)
         
-        // Explicitly disable location following
-        mapController.disableLocationFollow()
-        
-        // Set user's location (will be updated when location is received)
-        mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
-        
         // Center map on the place location and add marker
         if (latitude != 0.0 && longitude != 0.0) {
             mapController.centerOnLocation(latitude, longitude, locationName)
-        }
-        
-        // Handle center on user button
-        findViewById<FloatingActionButton>(R.id.btnCenterOnUser).setOnClickListener {
-            mapController.centerOnUser()
         }
     }
 
@@ -145,21 +113,6 @@ class LocationDetailsActivity : AppCompatActivity(), MapController.MapController
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::locationManager.isInitialized) {
-            locationManager.stopLocationUpdates()
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LocationManager.REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                locationManager.startLocationUpdates()
-            } else {
-                // Use default coordinates if permission denied
-                mapController.setUserLocationWithoutFollow(userLatitude, userLongitude)
-            }
-        }
     }
 
     // MapController.MapControllerListener Implementation
@@ -177,6 +130,10 @@ class LocationDetailsActivity : AppCompatActivity(), MapController.MapController
 
     override fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMapLocationClicked(latitude: Double, longitude: Double, placeName: String?, category: String?, distance: Int?) {
+        // Not used in details view - map is read-only here
     }
 
     private fun setupSocialLink(viewId: Int, url: String?) {

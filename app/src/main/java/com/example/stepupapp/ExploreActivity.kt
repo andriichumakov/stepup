@@ -4,6 +4,8 @@ import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.stepupapp.api.OpenTripMapResponse
@@ -192,6 +194,17 @@ class ExploreActivity : AppCompatActivity(),
         uiManager.showToast("Map error: $message")
     }
 
+    override fun onMapLocationClicked(latitude: Double, longitude: Double, placeName: String?, category: String?, distance: Int?) {
+        val title = placeName ?: "Unknown Location"
+        val subtitle = if (distance != null) {
+            "$category • $distance steps away"
+        } else {
+            "$category • Lat: ${String.format("%.4f", latitude)}, Lon: ${String.format("%.4f", longitude)}"
+        }
+        
+        showMapInfoPopup(title, subtitle)
+    }
+
     // ExploreUIManager.UIManagerListener Implementation
     override fun onCategorySelected(category: String) {
         presenter.onCategorySelected(category)
@@ -296,6 +309,43 @@ class ExploreActivity : AppCompatActivity(),
         mapController.initializeMap(binding.osmMapView)
         
         uiManager.setupUI()
+        
+        setupMapTouchHandling()
+    }
+
+    private fun setupMapTouchHandling() {
+        // Handle touch events on the map frame to prevent scroll conflicts
+        binding.mapFrameLayout.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    // Disable parent scrolling when touching the map
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // Re-enable parent scrolling
+                    v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false // Let the map handle the touch event
+        }
+    }
+    
+    private fun showMapInfoPopup(title: String, subtitle: String) {
+        binding.mapInfoTitle.text = title
+        binding.mapInfoSubtitle.text = subtitle
+        binding.mapInfoPopup.visibility = View.VISIBLE
+        
+        // Set up close button
+        binding.mapInfoCloseButton.setOnClickListener {
+            binding.mapInfoPopup.visibility = View.GONE
+        }
+        
+        // Auto-hide after 5 seconds
+        binding.mapInfoPopup.postDelayed({
+            if (binding.mapInfoPopup.visibility == View.VISIBLE) {
+                binding.mapInfoPopup.visibility = View.GONE
+            }
+        }, 5000)
     }
 
     private fun createPlaceRepository(): PlaceRepository {

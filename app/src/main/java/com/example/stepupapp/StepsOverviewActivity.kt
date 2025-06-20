@@ -84,6 +84,13 @@ class StepsOverviewActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Update header components when returning from settings or other activities
+        actionBarGreetingManager.updateGreeting()
+        actionBarProfileManager.updateProfilePicture()
+    }
+
     private fun setupTabs() {
         // Set up ViewPager adapter
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {

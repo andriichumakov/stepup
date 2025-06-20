@@ -437,12 +437,13 @@ class SettingsActivity : BaseActivity() {
             currentImageFile = File(filesDir, "profile_camera_${System.currentTimeMillis()}.jpg")
             val imageUri = FileProvider.getUriForFile(
                 this,
-                "${packageName}.fileprovider",
+                "${packageName}.provider",
                 currentImageFile!!
             )
             cameraLauncher.launch(imageUri)
         } catch (e: Exception) {
-            Toast.makeText(this, "Camera not available", Toast.LENGTH_SHORT).show()
+            android.util.Log.e("SettingsActivity", "Camera error: ${e.message}", e)
+            Toast.makeText(this, "Camera not available: ${e.message}", Toast.LENGTH_SHORT).show()
             openGallery()
         }
     }

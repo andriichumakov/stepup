@@ -74,6 +74,10 @@ class ExploreActivity : AppCompatActivity(),
         mapController.onResume()
         presenter.onResume()
         
+        // Update header components when returning from settings or other activities
+        actionBarGreetingManager.updateGreeting()
+        actionBarProfileManager.updateProfilePicture()
+        
         // Resume location updates if needed
         if (locationManager.checkLocationPermission() && !locationManager.isUpdatesActive()) {
             locationManager.startLocationUpdates()

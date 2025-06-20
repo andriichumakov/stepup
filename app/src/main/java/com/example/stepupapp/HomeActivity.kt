@@ -202,6 +202,13 @@ class HomeActivity : BaseActivity() {
             updateQuote()
         }
 
+        // Initialize action bar managers
+        actionBarGreetingManager = ActionBarGreetingManager(this)
+        actionBarGreetingManager.updateGreeting()
+        
+        actionBarProfileManager = ActionBarProfileManager(this)
+        actionBarProfileManager.updateProfilePicture()
+
         // Initialize UI with zeros and a random quote
         updateQuote()
         

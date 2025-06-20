@@ -25,16 +25,19 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class AddMemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddMemoryBinding
     private var selectedImageUri: Uri? = null
     private var imageUriFromCamera: Uri? = null
+    private lateinit var locationManager: com.example.stepupapp.LocationManager
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1001
         private const val CAMERA_REQUEST_CODE = 1002
         private const val CAMERA_PERMISSION_CODE = 2001
+        private const val LOCATION_PERMISSION_CODE = 2002
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +47,14 @@ class AddMemoryActivity : AppCompatActivity() {
 
         val currentSteps = intent.getIntExtra("currentSteps", 0)
         binding.textViewSteps.text = currentSteps.toString()
+
+        // Initialize location manager
+        locationManager = com.example.stepupapp.LocationManager(this) { location ->
+            val locationName = locationManager.getLocationName(location.latitude, location.longitude)
+            binding.editTextLocation.setText(locationName)
+            Toast.makeText(this, "Current location detected: $locationName", Toast.LENGTH_SHORT).show()
+            locationManager.stopLocationUpdates()
+        }
 
         binding.btnChooseImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -55,7 +66,11 @@ class AddMemoryActivity : AppCompatActivity() {
         }
 
         binding.btnTakePicture.setOnClickListener {
-            checkCameraPermissionAndOpenCamera()
+            checkPermissionsAndOpenCamera()
+        }
+
+        binding.btnGetCurrentLocation.setOnClickListener {
+            getCurrentLocation()
         }
 
         binding.btnSubmitMemory.setOnClickListener {
@@ -108,7 +123,7 @@ class AddMemoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkCameraPermissionAndOpenCamera() {
+    private fun checkPermissionsAndOpenCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -134,21 +149,7 @@ class AddMemoryActivity : AppCompatActivity() {
         startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_CODE &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
-            openCamera()
-        } else {
-            Toast.makeText(this, "Camera permission is required to take photos.", Toast.LENGTH_SHORT).show()
-        }
-    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -168,13 +169,17 @@ class AddMemoryActivity : AppCompatActivity() {
                     Log.d("MemoryDebug", "Setting date to: $dateTaken")
                     binding.textViewDate.setText(dateTaken)
 
-                    val address = getLocationFromImage(uri)
-                    if (address != null) {
-                        binding.editTextLocation.setText(address)
-                        binding.editTextLocation.visibility = android.view.View.GONE
-                    } else {
-                        binding.editTextLocation.visibility = android.view.View.VISIBLE
-                        Toast.makeText(this, "No GPS data found. Please enter location manually.", Toast.LENGTH_SHORT).show()
+                    // Try to extract location from image metadata
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val address = getLocationFromImage(uri)
+                        withContext(Dispatchers.Main) {
+                            if (address != null) {
+                                binding.editTextLocation.setText(address)
+                                Toast.makeText(this@AddMemoryActivity, "Location detected: $address", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@AddMemoryActivity, "No GPS data in image. Use 📍 Current button or enter manually.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
 
                 } catch (e: Exception) {
@@ -192,13 +197,17 @@ class AddMemoryActivity : AppCompatActivity() {
                 val dateTaken = getDateFromImage(uri)
                 binding.textViewDate.text = dateTaken ?: ""
 
-                val address = getLocationFromImage(uri)
-                if (address != null) {
-                    binding.editTextLocation.setText(address)
-                    binding.editTextLocation.visibility = android.view.View.GONE
-                } else {
-                    binding.editTextLocation.visibility = android.view.View.VISIBLE
-                    Toast.makeText(this, "No GPS data found. Please enter location manually.", Toast.LENGTH_SHORT).show()
+                // Try to extract location from image metadata
+                CoroutineScope(Dispatchers.IO).launch {
+                    val address = getLocationFromImage(uri)
+                    withContext(Dispatchers.Main) {
+                        if (address != null) {
+                            binding.editTextLocation.setText(address)
+                            Toast.makeText(this@AddMemoryActivity, "Location detected: $address", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@AddMemoryActivity, "No GPS data in image. Use 📍 Current button or enter manually.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             } ?: run {
                 Toast.makeText(this, "Failed to capture image.", Toast.LENGTH_SHORT).show()
@@ -226,11 +235,14 @@ class AddMemoryActivity : AppCompatActivity() {
                     } else {
                         Log.d("MemoryDebug", "No addresses found from geocoder")
                     }
+                } else {
+                    Log.d("MemoryDebug", "No GPS data in image - could enable camera location or use current location")
                 }
                 inputStream.close()
             }
             null
         } catch (e: Exception) {
+            Log.e("MemoryDebug", "Error extracting location: ${e.message}")
             e.printStackTrace()
             null
         }
@@ -261,6 +273,40 @@ class AddMemoryActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    private fun getCurrentLocation() {
+        if (locationManager.checkLocationPermission()) {
+            binding.editTextLocation.hint = "Getting current location..."
+            locationManager.startLocationUpdates()
+        } else {
+            locationManager.requestLocationPermission()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        
+        when (requestCode) {
+            CAMERA_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera()
+                } else {
+                    Toast.makeText(this, "Camera permission is required to take photos.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            com.example.stepupapp.LocationManager.REQUEST_LOCATION_PERMISSION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCurrentLocation()
+                } else {
+                    Toast.makeText(this, "Location permission denied. Please enter location manually.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

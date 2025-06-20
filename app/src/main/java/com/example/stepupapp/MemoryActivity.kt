@@ -36,17 +36,19 @@ class MemoryActivity : AppCompatActivity() {
         actionBarProfileManager = ActionBarProfileManager(this)
         actionBarProfileManager.updateProfilePicture()
 
-        // Add a memory item manually (you can add more this way)
-        addMemory(
-            imageRes = R.drawable.ic_launcher_background,
-            date = "2025-05-09",
-            location = "Hanoi, Vietnam"
-        )
+
 
         binding.btnAddPlace.setOnClickListener {
             val intent = Intent(this, AddMemoryActivity::class.java)
+            val currentSteps = UserPreferences.getDailySteps(this, java.util.Date())
             intent.putExtra("currentSteps", currentSteps)
-            startActivityForResult(intent, ADD_MEMORY_REQUEST_CODE)        }
+            startActivityForResult(intent, ADD_MEMORY_REQUEST_CODE)
+        }
+
+        binding.btnMemoryDashboard.setOnClickListener {
+            val intent = Intent(this, MemoryDashboardActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.backButton.setOnClickListener {
             startActivity(Intent(this, HomeActivity::class.java))

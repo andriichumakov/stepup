@@ -33,6 +33,11 @@ class MemoryDashboardActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadDashboardData()
+    }
+
     private fun loadDashboardData() {
         CoroutineScope(Dispatchers.IO).launch {
             val db = PlaceDatabase.getDatabase(applicationContext)
@@ -78,14 +83,21 @@ class MemoryDashboardActivity : AppCompatActivity() {
                 setCircleColor(getColor(R.color.dark_green))
             }
 
-            val pieColors = listOf(
+            val baseColors = listOf(
                 getColor(R.color.primary_green),
                 getColor(R.color.gold_accent),
                 getColor(R.color.dark_green),
                 getColor(R.color.purple_500),
                 getColor(android.R.color.holo_orange_light),
                 getColor(android.R.color.holo_blue_light)
-            ).shuffled()
+            )
+            
+            // Generate enough colors for all locations
+            val pieColors = mutableListOf<Int>()
+            repeat(locationMap.size) { i ->
+                pieColors.add(baseColors[i % baseColors.size])
+            }
+            pieColors.shuffle()
 
             val pieEntries = locationMap.entries.mapIndexed { i, entry ->
                 PieEntry(entry.value.toFloat(), "") // Empty label to hide on pie surface
@@ -131,7 +143,7 @@ class MemoryDashboardActivity : AppCompatActivity() {
                 binding.tvLatestMemoryName.text = lastMemory.name
 
                 // Populate legend manually
-                buildPieLegend(locationMap.keys.toList(), pieColors.take(locationMap.size))
+                buildPieLegend(locationMap.keys.toList(), pieColors)
 
                 binding.tvSummary.text = "You added ${places.size} memories.\nFrom ${firstMemory.date_saved} to ${lastMemory.date_saved}"
             }

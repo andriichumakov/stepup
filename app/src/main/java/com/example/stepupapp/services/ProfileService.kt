@@ -39,7 +39,7 @@ object ProfileService {
         return auth.currentSessionOrNull() != null
     }
 
-    private fun getCurrentRefreshToken(): String? {
+    fun getCurrentRefreshToken(): String? {
         return auth.currentSessionOrNull()?.refreshToken
     }
 
@@ -62,6 +62,17 @@ object ProfileService {
                 false
             }
         } else {
+            false
+        }
+    }
+
+    suspend fun restoreSessionFromToken(context: Context, refreshToken: String): Boolean {
+        return try {
+            auth.refreshSession(refreshToken)
+            Log.d(TAG, "Session successfully restored from provided refresh token.")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to restore session: ${e.localizedMessage}", e)
             false
         }
     }

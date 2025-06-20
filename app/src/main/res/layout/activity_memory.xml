@@ -9,14 +9,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white">
+        android:background="@color/background_cream">
 
         <ScrollView
             android:id="@+id/contentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            android:padding="16dp"
+            android:padding="20dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -25,191 +25,271 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:orientation="vertical">
 
-                <!-- Image placeholder -->
-                <ImageView
-                    android:id="@+id/imgMemory"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_launcher_background"
-                    android:contentDescription="Memory image"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Place name -->
-                <TextView
-                    android:id="@+id/txtPlaceName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="Name of the place"
-                    android:textColor="@color/primary_green"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <!-- Icon + Info Rows -->
-                <LinearLayout
+                <!-- Header Card with Image and Title -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
-
-                    <!-- Row 1 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="Clock" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="0dp"
-                            android:text="Information of the place" />
-                    </LinearLayout>
-
-                    <!-- Repeat 3 more rows with different icons -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="Icon 1" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="0dp"
-                            android:text="Information of the place" />
-                    </LinearLayout>
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="8dp"
+                    app:cardBackgroundColor="@color/white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:orientation="vertical">
 
+                        <!-- Memory Image -->
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="Calendar" />
+                            android:id="@+id/imgMemory"
+                            android:layout_width="match_parent"
+                            android:layout_height="240dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_launcher_background"
+                            android:contentDescription="Memory image" />
 
+                        <!-- Place Name -->
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/txtPlaceName"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="0dp"
-                            android:text="Information of the place" />
+                            android:padding="20dp"
+                            android:text="Name of the place"
+                            android:textColor="@color/dark_green"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:gravity="center_horizontal" />
+
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="Music Note" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="0dp"
-                            android:text="Information of the place" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- List of places (Clickables) -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="List of places"
-                    android:textColor="@color/dark_green" />
-
-                <HorizontalScrollView
+                <!-- Memory Details Card -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/white">
 
                     <LinearLayout
-                        android:id="@+id/placeListContainer"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                        <!-- Example items (can be added dynamically) -->
-                        <Button
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginEnd="8dp"
-                            android:backgroundTint="@color/primary_green"
-                            android:text="1" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Memory Details"
+                            android:textColor="@color/dark_green"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
 
-                        <Button
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginEnd="8dp"
-                            android:backgroundTint="@color/primary_green"
-                            android:text="2" />
+                        <!-- Detail Rows -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp"
+                            android:gravity="center_vertical">
 
-                        <!-- More buttons can be added here -->
+                            <TextView
+                                 android:id="@+id/txtSteps"
+                                 android:layout_width="0dp"
+                                 android:layout_height="wrap_content"
+                                 android:layout_weight="1"
+                                 android:text="Visit time information"
+                                 android:textColor="@color/dark_blue"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:orientation="horizontal"
+                             android:layout_marginBottom="12dp"
+                             android:gravity="center_vertical">
+
+                             <TextView
+                                 android:id="@+id/txtDate"
+                                 android:layout_width="0dp"
+                                 android:layout_height="wrap_content"
+                                 android:layout_weight="1"
+                                 android:text="Date information"
+                                 android:textColor="@color/dark_blue"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:orientation="horizontal"
+                             android:layout_marginBottom="12dp"
+                             android:gravity="center_vertical">
+
+                             <TextView
+                                 android:id="@+id/txtDescription"
+                                 android:layout_width="0dp"
+                                 android:layout_height="wrap_content"
+                                 android:layout_weight="1"
+                                 android:text="Location details"
+                                 android:textColor="@color/dark_blue"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:orientation="horizontal"
+                             android:gravity="center_vertical">
+
+                             <TextView
+                                 android:id="@+id/txtRating"
+                                 android:layout_width="0dp"
+                                 android:layout_height="wrap_content"
+                                 android:layout_weight="1"
+                                 android:text="Memory rating"
+                                 android:textColor="@color/dark_blue"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+
                     </LinearLayout>
-                </HorizontalScrollView>
+                </androidx.cardview.widget.CardView>
 
+                <!-- Related Places Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Related Places"
+                            android:textColor="@color/dark_green"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:id="@+id/placeListContainer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <!-- Example place chips -->
+                                <com.google.android.material.chip.Chip
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    android:text="Place 1"
+                                    android:textColor="@color/dark_green"
+                                    android:textSize="14sp"
+                                    app:chipBackgroundColor="@color/white"
+                                    app:chipStrokeColor="@color/primary_green"
+                                    app:chipStrokeWidth="2dp"
+                                    app:chipCornerRadius="20dp"
+                                    app:chipMinHeight="40dp"
+                                    app:chipStartPadding="16dp"
+                                    app:chipEndPadding="16dp"
+                                    app:ensureMinTouchTargetSize="true"
+                                    app:rippleColor="@color/light_green" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    android:text="Place 2"
+                                    android:textColor="@color/dark_green"
+                                    android:textSize="14sp"
+                                    app:chipBackgroundColor="@color/white"
+                                    app:chipStrokeColor="@color/primary_green"
+                                    app:chipStrokeWidth="2dp"
+                                    app:chipCornerRadius="20dp"
+                                    app:chipMinHeight="40dp"
+                                    app:chipStartPadding="16dp"
+                                    app:chipEndPadding="16dp"
+                                    app:ensureMinTouchTargetSize="true"
+                                    app:rippleColor="@color/light_green" />
+
+                            </LinearLayout>
+                        </HorizontalScrollView>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Memory Container for additional content -->
                 <LinearLayout
                     android:id="@+id/memoryContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="24dp"/>
+                    android:layout_marginBottom="24dp"/>
 
-                <Button
-                    android:id="@+id/btnMemoryDashboard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Memory Dashboard"
-                    android:background="@color/background_cream"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Add New Place button -->
-                <Button
-                    android:id="@+id/btnAddPlace"
+                <!-- Action Buttons -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/primary_green"
-                    android:text="ADD NEW PLACE"
-                    android:textColor="#FFFFFF" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="80dp">
+
+                    <Button
+                        android:id="@+id/btnMemoryDashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="12dp"
+                        android:text="Memory Dashboard"
+                        android:textSize="16sp"
+                        android:textColor="@color/dark_green"
+                        android:backgroundTint="@color/light_yellow"
+                        android:background="@drawable/rounded_background" />
+
+                    <Button
+                        android:id="@+id/btnAddPlace"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/rounded_background"
+                        android:backgroundTint="@color/primary_green"
+                        android:text="ADD NEW PLACE"
+                        android:textColor="@color/dark_blue"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </ScrollView>
 
-
-        <!-- Back Button -->
+        <!-- Floating Back Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:alpha="0.8"
+            android:layout_margin="20dp"
             android:contentDescription="Go back to home"
-            app:backgroundTint="@color/light_yellow"
+            app:backgroundTint="@color/white"
             app:fabSize="normal"
             app:srcCompat="@android:drawable/ic_menu_revert"
-            app:tint="@color/dark_blue"
+            app:tint="@color/dark_green"
+            app:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 

@@ -335,6 +335,7 @@
                 android:layout_marginHorizontal="2dp">
 
                 <FrameLayout
+                    android:id="@+id/mapFrameLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -370,6 +371,61 @@
                         app:backgroundTint="@color/dark_blue"
                         app:tint="@color/white"
                         app:fabSize="mini" />
+
+                    <!-- Map Info Popup -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mapInfoPopup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|center_horizontal"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="8dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:minWidth="200dp">
+
+                            <TextView
+                                android:id="@+id/mapInfoTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Place Name"
+                                android:textColor="@color/dark_blue"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+
+                            <TextView
+                                android:id="@+id/mapInfoSubtitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Category • Distance"
+                                android:textColor="@color/dark_green"
+                                android:textSize="12sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/mapInfoCloseButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_gravity="end"
+                                android:layout_marginTop="8dp"
+                                android:text="Close"
+                                android:textSize="10sp"
+                                android:textColor="@color/white"
+                                app:backgroundTint="@color/dark_blue"
+                                app:cornerRadius="16dp"
+                                style="@style/Widget.Material3.Button.TextButton" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </FrameLayout>
 

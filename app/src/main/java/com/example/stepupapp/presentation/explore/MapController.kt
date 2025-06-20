@@ -22,6 +22,7 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -42,12 +43,14 @@ class MapController(
         fun onRouteCleared()
         fun onMapError(message: String)
         fun showToast(message: String)
+        fun onMapLocationClicked(latitude: Double, longitude: Double, placeName: String?, category: String?, distance: Int?)
     }
     
     private var listener: MapControllerListener? = null
     private lateinit var mapView: MapView
     private var myLocationOverlay: MyLocationNewOverlay? = null
     private var currentRouteOverlay: Polyline? = null
+    private var currentPlaces: List<OpenTripMapResponse> = emptyList()
     private val TAG = "MapController"
     
     private val STEP_LENGTH = 0.50 // Average step length in meters
@@ -77,6 +80,7 @@ class MapController(
         mapView.controller.setZoom(15.0)
         
         setupMyLocationOverlay()
+        setupMapClickListener()
     }
     
     fun initializeMapForLocationDetails(mapView: MapView) {
@@ -88,9 +92,9 @@ class MapController(
         // Set tile source to OpenStreetMap
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         
-        // Enable zoom controls
-        mapView.setBuiltInZoomControls(true)
-        mapView.setMultiTouchControls(true)
+        // Completely disable all zoom controls and interactions
+        mapView.setBuiltInZoomControls(false)
+        mapView.setMultiTouchControls(false)
         
         // Set initial zoom level
         mapView.controller.setZoom(15.0)
@@ -124,6 +128,9 @@ class MapController(
     }
     
     fun updateMapMarkers(places: List<OpenTripMapResponse>) {
+        // Store current places for click detection
+        currentPlaces = places
+        
         // Clear existing markers (except my location)
         mapView.overlays.clear()
         
@@ -189,6 +196,14 @@ class MapController(
         }
     }
     
+    private fun setupMapClickListener() {
+        // For now, use marker-based clicking only
+        // We'll enhance the markers to show info popups when clicked
+        Log.d(TAG, "Map click listener setup - using marker-based interaction")
+    }
+    
+
+
     private fun setupMyLocationOverlay() {
         myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), mapView)
         myLocationOverlay?.let { overlay ->
@@ -234,8 +249,22 @@ class MapController(
         marker.icon = getMarkerDrawableForCategory(place.kinds)
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         
-        // Add click listener for route drawing
-        marker.setOnMarkerClickListener { _, _ ->
+        // Add click listener for info popup and route drawing
+        marker.setOnMarkerClickListener { clickedMarker, _ ->
+            // Show info popup
+            val category = place.kinds.split(",").firstOrNull()?.replace("_", " ") ?: "Unknown"
+            val distance = (place.dist / STEP_LENGTH).toInt()
+            val placeName = place.name.ifEmpty { "Unnamed Place" }
+            
+            listener?.onMapLocationClicked(
+                latitude = place.point.lat,
+                longitude = place.point.lon,
+                placeName = placeName,
+                category = category,
+                distance = distance
+            )
+            
+            // Also draw route
             drawRouteToPlace(place)
             true
         }

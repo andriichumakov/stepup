@@ -50,17 +50,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
                         
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/btnCenterOnUser"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="12dp"
-                        android:src="@android:drawable/ic_menu_mylocation"
-                        app:backgroundTint="@color/primary_green"
-                        app:tint="@android:color/white"
-                        app:fabSize="mini" />
-                        
+                    <!-- Transparent overlay to prevent map interaction -->
+                    <View
+                        android:id="@+id/mapOverlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:focusable="true" />
+
                 </FrameLayout>
                     
             </com.google.android.material.card.MaterialCardView>

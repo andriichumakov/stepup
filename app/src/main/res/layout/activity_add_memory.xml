@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -47,6 +48,8 @@
                 android:text="Take Picture" />
         </LinearLayout>
 
+        <!-- Location Permission Info -->
+
         <!-- Date Input -->
         <TextView
             android:id="@+id/textViewDate"
@@ -56,12 +59,31 @@
             android:textSize="16sp"
             android:padding="8dp" />
 
-
-        <EditText
-            android:id="@+id/editTextLocation"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter location (if not detected automatically)" />
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/editTextLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Enter location (if not detected automatically)" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnGetCurrentLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:src="@android:drawable/ic_menu_mylocation"
+                android:contentDescription="Get current location"
+                app:backgroundTint="@color/primary_green"
+                app:tint="@color/white"
+                app:fabSize="mini" />
+        </LinearLayout>
 
         <EditText
             android:id="@+id/editTextDescription"
@@ -84,12 +106,10 @@
             android:id="@+id/ratingBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="0.5"
-            android:rating="3.5"
             android:layout_marginTop="12dp"
-            />
-
+            android:numStars="5"
+            android:rating="2.5"
+            android:stepSize="0.5" />
 
         <!-- Submit Button -->
         <Button

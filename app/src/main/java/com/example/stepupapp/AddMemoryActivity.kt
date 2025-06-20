@@ -25,7 +25,6 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class AddMemoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddMemoryBinding
@@ -48,7 +47,6 @@ class AddMemoryActivity : AppCompatActivity() {
         val currentSteps = intent.getIntExtra("currentSteps", 0)
         binding.textViewSteps.text = currentSteps.toString()
 
-        // Initialize location manager
         locationManager = com.example.stepupapp.LocationManager(this) { location ->
             val locationName = locationManager.getLocationName(location.latitude, location.longitude)
             binding.editTextLocation.setText(locationName)
@@ -149,14 +147,12 @@ class AddMemoryActivity : AppCompatActivity() {
         startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
 
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             selectedImageUri = data.data
-            imageUriFromCamera = null  // Clear camera URI since user picked image
+            imageUriFromCamera = null
             selectedImageUri?.let { uri ->
                 try {
                     contentResolver.takePersistableUriPermission(
@@ -169,7 +165,6 @@ class AddMemoryActivity : AppCompatActivity() {
                     Log.d("MemoryDebug", "Setting date to: $dateTaken")
                     binding.textViewDate.setText(dateTaken)
 
-                    // Try to extract location from image metadata
                     CoroutineScope(Dispatchers.IO).launch {
                         val address = getLocationFromImage(uri)
                         withContext(Dispatchers.Main) {
@@ -188,7 +183,7 @@ class AddMemoryActivity : AppCompatActivity() {
             }
 
         }else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            selectedImageUri = null  // Clear the gallery image URI
+            selectedImageUri = null
 
             imageUriFromCamera?.let { uri ->
                 binding.imagePreview.setImageURI(uri)
@@ -196,7 +191,6 @@ class AddMemoryActivity : AppCompatActivity() {
                 val dateTaken = getDateFromImage(uri)
                 binding.textViewDate.text = dateTaken ?: ""
 
-                // Try to extract location from image metadata
                 CoroutineScope(Dispatchers.IO).launch {
                     val address = getLocationFromImage(uri)
                     withContext(Dispatchers.Main) {
@@ -247,7 +241,6 @@ class AddMemoryActivity : AppCompatActivity() {
         }
     }
 
-
     private fun getDateFromImage(uri: Uri): String? {
         return try {
             val inputStream = contentResolver.openInputStream(uri)
@@ -257,7 +250,6 @@ class AddMemoryActivity : AppCompatActivity() {
                     ?: exif.getAttribute(ExifInterface.TAG_DATETIME)
 
                 if (dateTimeStr != null) {
-                    // Expected format: "yyyy:MM:dd HH:mm:ss"
                     val parser = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.getDefault())
                     val formatter = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
 

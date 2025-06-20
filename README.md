@@ -2,45 +2,45 @@
 
 A comprehensive step tracking Android application built with Kotlin that helps users monitor their daily steps, explore nearby locations, and create walking memories.
 
-## 🌟 Features
+## Features
 
-### 📱 Core Features
+### Core Features
 - **Step Counter**: Real-time step tracking using device sensors with foreground service
 - **Daily Step Targets**: Customizable daily step goals (5000, 6500, 8000 steps, or custom)
 - **Health Metrics**: Track steps, distance (km), and calories burned
 - **Weekly Statistics**: Comprehensive 7-day history with charts and progress tracking
 - **Goal Progress**: Visual progress bars and achievement notifications
 
-### 🗺️ Location & Exploration
+### Location & Exploration
 - **Nearby Places Discovery**: Find interesting locations near you using OpenTripMap API
 - **Location Categories**: Filter by interests (Amusements, Architecture, Cultural, Shops, Foods, Sport, Historical, Natural)
 - **Interactive Maps**: OpenStreetMap integration with location details
 - **Location Details**: Detailed information about nearby attractions and places
 - **Route Visualization**: Display walking routes to destinations
 
-### 📸 Memory Management
+### Memory Management
 - **Photo Memories**: Create and store memories of visited locations
 - **Location-Tagged Photos**: Associate photos with specific locations and dates
 - **Memory Gallery**: Browse through your walking adventures and achievements
 
-### 👤 User Management
+### User Management
 - **User Authentication**: Secure login/register system with Supabase backend
 - **User Profiles**: Manage personal information and preferences
 - **Interest Preferences**: Customize location recommendations based on interests
 - **Setup Wizard**: Initial app configuration for new users
 
-### 🔔 Smart Notifications
+### Smart Notifications
 - **Goal Achievement Alerts**: Notifications at 75%, 90%, 95%, and 100% goal completion
 - **Daily Reminders**: Customizable walking reminders
 - **Background Tracking**: Persistent step counting even when app is closed
 
-### 📊 Analytics & Insights
+### Analytics & Insights
 - **Progress Charts**: Visual representation of daily and weekly progress using Jetpack Compose
 - **Streak Tracking**: Monitor consecutive days of goal achievement
 - **Average Statistics**: Weekly and monthly step averages
 - **Performance Insights**: Track improvements over time
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Language**: Kotlin
@@ -66,7 +66,7 @@ A comprehensive step tracking Android application built with Kotlin that helps u
 - **Maps**: OSMDroid for OpenStreetMap integration
 - **Coroutines**: Kotlin Coroutines for asynchronous operations
 
-## 📋 Dependencies
+## Dependencies
 
 ### Core Android Dependencies
 ```gradle
@@ -105,7 +105,7 @@ implementation("com.github.bumptech.glide:glide:4.16.0")
 annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Android Studio**: Latest stable version (2023.1 or newer)
@@ -118,13 +118,12 @@ annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 #### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd stepup-android-app
+cd StepUpAppDev/stepup
 ```
 
 #### 2. Setup Supabase Backend
 1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Copy `supabase.properties.example` to `supabase.properties`
-3. Add your Supabase credentials:
+2. Create a file named `supabase.properties` in the project root (next to `README.md`):
    ```properties
    SUPABASE_URL=https://your-project-id.supabase.co
    SUPABASE_KEY=your-public-anon-key
@@ -132,7 +131,7 @@ cd stepup-android-app
 
 #### 3. Configure API Keys
 1. Get an API key from [OpenTripMap](https://opentripmap.io/docs)
-2. Add the API key to your project (check the API service files for configuration)
+2. Open `app/src/main/java/com/example/stepupapp/api/OpenTripMapService.kt` and set your API key in the appropriate variable or constant (see comments in that file).
 
 #### 4. Android Studio Setup
 1. Open the project in Android Studio
@@ -168,10 +167,14 @@ The app requires the following permissions (already configured in AndroidManifes
 - `INTERNET` - For API calls
 - `FOREGROUND_SERVICE` - For background step tracking
 - `POST_NOTIFICATIONS` - For goal achievement notifications
+- `CAMERA` - For taking photos in memories
+- `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` - For selecting and saving images
+
+> **Note:** The app will request Camera and Storage permissions for photo memories. Accept these when prompted. If denied, you can enable them in your device's app settings.
 
 #### 8. Testing
-1. **Emulator Testing**: The app includes emulator mode for step counting simulation
-2. **Device Testing**: Install on a physical device for accurate step counting
+1. **Emulator Testing**: The app includes emulator mode for step counting simulation (note: camera and step counting may not work as expected on emulator)
+2. **Device Testing**: Install on a physical device for accurate step counting and camera features
 3. **Location Testing**: Ensure location services are enabled for the explore feature
 
 ### Build & Run
@@ -186,7 +189,7 @@ The app requires the following permissions (already configured in AndroidManifes
 ./gradlew test
 ```
 
-## 📱 App Architecture
+## App Architecture
 
 ### Activities Overview
 - **LoadingScreenActivity**: App entry point and splash screen
@@ -209,7 +212,7 @@ The app requires the following permissions (already configured in AndroidManifes
 - **UserPreferences**: Local data storage and settings
 - **FilterManager**: Location filtering and categorization
 
-## 🔧 Configuration
+## Configuration
 
 ### Customization Options
 - **Step Targets**: Modify default targets in `UserPreferences.kt`
@@ -224,7 +227,7 @@ sdk.dir=/path/to/android/sdk
 MAPS_API_KEY=your_maps_api_key_if_needed
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 1. **Step Counter Not Working**: Ensure ACTIVITY_RECOGNITION permission is granted
@@ -237,7 +240,7 @@ MAPS_API_KEY=your_maps_api_key_if_needed
 - Use Android Studio's Logcat to monitor app behavior
 - Test location features on physical device for best results
 
-## 📄 License
+## License
 
 This project is for educational purposes. Please ensure you comply with all API terms of service when using third-party services.
 

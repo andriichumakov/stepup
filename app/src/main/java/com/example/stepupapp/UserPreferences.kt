@@ -99,8 +99,6 @@ object UserPreferences {
         return PreferencesManagerFactory.createStepPreferencesManager(context).getWeeklySteps()
     }
 
-
-
     fun getWeeklyCalories(context: Context): List<DailyStepsData> {
         return PreferencesManagerFactory.createStepPreferencesManager(context).getWeeklyCalories()
     }
@@ -299,7 +297,6 @@ object UserPreferences {
     fun doesNicknameNeedSync(context: Context): Boolean {
         return PreferencesManagerFactory.createSyncPreferencesManager(context).doesNicknameNeedSync()
     }
-
 
     data class DailyStepsData(
         val day: String,

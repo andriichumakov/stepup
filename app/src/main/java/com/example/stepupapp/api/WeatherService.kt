@@ -11,6 +11,14 @@ interface WeatherService {
         @Query("current") current: String = "temperature_2m,weather_code",
         @Query("timezone") timezone: String = "auto"
     ): WeatherResponse
+
+    @GET("v1/forecast")
+    suspend fun getWeatherForecast(
+        @Query("latitude") lat: Double,
+        @Query("longitude") lon: Double,
+        @Query("daily") daily: String = "temperature_2m_min,temperature_2m_max,weathercode",
+        @Query("timezone") timezone: String = "auto"
+    ): ForecastResponse
 }
 
 data class WeatherResponse(
@@ -29,4 +37,15 @@ data class CurrentWeather(
 data class CurrentUnits(
     val temperature_2m: String,
     val weather_code: String
-) 
+)
+
+data class ForecastResponse(
+    val daily: DailyForecast
+)
+
+data class DailyForecast(
+    val temperature_2m_min: List<Double>,
+    val temperature_2m_max: List<Double>,
+    val weathercode: List<Int>,
+    val time: List<String>
+)

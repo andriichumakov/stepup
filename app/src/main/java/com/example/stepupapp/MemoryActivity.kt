@@ -213,10 +213,12 @@ class MemoryActivity : AppCompatActivity() {
         memoryViews.add(layout)
         binding.memoryContainer.addView(layout)
 
-        // Button (2, 3, ...)
-        val button = Button(context).apply {
-            text = (index + 2).toString()
-            layoutParams = LinearLayout.LayoutParams(150, 150).apply {
+        val thumbnailLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                250,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
                 setMargins(8)
             }
             setOnClickListener {
@@ -226,7 +228,38 @@ class MemoryActivity : AppCompatActivity() {
             }
         }
 
-        binding.placeListContainer.addView(button)
+        val thumbnail = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                150
+            )
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            background = resources.getDrawable(R.drawable.memory_image_background, null)
+            clipToOutline = true
+            try {
+                setImageURI(Uri.parse(place.imageUri))
+            } catch (e: Exception) {
+                setImageResource(R.drawable.ic_launcher_background)
+            }
+        }
+
+        val label = TextView(context).apply {
+            text = place.name
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            textSize = 14f
+            setTextColor(getColor(R.color.dark_green))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 8, 0, 0)
+            }
+        }
+
+        thumbnailLayout.addView(thumbnail)
+        thumbnailLayout.addView(label)
+
+        binding.placeListContainer.addView(thumbnailLayout)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
